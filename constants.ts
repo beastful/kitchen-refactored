@@ -1,0 +1,18 @@
+export const WALL_THICKNESS = 0.05
+
+export const HAS_TABLETOP = "has_tabletop"
+export const INCONFIGURABLE = "inconfigurable"
+export const EXPLICT_CASE_DOUBLE = "explict_case_double"
+export const EXPLICT_CASE_TUNNEL = "explict_case_tunnel"
+export const EXPLICT_CASE_WINDOW = "explict_case_window"
+export const EXPLICT_CASE_STRAIGHT = "explict_case_straight"
+export const EXPLICT_CASE_EXTRA_QPI = "explict_case_extra_qpi"
+export const EXPLICT_CASE_FOLD = "explict_case_fold"
+export const EXPLICT_CASE_TOP = "explict_case_top"
+export const CATEGORY_ROOM = "category_room"
+export const CATEGORY_TECH = "category_tech"
+export const CATEGORY_WALL = "category_wall"
+export const CATEGORY_FLOOR = "category_floor"
+export const CONFIGURABLE_FLOOR = "configurable_floor"
+export const HAS_CONFIGURATION = "has_configuration"
+export const ROTATATABLE = "rotatable"
