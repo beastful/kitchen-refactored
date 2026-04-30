@@ -215,7 +215,6 @@ export default function Configurator() {
                             enableRotate={true}
                             enablePan={true}
                         />
-
                     </Canvas>
                 </div>
                 {/* Нижняя панель */}
