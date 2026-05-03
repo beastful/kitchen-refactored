@@ -10,8 +10,12 @@ import { SnapConstraint } from "@/snapping-tools/snap-constraint";
 import { SnapPlacedObject } from "@/snapping-tools/placed-constraint";
 import { usePlacementData } from "@/snapping-tools/hooks/use-placement-data";
 import { store } from '@/store';
-import { toModuleEntity } from '@/types';
+import { ModuleEntity, toModuleEntity } from '@/types';
 import { Model as M_2YNSD_1 } from "@/modules/2YNSD_JSX/M_2YNSD_1"
+import { FacadeConfig } from "@/components/legacy/facade-config"
+import { ModuleMenu } from "@/components/legacy/module-menu";
+import { RoomWalls } from "@/components/interior/room-walls";
+import { Tabletop } from "@/components/interior/tabletop";
 
 // ─── Модели ───
 function Box4(props: ThreeElements["group"]) {
@@ -38,44 +42,11 @@ function Floor(props: ThreeElements["group"]) {
     );
 }
 
-// ─── Кнопка поворота ───
-function RotateButton({ onRotate }: { onRotate: () => void }) {
-    return (
-        <Html center position={[0, 1.3, 0]} style={{ pointerEvents: 'auto' }}>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onRotate();
-                }}
-                style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    border: '2px solid white',
-                    background: '#2196F3',
-                    color: 'white',
-                    fontSize: 16,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                }}
-            >
-                ↻
-            </button>
-        </Html>
-    );
-}
-
-// ─── Компонент сцены ───
 export default function Room() {
     const snap = useSnapshot(store);
     const getPlacementData = usePlacementData();
-
     const [debugPlacement, setSebugPlacement] = useState<any>(null);
 
-    // Размещение по pointerup
     useEffect(() => {
         const handlePointerUp = () => {
             if (!store.currentRawModule) return;
@@ -108,42 +79,18 @@ export default function Room() {
         return () => window.removeEventListener('pointerup', handlePointerUp, true);
     }, [getPlacementData]);
 
-    const handleRotate = useCallback((id: string) => {
-        const module = store.modules.find(m => m.id === id);
-        if (module) module.openAngle += Math.PI / 2;
-    }, []);
-
-    // ─── Динамическая модель для курсора ───
-    // Важно: PascalCase переменная для JSX
     const CursorModel = snap.currentRawModule?.model ?? null;
-
     return (
         <>
-           
-        
+
+
             {/* Курсор — только при drag */}
             {CursorModel && (
                 <SnapCursor userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
                     <CursorModel />
                 </SnapCursor>
             )}
-
-            {/* Constraints */}
-            <SnapConstraint userData={{ layer: 'modules' }} name="wall-back" useCursor useDistance position={[0, 0, -2]}>
-                <Wall />
-            </SnapConstraint>
-
-            <SnapConstraint userData={{ layer: 'modules' }} name="wall-left" useCursor useDistance rotation={[0, Math.PI / 2, 0]} position={[-2, 0, 0]}>
-                <Wall />
-            </SnapConstraint>
-
-            <SnapConstraint userData={{ layer: 'modules' }} name="wall-right" useCursor useDistance rotation={[0, Math.PI / 2, 0]} position={[2, 0, 0]}>
-                <Wall />
-            </SnapConstraint>
-
-            <SnapConstraint useCursor useDistance position={[0, -1.25, 0]}>
-                <Floor />
-            </SnapConstraint>
+            <RoomWalls />
 
             {/* Размещённые модули */}
             {snap.modules.map(entity => {
@@ -157,12 +104,20 @@ export default function Room() {
                             scale={0.1}
                             id={`placed-${entity.id}`}
                             rotation={[0, entity.openAngle, 0]}
-                            halfExtents={entity.halfExtents}
-                            snapPlanes={entity.snapPlanes}
+                            halfExtents={[...entity.halfExtents]}
+                            snapPlanes={entity.snapPlanes.map(plane => ({
+                                point: [...plane.point],
+                                normal: [...plane.normal]
+                            }))}
                             useDistance={true}
                         >
-                            {EntityModel && <EntityModel />}
-                            <RotateButton onRotate={() => handleRotate(entity.id)} />
+                            {EntityModel && <ModuleMenu entity={entity as ModuleEntity}>
+                                <Tabletop entity={entity}>
+                                    <FacadeConfig entity={entity}>
+                                        <EntityModel />
+                                    </FacadeConfig>
+                                </Tabletop>
+                            </ModuleMenu>}
                         </SnapPlacedObject>
                     </group>
                 );

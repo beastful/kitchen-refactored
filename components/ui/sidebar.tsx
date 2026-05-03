@@ -27,8 +27,8 @@ export function Sidebar({ children, defaultPage }: SidebarProps) {
   const pages = Children.toArray(children).filter(isSidebarPage);
 
   return (
-    <div className="h-full flex gap-1 w-[550px] min-w-[550px]">
-      <nav className="flex gap-1 flex-col py-1 font-semibold">
+    <div className="h-full flex gap-1 w-[550px] min-w-[550px] relative">
+      <nav className="flex gap-1 flex-col py-1 font-semibold absolute top-0 left-[-45px]">
         {pages.map(child => {
           const isActive = child.props.page === activePage;
           return (

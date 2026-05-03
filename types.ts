@@ -43,7 +43,7 @@ export interface ModuleEntity {
     id: string;
     name: string;
     displayName: string;
-    tags: string[];
+    tags: readonly string[];
     image: string;
     fertile: boolean;
     type: string;

@@ -1,25 +1,54 @@
-"use client"
+'use client'
 
-import { OrbitControls, useBounds } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { ThreeElements } from '@react-three/fiber';
-import { ReactNode, useEffect, useState } from 'react';
-import { Vector3 } from "three";
-import { SnapProvider, useSnapContext } from "@/snapping-tools/snap-provider";
-import { SnapConstraint } from "@/snapping-tools/snap-constraint";
-import { SnapCursor } from "@/snapping-tools/snap-cursor";
-import Room from "./room";
-import Configurator from "./connfigurator";
+import Configurator from '@/app/connfigurator';
+import Introduction from '@/app/introduction';
+import { store } from '@/store';
+import React, { Suspense, useEffect, useState } from 'react';
+import { useSnapshot } from 'valtio';
+import { AnimatePresence, motion } from "motion/react"
+import { SnapProvider } from '@/snapping-tools/snap-provider';
+import { useTexture } from '@react-three/drei';
+
+useTexture.preload('/matcap/mc1.png');
+useTexture.preload('/matcap/mc2.png');
+useTexture.preload('/matcap/mc3.png');
+
+function BiggerScreen() {
+  return
+}
+
+function Home() {
+  const snap = useSnapshot(store)
 
 
-export default function Home() {
-  const [rotation, setRotation] = useState(0)
 
   return (
-    <SnapProvider debug={true}>
-      <div className="h-[100vh]">
-        <Configurator />
+    <SnapProvider>
+      <div className='w-full h-[100vh] overflow-hidden'>
+
+        {snap.page == 'starter' && <AnimatePresence>
+          <motion.div
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}>
+            <Introduction />
+          </motion.div>
+        </AnimatePresence>}
+
+        {snap.page == 'config' && <AnimatePresence>
+          <motion.div
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}>
+
+            <Configurator />
+
+          </motion.div>
+        </AnimatePresence>}
+
       </div>
     </SnapProvider>
   );
 }
+
+export default Home;

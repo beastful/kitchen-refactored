@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, Suspense } from 'react'
 import {
     Settings, Ruler, DoorOpen, Save, Printer, Calculator,
     Columns3Cog, LogIn, Code2, Search
@@ -12,8 +12,18 @@ import { data } from '@/data'
 import { ModuleCard } from '@/components/ui/module-card'
 import Room from './room'
 import { Canvas } from '@react-three/fiber'
-import { CameraControls, OrbitControls } from '@react-three/drei'
-import { ConstantForwardOrbitControls, InfiniteForwardOrbitControls } from '@/components/ui/infinite-dolly'
+import { CameraControls, Html, Loader, OrbitControls, Preload } from '@react-three/drei'
+import { ConstantForwardOrbitControls } from '@/components/ui/infinite-dolly'
+import { CalculatorComponent } from './calculator'
+import { PDFExportButton } from '@/components/ui/pdf-button'
+import { CATEGORY_FLOOR, CATEGORY_TECH, CATEGORY_WALL } from '@/constants'
+import ModuleConfig from '@/components/ui/module-config'
+import { MobileScreen } from '@/components/ui/mobile-screen'
+import { HintScreen } from '@/components/ui/hint-screen'
+import { Hint } from '@/components/ui/hint'
+import { PreloaderOverlay } from '@/components/ui/preload'
+import GroupEdit from '@/components/ui/group-edit'
+import { RaycastRuler } from '@/components/legacy/raycast-ruler'
 
 // ─── Типы ───
 
@@ -192,143 +202,215 @@ export default function Configurator() {
     }, [])
 
     return (
-        <div className="flex h-screen w-full bg-indigo-100">
+        <>
 
-            <div className="w-full relative">
-                {/* Верхняя панель */}
-                <header className="flex items-center w-full absolute top-0 left-0 p-5 gap-5 z-10">
-                    <img src="/logo.png" alt="Logo" className="h-8" />
-                    <div className="flex-1" />
-                    <ToolButton
-                        active={false}
-                        onClick={handleToggleHints}
-                        icon={<Settings size={20} />}
-                    />
-                </header>
-                <div className='h-screen'>
-                    <Canvas>
-                        <Room />
-                        <ambientLight intensity={2} />
-                        <directionalLight position={[0, 0, 5]} color="red" />
-                        <ConstantForwardOrbitControls
-                            stepSize={0.4}      // moves 1.5 units per scroll tick, always
-                            enableRotate={true}
-                            enablePan={true}
+            <div className="flex h-screen w-full bg-indigo-100">
+
+                <div className="w-full relative">
+                    {/* Верхняя панель */}
+                    <header className="flex items-center w-full absolute top-0 left-0 p-5 gap-5 pr-15">
+                        <img src="/logo.png" alt="Logo" className="h-8" />
+                        <div className="flex-1" />
+                        <Hint
+                            lineStyle={`w-[4px] h-[60px] translate-x-[25px] translate-y-[90%]`}
+                            className={`w-[300px] translate-x-[-80%] translate-y-[80px]`} content='Показать или скрыть подсказки'>
+                            <ToolButton
+                                active={false}
+                                onClick={handleToggleHints}
+                                icon={<Settings size={20} />}
+                            />
+                        </Hint>
+                    </header>
+                    <div className='h-screen'>
+                        <Canvas camera={{
+                            position: [-6, 6, 6],
+                            fov: 45,
+                            near: 0.1,
+                            far: 1000,
+                        }}>
+                            {/* <Html>
+                                <PreloaderOverlay />
+                            </Html> */}
+                            <Room />
+                            <ambientLight intensity={0.6} color="#fff8f0" />
+
+                            {/* Направленное — имитация окна */}
+                            <directionalLight
+                                position={[5, 8, 5]}
+                                intensity={1.2}
+                                color="#ffffff"
+                                castShadow
+                                shadow-mapSize={[1024, 1024]}
+                            />
+
+                            {/* Заполняющее — убирает тени */}
+                            <directionalLight
+                                position={[-3, 4, -3]}
+                                intensity={0.4}
+                                color="#e8e4ff"
+                            />
+
+                            {/* Подсветка снизу — для фасадов */}
+                            <pointLight position={[0, -1, 2]} intensity={0.3} color="#ffeedd" />
+
+                            {/* Hemisphere — небо/земля */}
+                            <hemisphereLight
+                                args={["#ddeeff", "#332211", 0.5]}
+                            />
+
+                            <ConstantForwardOrbitControls
+                                stepSize={0.4}      // moves 1.5 units per scroll tick, always
+                                enableRotate={true}
+                                enablePan={true}
+                                minDistance={2}
+                                maxDistance={10}
+                                maxPolarAngle={Math.PI / 2}
+                            />
+                        </Canvas>
+                    </div>
+                    {/* Нижняя панель */}
+                    <footer className="flex items-end gap-4 w-full absolute bottom-0 left-0 p-5 z-10 pr-15">
+                        <ToolButton
+                            active={snap.openAngle !== 0}
+                            onClick={handleToggleDoors}
+                            icon={<DoorOpen size={20} />}
                         />
-                    </Canvas>
+                        <ToolButton
+                            active={snap.ruler}
+                            onClick={handleToggleRuler}
+                            icon={<Ruler size={20} />}
+                        />
+                        <ToolButton
+                            active={snap.groupEdit}
+                            onClick={handleOpenGroupEdit}
+                            icon={<Columns3Cog size={20} />}
+                        />
+                        <div className="flex-1" />
+                        <ToolButton
+                            active={debug}
+                            onClick={handleToggleDebug}
+                            icon={<Code2 size={20} />}
+                        />
+                        <ToolButton
+                            active={false}
+                            onClick={() => { }}
+                            icon={<LogIn size={20} />}
+                        />
+                        <ToolButton
+                            active={false}
+                            onClick={() => { }}
+                            icon={<Save size={20} />}
+                        />
+                        <ToolButton
+                            active={false}
+                            onClick={() => { }}
+                            icon={<Printer size={20} />}
+                        />
+                        <ToolButton
+                            active={snap.calculatorWindow}
+                            onClick={handleOpenCalculator}
+                            icon={<Calculator size={20} />}
+                        />
+                        <PDFExportButton />
+                    </footer>
                 </div>
-                {/* Нижняя панель */}
-                <footer className="flex items-end gap-4 w-full absolute bottom-0 left-0 p-5 z-10">
-                    <ToolButton
-                        active={snap.openAngle !== 0}
-                        onClick={handleToggleDoors}
-                        icon={<DoorOpen size={20} />}
-                    />
-                    <ToolButton
-                        active={snap.ruler}
-                        onClick={handleToggleRuler}
-                        icon={<Ruler size={20} />}
-                    />
-                    <ToolButton
-                        active={snap.groupEdit}
-                        onClick={handleOpenGroupEdit}
-                        icon={<Columns3Cog size={20} />}
-                    />
-                    <div className="flex-1" />
-                    <ToolButton
-                        active={debug}
-                        onClick={handleToggleDebug}
-                        icon={<Code2 size={20} />}
-                    />
-                    <ToolButton
-                        active={false}
-                        onClick={() => { }}
-                        icon={<LogIn size={20} />}
-                    />
-                    <ToolButton
-                        active={false}
-                        onClick={() => { }}
-                        icon={<Save size={20} />}
-                    />
-                    <ToolButton
-                        active={false}
-                        onClick={() => { }}
-                        icon={<Printer size={20} />}
-                    />
-                    <ToolButton
-                        active={snap.calculatorWindow}
-                        onClick={handleOpenCalculator}
-                        icon={<Calculator size={20} />}
-                    />
-                </footer>
-            </div>
 
-            {/* Сайдбар */}
-            <Sidebar defaultPage="floor">
-                <SidebarPage title="Напольные" page="floor">
-                    {/* <PlaceholderPage title="Напольные модули" search /> */}
-                    <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
-                        <div className='text-2xl font-semibold'>Напольные модули</div>
-                        <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
-                            <div className='opacity-30'>
-                                <Search />
+                {/* Сайдбар */}
+                <Sidebar defaultPage="floor">
+                    <SidebarPage title="Напольные" page="floor">
+                        {/* <PlaceholderPage title="Напольные модули" search /> */}
+                        <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
+                            <div className='text-2xl font-semibold'>Напольные модули</div>
+                            <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
+                                <div className='opacity-30'>
+                                    <Search />
+                                </div>
+                                <input className='p-3 w-full' placeholder='Ваш запрос' />
                             </div>
-                            <input className='p-3 w-full' placeholder='Ваш запрос' />
+                            <div className='grid grid-cols-3 gap-[15px]'>
+                                {data.filter(module => module.tags.includes(CATEGORY_FLOOR)).map((module) => <ModuleCard module={module} />)}
+                            </div>
                         </div>
-                        <div className='grid grid-cols-3 gap-[15px]'>
-                            {data.map((module) => <ModuleCard module={module} />)}
+                    </SidebarPage>
+
+                    <SidebarPage title="Настенные" page="wall">
+                        <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
+                            <div className='text-2xl font-semibold'>Настенные модули</div>
+                            <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
+                                <div className='opacity-30'>
+                                    <Search />
+                                </div>
+                                <input className='p-3 w-full' placeholder='Ваш запрос' />
+                            </div>
+                            <div className='grid grid-cols-3 gap-[15px]'>
+                                {data.filter(module => module.tags.includes(CATEGORY_WALL)).map((module) => <ModuleCard module={module} />)}
+                            </div>
                         </div>
-                    </div>
-                </SidebarPage>
+                    </SidebarPage>
 
-                <SidebarPage title="Настенные" page="wall">
-                    <PlaceholderPage title="Настенные модули" />
-                </SidebarPage>
+                    <SidebarPage title="Техника" page="tech">
+                        <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
+                            <div className='text-2xl font-semibold'>Техника</div>
+                            <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
+                                <div className='opacity-30'>
+                                    <Search />
+                                </div>
+                                <input className='p-3 w-full' placeholder='Ваш запрос' />
+                            </div>
+                            <div className='grid grid-cols-3 gap-[15px]'>
+                                {data.filter(module => module.tags.includes(CATEGORY_TECH)).map((module) => <ModuleCard module={module} />)}
+                            </div>
+                        </div>
+                    </SidebarPage>
 
-                <SidebarPage title="Техника" page="tech">
-                    <PlaceholderPage title="Бытовая техника" />
-                </SidebarPage>
-
-                <SidebarPage title="Столешница" page="table">
-                    <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
-                        <h2 className="text-2xl font-semibold">Столешница</h2>
-                        <TabletopSelector
-                            options={TABLETOP_OPTIONS}
-                            selected={snap.tabletop as TabletopOption}
-                            onSelect={handleTabletopSelect}
-                        />
-                        <section>
-                            <h3 className="text-lg font-semibold mb-4">Цвет столешницы</h3>
-                            <ColorPicker
-                                colors={COLORS}
-                                selected={snap.tabletopColor}
-                                onSelect={handleTabletopColorSelect}
+                    <SidebarPage title="Столешница" page="table">
+                        <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
+                            <h2 className="text-2xl font-semibold">Столешница</h2>
+                            <TabletopSelector
+                                options={TABLETOP_OPTIONS}
+                                selected={snap.tabletop as TabletopOption}
+                                onSelect={handleTabletopSelect}
                             />
-                        </section>
-                    </div>
-                </SidebarPage>
+                            <section>
+                                <h3 className="text-lg font-semibold mb-4">Цвет столешницы</h3>
+                                <ColorPicker
+                                    colors={COLORS}
+                                    selected={snap.tabletopColor}
+                                    onSelect={handleTabletopColorSelect}
+                                />
+                            </section>
+                        </div>
+                    </SidebarPage>
 
-                <SidebarPage title="Помещение" page="room">
-                    <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
-                        <section>
-                            <h3 className="text-lg font-semibold mb-4">Цвет стен</h3>
-                            <ColorPicker
-                                colors={COLORS}
-                                selected={snap.roomColor}
-                                onSelect={handleRoomColorSelect}
-                            />
-                        </section>
-                        <section>
-                            <h3 className="text-lg font-semibold mb-4">Высота фартука</h3>
-                            <WallHeightSelector
-                                heights={WALL_HEIGHTS}
-                                selected={snap.wallHeight}
-                                onSelect={handleWallHeightSelect}
-                            />
-                        </section>
-                    </div>
-                </SidebarPage>
-            </Sidebar>
-        </div>
+                    <SidebarPage title="Помещение" page="room">
+                        <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
+                            <section>
+                                <h3 className="text-lg font-semibold mb-4">Цвет стен</h3>
+                                <ColorPicker
+                                    colors={COLORS}
+                                    selected={snap.roomColor}
+                                    onSelect={handleRoomColorSelect}
+                                />
+                            </section>
+                            <section>
+                                <h3 className="text-lg font-semibold mb-4">Высота фартука</h3>
+                                <WallHeightSelector
+                                    heights={WALL_HEIGHTS}
+                                    selected={snap.wallHeight}
+                                    onSelect={handleWallHeightSelect}
+                                />
+                            </section>
+                        </div>
+                    </SidebarPage>
+                </Sidebar>
+                <HintScreen />
+                <CalculatorComponent />
+                <ModuleConfig />
+                <MobileScreen />
+                <GroupEdit />
+                
+            </div >
+
+        </>
     )
 }

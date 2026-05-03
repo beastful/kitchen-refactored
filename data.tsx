@@ -279,16 +279,7 @@ function ModuleExample() {
 }
 
 const floor_data: ModuleDef[] = [
-    {
-        model: ModuleExample,
-        type: 'floor',
-        price: 5600,
-        name: 'M_3YNSD_1',
-        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_1_NN.obj.png',
-        displayName: 'ModuleExample',
-        displaySize: '300'
-    },
+
     {
         model: M_3YNSD_1,
         type: 'floor',
