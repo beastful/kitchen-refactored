@@ -7,6 +7,8 @@ import { X } from "lucide-react";
 import { Color } from "three";
 import { useEffect, useState, useMemo } from "react";
 import { hinges } from "@/data";
+import { COLORS } from "@/constants";
+import { ModuleEntity } from "@/types";
 
 export function ModuleConfig() {
     const snap = useSnapshot(store);
@@ -24,31 +26,15 @@ export function ModuleConfig() {
             setCurrentFacade(currentModule.facade);
         }
     }, [currentModule]);
-
-    // Color palette (from original)
-    const colors = [
-        "#617774",
-        "#CAC0B4",
-        "#F9F8F4",
-        "#F8F1D7",
-        "#8E8478",
-        "#256668",
-        "#807B77",
-        "#B3C7D7",
-        "#B8D1C7",
-        "#705A4C",
-    ];
-
     // Helper to update module fields directly in the store
-    const updateModuleField = <K extends keyof typeof currentModule>(
+    const updateModuleField = <K extends Exclude<keyof ModuleEntity, 'snapPlanes'>>(
         field: K,
-        value: (typeof currentModule)[K]
+        value: ModuleEntity[K]
     ) => {
         if (!currentModule) return;
-        // Since store.modules is a proxy array, we need to find and update the specific module
         const index = store.modules.findIndex((m) => m.id === currentModule.id);
         if (index !== -1) {
-            (store.modules[index] as any)[field] = value;
+            store.modules[index][field] = value;
         }
     };
 
@@ -83,11 +69,11 @@ export function ModuleConfig() {
                         <div>
                             <div className="text-base font-semibold text-gray-700 mb-3">Цвет корпуса</div>
                             <div className="grid grid-cols-5 gap-3">
-                                {colors.map((color) => (
+                                {COLORS.map((color) => (
                                     <button
                                         key={color}
-                                        onClick={() => updateModuleField("color", color)}
-                                        className={`w-full aspect-square rounded-xl shadow-md transition-all hover:scale-105 ${currentModule.color === color ? "ring-2 ring-[#F06900] ring-offset-2" : ""
+                                        onClick={() => updateModuleField("color", new Color(color))}
+                                        className={`w-full aspect-square rounded-xl shadow-md transition-all hover:scale-105 ${currentModule.color === new Color(color) ? "ring-2 ring-[#F06900] ring-offset-2" : ""
                                             }`}
                                         style={{ backgroundColor: color }}
                                         aria-label={`Цвет ${color}`}
@@ -132,8 +118,8 @@ export function ModuleConfig() {
                                         key={value}
                                         onClick={() => updateModuleField("handles", value)}
                                         className={`flex-1 py-3 text-center font-medium rounded-xl shadow-md transition-all ${currentModule.handles === value
-                                                ? "bg-[#F06900] text-white"
-                                                : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                                            ? "bg-[#F06900] text-white"
+                                            : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                                             }`}
                                     >
                                         {label}
@@ -167,11 +153,11 @@ export function ModuleConfig() {
                         <div>
                             <div className="text-base font-semibold text-gray-700 mb-3">Цвет ручки</div>
                             <div className="grid grid-cols-5 gap-3">
-                                {colors.map((color) => (
+                                {COLORS.map((color) => (
                                     <button
                                         key={color}
-                                        onClick={() => updateModuleField("handleColor", color)}
-                                        className={`drop-shadow-sm transition-all hover:drop-shadow-lg hover:-translate-y-1 ${currentModule.handleColor === color ? "ring-2 ring-[#F06900] ring-offset-2 rounded-xl" : ""
+                                        onClick={() => updateModuleField("handleColor", new Color(color))}
+                                        className={`drop-shadow-sm transition-all hover:drop-shadow-lg hover:-translate-y-1 ${currentModule.handleColor === new Color(color) ? "ring-2 ring-[#F06900] ring-offset-2 rounded-xl" : ""
                                             }`}
                                     >
                                         <div
@@ -200,8 +186,8 @@ export function ModuleConfig() {
                                         key={hingeId}
                                         onClick={() => updateModuleField("hingeReplacement", hingeId)}
                                         className={`flex-1 py-3 text-center font-medium rounded-xl shadow-md transition-all ${currentModule.hingeReplacement === hingeId
-                                                ? "bg-[#F06900] text-white"
-                                                : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                                            ? "bg-[#F06900] text-white"
+                                            : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                                             }`}
                                     >
                                         {hinges[hingeId]?.name || "Стандартные"}

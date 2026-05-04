@@ -24,6 +24,11 @@ export type CaseTag =
     | typeof EXPLICT_CASE_FOLD
     | typeof EXPLICT_CASE_TOP;
 
+
+export type TabletopOption = [thickness: number, name: string, pricePerM2: number]
+
+export type WallHeight = 0.6 | 0.7
+
 export type ModuleTag = CategoryTag | FeatureTag | CaseTag;
 
 export type ModuleType = 'wall' | 'floor' | 'tall' | 'base' | 'corner' | 'tech' | 'room';
@@ -99,3 +104,7 @@ export function toModuleEntity(def: ModuleDef, position: Vector3, normal?: Vecto
     };
 }
 
+export interface AssemblerProps {
+  children: React.ReactNode;
+  entity: ModuleEntity;
+}

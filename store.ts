@@ -1,7 +1,7 @@
 import { proxy, subscribe } from 'valtio';
 import { Color, Vector3 } from 'three';
 import { ModuleDef, ModuleEntity } from './types';
-import { data } from '@/data';           // default export: ModuleDef[]
+import { data } from '@/data';
 
 const STORAGE_KEY = 'room-configurator-store';
 
@@ -55,15 +55,13 @@ const findDefByName = (name: string): ModuleDef | undefined =>
 function serializeEntity(entity: ModuleEntity): any {
     return {
         ...entity,
-        model: undefined,                 // strip React component
+        model: undefined,
         handleColor: serColor(entity.handleColor),
         color: serColor(entity.color),
         size: serVec3(entity.size),
         position: serVec3(entity.position),
         normal: serVec3(entity.normal),
         lock: serVec3(entity.lock),
-        // snapPlanes — assumed plain JSON. If it holds Three.js types,
-        // add custom serialization here.
     };
 }
 
@@ -97,7 +95,7 @@ function serializeState(state: Store): any {
 
 function deserializeState(saved: any): Partial<Store> {
     const copy = { ...saved };
-    delete copy.currentRawModuleName;   // remove helper key
+    delete copy.currentRawModuleName;
 
     copy.modules = saved.modules?.map(deserializeEntity) ?? [];
     copy.currentModule = saved.currentModule
@@ -111,7 +109,7 @@ function deserializeState(saved: any): Partial<Store> {
 }
 
 // ------------------------------------------------------------------
-// 5. Store + localStorage sync
+// 5. Store (defaults only)
 // ------------------------------------------------------------------
 
 export const store = proxy<Store>({
@@ -135,22 +133,33 @@ export const store = proxy<Store>({
     currentModule: null,
 });
 
-// --- Hydrate on boot ---
-try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-        const parsed = JSON.parse(raw);
-        Object.assign(store, deserializeState(parsed));
+// ------------------------------------------------------------------
+// 6. Hydration (вынесена в функцию + вызывается сразу как раньше)
+// ------------------------------------------------------------------
+
+export function hydrateStoreFromLocalStorage() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            Object.assign(store, deserializeState(parsed));
+        }
+    } catch (e) {
+        console.error('[Store] Failed to hydrate from localStorage:', e);
     }
-} catch (e) {
-    console.error('[Store] Failed to hydrate from localStorage:', e);
 }
 
-// --- Persist on every mutation ---
-subscribe(store, () => {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState(store)));
-    } catch (e) {
-        console.error('[Store] Failed to persist to localStorage:', e);
-    }
-});
+// Как и раньше — восстанавливаем состояние при импорте модуля
+// hydrateStoreFromLocalStorage();
+
+// ------------------------------------------------------------------
+// 7. Persist on every mutation (как было изначально)
+// ------------------------------------------------------------------
+
+// subscribe(store, () => {
+//     try {
+//         localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState(store)));
+//     } catch (e) {
+//         console.error('[Store] Failed to persist to localStorage:', e);
+//     }
+// });

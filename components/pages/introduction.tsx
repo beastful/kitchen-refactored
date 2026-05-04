@@ -2,9 +2,9 @@
 
 import { store } from '@/store';
 import { X } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState, Dispatch, SetStateAction, ChangeEvent } from 'react';
 
-function validate(n) {
+function validate(n: string): boolean {
     if (n === '' || n === null || n === undefined) return true;
     if (isNaN(parseFloat(n))) return true;
     const num = parseFloat(n);
@@ -13,22 +13,19 @@ function validate(n) {
 }
 
 function Introduction() {
-    const [width, setWidth] = useState('5');
-    const [height, setHeight] = useState('3');
-    const [depth, setDepth] = useState('4');
-    const [error, setError] = useState('');
+    const [width, setWidth] = useState<string>('5');
+    const [height, setHeight] = useState<string>('3');
+    const [depth, setDepth] = useState<string>('4');
+    const [error, setError] = useState<string>('');
 
-    const handleStart = () => {
-        // Validate all fields
+    const handleStart = (): void => {
         if (validate(width) || validate(height) || validate(depth)) {
             setError('Пожалуйста, введите корректное число в диапазоне от 2 до 20 для всех измерений');
             return;
         }
 
-        // Clear any previous errors
         setError('');
 
-        // Convert to numbers and set store values
         const w = parseFloat(width);
         const h = parseFloat(height);
         const d = parseFloat(depth);
@@ -39,11 +36,12 @@ function Introduction() {
         store.room.h = h;
     };
 
-    const handleInputChange = (setter, value) => {
-        // Allow only numbers and decimal point
+    const handleInputChange = (
+        setter: Dispatch<SetStateAction<string>>,
+        value: string
+    ): void => {
         if (value === '' || /^\d*\.?\d*$/.test(value)) {
             setter(value);
-            // Clear error when user starts typing
             if (error) setError('');
         }
     };
@@ -66,7 +64,7 @@ function Introduction() {
                             <div className='text-sm font-semibold pb-1 text-gray-500'>Длина, м</div>
                             <input
                                 value={width}
-                                onInput={(e) => handleInputChange(setWidth, e.target.value)}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => { handleInputChange(setWidth, e.target.value) }}
                                 className={`${validate(width) ? 'border-2 border-red-400 bg-red-100' : 'border-2 border-white bg-white'} outline-none w-full h-[60px] rounded-[10px] text-center`}
                                 placeholder='Длина, м'
                             />
@@ -78,7 +76,7 @@ function Introduction() {
                             <div className='text-sm font-semibold pb-1 text-gray-500'>Ширина, м</div>
                             <input
                                 value={depth}
-                                onInput={(e) => handleInputChange(setDepth, e.target.value)}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(setDepth, e.target.value)}
                                 className={`${validate(depth) ? 'border-2 border-red-400 bg-red-100' : 'border-2 border-white bg-white'} outline-none w-full h-[60px] rounded-[10px] text-center`}
                                 placeholder='Ширина, м'
                             />
@@ -90,7 +88,7 @@ function Introduction() {
                             <div className='text-sm font-semibold pb-1 text-gray-500'>Высота, м</div>
                             <input
                                 value={height}
-                                onInput={(e) => handleInputChange(setHeight, e.target.value)}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(setHeight, e.target.value)}
                                 className={`${validate(height) ? 'border-2 border-red-400 bg-red-100' : 'border-2 border-white bg-white'} outline-none w-full h-[60px] rounded-[10px] text-center`}
                                 placeholder='Высота, м'
                             />

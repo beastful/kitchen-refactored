@@ -1,8 +1,8 @@
 'use client'
 
-import Configurator from '@/app/connfigurator';
-import Introduction from '@/app/introduction';
-import { store } from '@/store';
+import Configurator from '@/components/pages/connfigurator';
+import Introduction from '@/components/pages/introduction';
+import { hydrateStoreFromLocalStorage, store } from '@/store';
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio';
 import { AnimatePresence, motion } from "motion/react"
@@ -18,6 +18,8 @@ function BiggerScreen() {
 }
 
 function Home() {
+  
+  
   const snap = useSnapshot(store)
 
 

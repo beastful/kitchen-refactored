@@ -1,0 +1,29 @@
+{
+    "openMenuId": null,
+    "page": "config",
+    "hints": false,
+    "configWindow": false,
+    "configurableEntity": null,
+    "calculatorWindow": false,
+    "ruler": false,
+    "groupEdit": false,
+    "openAngle": 0,
+    "roomColor": "#F9F8F4",
+    "tabletopColor": "#8E8478",
+    "tabletop": [
+        0.026,
+        "Скиф 26",
+        600
+    ],
+    "wallHeight": 0.7,
+    "enableRotate": true,
+    "room": {
+        "d": 4,
+        "w": 5,
+        "h": 3
+    },
+    "modules": [],
+    "currentRawModule": null,
+    "currentModule": null,
+    "currentRawModuleName": null
+}

@@ -5,34 +5,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { Color } from 'three';
 import { store } from '@/store';
-import type { ModuleEntity } from '@/types';
-
-const COLORS = [
-    '#617774', '#CAC0B4', '#F9F8F4', '#F8F1D7', '#8E8478',
-    '#256668', '#807B77', '#B3C7D7', '#B8D1C7', '#705A4C'
-];
-
-const FACADE_TYPES = ['A', 'B', 'C', 'Flat'];
-const HANDLE_TYPES = ['V', 'H'];
-const HANDLE_VARIANTS = [0, 1, 2, 3, 4];
-
-const toColor = (hex: string): Color => new Color(hex);
-
-const updateModulesByType = (targetType: 'wall' | 'floor', updates: Partial<ModuleEntity>) => {
-    const newModules = store.modules.map(module => {
-        if (module.type === targetType) {
-            const updated = { ...module };
-            if (updates.color) updated.color = toColor(updates.color as unknown as string);
-            if (updates.handleColor) updated.handleColor = toColor(updates.handleColor as unknown as string);
-            if (updates.facade) updated.facade = updates.facade as string;
-            if (updates.handles) updated.handles = updates.handles as string;
-            if (updates.handleVariant !== undefined) updated.handleVariant = updates.handleVariant;
-            return updated;
-        }
-        return module;
-    });
-    store.modules = newModules;
-};
+import { COLORS, FACADE_TYPES, HANDLE_TYPES, HANDLE_VARIANTS } from '@/constants';
+import { updateModulesByType } from '@/lib/utils';
 
 export function GroupEdit() {
     const snap = useSnapshot(store);
@@ -73,7 +47,7 @@ export function GroupEdit() {
                                         {COLORS.map(color => (
                                             <button
                                                 key={color}
-                                                onClick={() => updateModulesByType('wall', { color })}
+                                                onClick={() => updateModulesByType('wall', { color: new Color(color) })}
                                                 className="aspect-square rounded-xl shadow-sm transition-all hover:scale-105 hover:shadow-md"
                                                 style={{ backgroundColor: color }}
                                             />
@@ -145,7 +119,7 @@ export function GroupEdit() {
                                         {COLORS.map(color => (
                                             <button
                                                 key={color}
-                                                onClick={() => updateModulesByType('wall', { handleColor: color })}
+                                                onClick={() => updateModulesByType('wall', { handleColor: new Color(color) })}
                                                 className="relative aspect-square rounded-xl overflow-hidden shadow-sm transition-all hover:scale-105"
                                                 style={{ backgroundColor: color }}
                                             >
@@ -171,7 +145,7 @@ export function GroupEdit() {
                                         {COLORS.map(color => (
                                             <button
                                                 key={color}
-                                                onClick={() => updateModulesByType('floor', { color })}
+                                                onClick={() => updateModulesByType('floor', { color: new Color(color) })}
                                                 className="aspect-square rounded-xl shadow-sm transition-all hover:scale-105 hover:shadow-md"
                                                 style={{ backgroundColor: color }}
                                             />
@@ -243,7 +217,7 @@ export function GroupEdit() {
                                         {COLORS.map(color => (
                                             <button
                                                 key={color}
-                                                onClick={() => updateModulesByType('floor', { handleColor: color })}
+                                                onClick={() => updateModulesByType('floor', { handleColor: new Color(color) })}
                                                 className="relative aspect-square rounded-xl overflow-hidden shadow-sm transition-all hover:scale-105"
                                                 style={{ backgroundColor: color }}
                                             >

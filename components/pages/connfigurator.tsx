@@ -1,55 +1,25 @@
 'use client'
 
-import React, { useState, useCallback, Suspense } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
     Settings, Ruler, DoorOpen, Save, Printer, Calculator,
     Columns3Cog, LogIn, Code2, Search
 } from 'lucide-react'
 import { useSnapshot } from 'valtio'
 import { store } from '@/store'
-import { Sidebar, SidebarPage } from '@/components/ui/sidebar'
+import { Sidebar, SidebarPage } from '@/components/organisms/sidebar'
 import { data } from '@/data'
-import { ModuleCard } from '@/components/ui/module-card'
-import Room from './room'
-import { Canvas } from '@react-three/fiber'
-import { CameraControls, Html, Loader, OrbitControls, Preload } from '@react-three/drei'
-import { ConstantForwardOrbitControls } from '@/components/ui/infinite-dolly'
-import { CalculatorComponent } from './calculator'
-import { PDFExportButton } from '@/components/ui/pdf-button'
-import { CATEGORY_FLOOR, CATEGORY_TECH, CATEGORY_WALL } from '@/constants'
-import ModuleConfig from '@/components/ui/module-config'
-import { MobileScreen } from '@/components/ui/mobile-screen'
-import { HintScreen } from '@/components/ui/hint-screen'
-import { Hint } from '@/components/ui/hint'
-import { PreloaderOverlay } from '@/components/ui/preload'
-import GroupEdit from '@/components/ui/group-edit'
-import { RaycastRuler } from '@/components/legacy/raycast-ruler'
-
-// ─── Типы ───
-
-type TabletopOption = [thickness: number, name: string, pricePerM2: number]
-
-type WallHeight = 0.6 | 0.7
-
-// ─── Константы ───
-
-const COLORS = [
-    '#617774', '#CAC0B4', '#F9F8F4', '#F8F1D7',
-    '#8E8478', '#256668', '#807B77', '#B3C7D7',
-    '#B8D1C7', '#705A4C'
-] as const
-
-const TABLETOP_OPTIONS: TabletopOption[] = [
-    [0.026, 'Скиф 26', 600],
-    [0.038, 'Скиф 38', 1500],
-    [0.038, 'Союз 38', 800]
-]
-
-const WALL_HEIGHTS: WallHeight[] = [0.6, 0.7]
-
-const OPEN_ANGLE_SNAP = Math.PI * 0.4
-
-// ─── Компоненты (не экспортируются) ───
+import { ModuleCard } from '@/components/moleculas/module-card'
+import { CalculatorComponent } from '../organisms/calculator'
+import { PDFExportButton } from '@/components/moleculas/pdf-button'
+import { CATEGORY_FLOOR, CATEGORY_TECH, CATEGORY_WALL, COLORS, OPEN_ANGLE_SNAP, TABLETOP_OPTIONS, WALL_HEIGHTS } from '@/constants'
+import ModuleConfig from '@/components/organisms/module-editor'
+import { MobileScreen } from '@/components/organisms/mobile-screen'
+import { HintScreen } from '@/components/organisms/hint-screen'
+import { Hint } from '@/components/atoms/hint'
+import GroupEdit from '@/components/organisms/group-editor'
+import Scene from '@/3d/eviroment/scene'
+import { TabletopOption, WallHeight } from "@/types"
 
 const ColorPicker = ({ colors, selected, onSelect }: {
     colors: readonly string[]
@@ -126,37 +96,6 @@ const ToolButton = ({ active, onClick, icon }: {
     </button>
 )
 
-const PlaceholderPage = ({ title, search }: {
-    title: string
-    search?: boolean
-}) => {
-    const [query, setQuery] = useState('')
-
-    return (
-        <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
-            <h2 className="text-2xl font-semibold">{title}</h2>
-
-            {search && (
-                <div className="flex rounded-xl bg-gray-100 items-center px-4">
-                    <Search className="opacity-30" size={20} />
-                    <input
-                        className="p-3 w-full bg-transparent outline-none"
-                        placeholder="Поиск..."
-                        value={query}
-                        onChange={e => setQuery(e.target.value)}
-                    />
-                </div>
-            )}
-
-            <div className="text-gray-400 text-center py-20">
-                Модули будут здесь
-            </div>
-        </div>
-    )
-}
-
-// ─── Главный компонент (единственный экспорт) ───
-
 export default function Configurator() {
     const snap = useSnapshot(store)
     const [debug, setDebug] = useState(false)
@@ -222,53 +161,9 @@ export default function Configurator() {
                         </Hint>
                     </header>
                     <div className='h-screen'>
-                        <Canvas camera={{
-                            position: [-6, 6, 6],
-                            fov: 45,
-                            near: 0.1,
-                            far: 1000,
-                        }}>
-                            {/* <Html>
-                                <PreloaderOverlay />
-                            </Html> */}
-                            <Room />
-                            <ambientLight intensity={0.6} color="#fff8f0" />
-
-                            {/* Направленное — имитация окна */}
-                            <directionalLight
-                                position={[5, 8, 5]}
-                                intensity={1.2}
-                                color="#ffffff"
-                                castShadow
-                                shadow-mapSize={[1024, 1024]}
-                            />
-
-                            {/* Заполняющее — убирает тени */}
-                            <directionalLight
-                                position={[-3, 4, -3]}
-                                intensity={0.4}
-                                color="#e8e4ff"
-                            />
-
-                            {/* Подсветка снизу — для фасадов */}
-                            <pointLight position={[0, -1, 2]} intensity={0.3} color="#ffeedd" />
-
-                            {/* Hemisphere — небо/земля */}
-                            <hemisphereLight
-                                args={["#ddeeff", "#332211", 0.5]}
-                            />
-
-                            <ConstantForwardOrbitControls
-                                stepSize={0.4}      // moves 1.5 units per scroll tick, always
-                                enableRotate={true}
-                                enablePan={true}
-                                minDistance={2}
-                                maxDistance={10}
-                                maxPolarAngle={Math.PI / 2}
-                            />
-                        </Canvas>
+                        <Scene />
                     </div>
-                    {/* Нижняя панель */}
+                   
                     <footer className="flex items-end gap-4 w-full absolute bottom-0 left-0 p-5 z-10 pr-15">
                         <ToolButton
                             active={snap.openAngle !== 0}
@@ -315,10 +210,9 @@ export default function Configurator() {
                     </footer>
                 </div>
 
-                {/* Сайдбар */}
                 <Sidebar defaultPage="floor">
                     <SidebarPage title="Напольные" page="floor">
-                        {/* <PlaceholderPage title="Напольные модули" search /> */}
+                       
                         <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
                             <div className='text-2xl font-semibold'>Напольные модули</div>
                             <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
@@ -328,7 +222,8 @@ export default function Configurator() {
                                 <input className='p-3 w-full' placeholder='Ваш запрос' />
                             </div>
                             <div className='grid grid-cols-3 gap-[15px]'>
-                                {data.filter(module => module.tags.includes(CATEGORY_FLOOR)).map((module) => <ModuleCard module={module} />)}
+                              
+                                {data.filter(module => module.tags.includes(CATEGORY_FLOOR)).map((module) => <ModuleCard key={JSON.stringify(module)} module={module} />)}
                             </div>
                         </div>
                     </SidebarPage>
@@ -343,7 +238,7 @@ export default function Configurator() {
                                 <input className='p-3 w-full' placeholder='Ваш запрос' />
                             </div>
                             <div className='grid grid-cols-3 gap-[15px]'>
-                                {data.filter(module => module.tags.includes(CATEGORY_WALL)).map((module) => <ModuleCard module={module} />)}
+                                {data.filter(module => module.tags.includes(CATEGORY_WALL)).map((module) => <ModuleCard key={JSON.stringify(module)} module={module} />)}
                             </div>
                         </div>
                     </SidebarPage>
@@ -358,7 +253,7 @@ export default function Configurator() {
                                 <input className='p-3 w-full' placeholder='Ваш запрос' />
                             </div>
                             <div className='grid grid-cols-3 gap-[15px]'>
-                                {data.filter(module => module.tags.includes(CATEGORY_TECH)).map((module) => <ModuleCard module={module} />)}
+                                {data.filter(module => module.tags.includes(CATEGORY_TECH)).map((module) => <ModuleCard key={JSON.stringify(module)} module={module} />)}
                             </div>
                         </div>
                     </SidebarPage>
@@ -408,7 +303,7 @@ export default function Configurator() {
                 <ModuleConfig />
                 <MobileScreen />
                 <GroupEdit />
-                
+
             </div >
 
         </>

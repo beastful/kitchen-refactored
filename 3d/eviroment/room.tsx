@@ -1,52 +1,23 @@
 "use client"
 
-import { OrbitControls, Html } from "@react-three/drei";
-import { ThreeElements } from '@react-three/fiber';
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio';
 import { Vector3 } from 'three';
 import { SnapCursor } from "@/snapping-tools/snap-cursor";
-import { SnapConstraint } from "@/snapping-tools/snap-constraint";
 import { SnapPlacedObject } from "@/snapping-tools/placed-constraint";
 import { usePlacementData } from "@/snapping-tools/hooks/use-placement-data";
 import { store } from '@/store';
 import { ModuleEntity, toModuleEntity } from '@/types';
-import { Model as M_2YNSD_1 } from "@/modules/2YNSD_JSX/M_2YNSD_1"
-import { FacadeConfig } from "@/components/legacy/facade-config"
-import { ModuleMenu } from "@/components/legacy/module-menu";
-import { RoomWalls } from "@/components/interior/room-walls";
-import { Tabletop } from "@/components/interior/tabletop";
-
-// ─── Модели ───
-function Box4(props: ThreeElements["group"]) {
-    return (
-        <group userData={{ layer: 'modules' }} {...props}>
-            <M_2YNSD_1 />
-        </group>
-    );
-}
-
-function Wall(props: ThreeElements["group"]) {
-    return (
-        <group {...props}>
-            <mesh><boxGeometry args={[4, 2.5, 0.1]} /><meshPhongMaterial color="green" /></mesh>
-        </group>
-    );
-}
-
-function Floor(props: ThreeElements["group"]) {
-    return (
-        <group {...props}>
-            <mesh><boxGeometry args={[5, 0.01, 5]} /><meshPhongMaterial color="brown" /></mesh>
-        </group>
-    );
-}
+import { FacadeConfig } from "@/3d/furniture/assembler"
+import { ModuleMenu } from "@/3d/furniture/actions";
+import { RoomWalls } from "@/3d/eviroment/room-walls";
+import { Tabletop } from "@/3d/furniture/tabletop";
+import { Gltf } from '@react-three/drei';
 
 export default function Room() {
     const snap = useSnapshot(store);
     const getPlacementData = usePlacementData();
-    const [debugPlacement, setSebugPlacement] = useState<any>(null);
-
+  
     useEffect(() => {
         const handlePointerUp = () => {
             if (!store.currentRawModule) return;
@@ -56,7 +27,6 @@ export default function Room() {
                 console.log('Cannot place:', result.reason);
                 return;
             }
-            setSebugPlacement(result)
             const placement = result.data!;
             const position = new Vector3(...placement.position);
             const normal = new Vector3(0, 0, 1);
@@ -82,9 +52,6 @@ export default function Room() {
     const CursorModel = snap.currentRawModule?.model ?? null;
     return (
         <>
-
-
-            {/* Курсор — только при drag */}
             {CursorModel && (
                 <SnapCursor userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
                     <CursorModel />
@@ -92,17 +59,15 @@ export default function Room() {
             )}
             <RoomWalls />
 
-            {/* Размещённые модули */}
             {snap.modules.map(entity => {
-                // PascalCase для динамического компонента
                 const EntityModel = entity.model;
 
                 return (
-                    <group key={entity.id} >
+                    <group key={entity.name} >
                         <SnapPlacedObject
                             position={entity.position.toArray()}
                             scale={0.1}
-                            id={`placed-${entity.id}`}
+                            id={`placed-${entity.name}`}
                             rotation={[0, entity.openAngle, 0]}
                             halfExtents={[...entity.halfExtents]}
                             snapPlanes={entity.snapPlanes.map(plane => ({
@@ -112,9 +77,9 @@ export default function Room() {
                             useDistance={true}
                         >
                             {EntityModel && <ModuleMenu entity={entity as ModuleEntity}>
-                                <Tabletop entity={entity}>
-                                    <FacadeConfig entity={entity}>
-                                        <EntityModel />
+                                <Tabletop entity={entity as ModuleEntity}>
+                                    <FacadeConfig entity={entity as ModuleEntity}>
+                                        <Gltf src={`/${entity.name}.glb`} />
                                     </FacadeConfig>
                                 </Tabletop>
                             </ModuleMenu>}
