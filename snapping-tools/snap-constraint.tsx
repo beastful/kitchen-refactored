@@ -21,7 +21,7 @@ export function SnapConstraint({
         throttle((e: any) => {
             snapContext.setPointerEvent(e);
             snapContext.setCursorVisible(true);
-        }, 16),
+        }, 10),
         [snapContext]
     );
 
@@ -44,21 +44,24 @@ export function SnapConstraint({
     }, [useCursor, useDistance, ignoreNormals, halfExtents, snapContext]);
 
     return <>
-        <group visible={false} ref={ref}>{children}</group>
+        <group visible={false} scale={groupProps.scale} ref={ref}>{children}</group>
         <group
+    
             ref={realRef}
             scale={groupProps.scale}
             position={groupProps.position}
             rotation={groupProps.rotation}
             onPointerEnter={(e) => {
-                e.stopPropagation();
+                
                 if (useCursor) {
+                    e.stopPropagation();
                     snapContext.setCursorVisible(true)
                 }
             }}
             onPointerOut={(e) => {
-                e.stopPropagation();
+                
                 if (useCursor) {
+                    e.stopPropagation();
                     snapContext.setCursorVisible(false)
                 }
             }}

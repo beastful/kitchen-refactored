@@ -1,4 +1,4 @@
-import { Mesh, Vector3 } from "three";
+import { Euler, Mesh, Vector3 } from "three";
 import { Box3, Object3D, Matrix4 } from 'three';
 import { MutableRefObject } from 'react';
 import { Intersection, SnapPlane } from "./types";
@@ -11,6 +11,18 @@ export function getYawFromNormal(normal: Vector3): number {
     }
     const angle = Math.atan2(flatX, flatZ);
     return angle;
+}
+
+export class SnapBox {
+    position: Vector3;
+    rotation: Euler;
+    halfExtents: Vector3;
+
+    constructor({ position, rotation, halfExtents }: { position: Vector3, rotation: Euler, halfExtents: Vector3 }) {
+        this.position = position;
+        this.rotation = rotation;
+        this.halfExtents = halfExtents;
+    }
 }
 
 const boxA = new Box3();
@@ -153,56 +165,56 @@ export function getDominantIntersectionNormal(
 }
 
 export function distanceSqToAABB(point: Vector3, box: Box3): number {
-  const dx = Math.max(box.min.x - point.x, 0, point.x - box.max.x);
-  const dy = Math.max(box.min.y - point.y, 0, point.y - box.max.y);
-  const dz = Math.max(box.min.z - point.z, 0, point.z - box.max.z);
-  return dx * dx + dy * dy + dz * dz;
+    const dx = Math.max(box.min.x - point.x, 0, point.x - box.max.x);
+    const dy = Math.max(box.min.y - point.y, 0, point.y - box.max.y);
+    const dz = Math.max(box.min.z - point.z, 0, point.z - box.max.z);
+    return dx * dx + dy * dy + dz * dz;
 }
 
 export function computeSnappedPosition(
-  cursorPos: Vector3,
-  intersections: Intersection[],
-  cursorHalfExtents: Vector3,
-  yaw: number,
-  out: Vector3,
+    cursorPos: Vector3,
+    intersections: Intersection[],
+    cursorHalfExtents: Vector3,
+    yaw: number,
+    out: Vector3,
 ): Vector3 {
-  out.copy(cursorPos);
-  const locked = { x: false, y: false, z: false };
+    out.copy(cursorPos);
+    const locked = { x: false, y: false, z: false };
 
-  const cos = Math.cos(yaw);
-  const sin = Math.sin(yaw);
-  const worldHalfX = Math.abs(cursorHalfExtents.x * cos) + Math.abs(cursorHalfExtents.z * sin);
-  const worldHalfZ = Math.abs(cursorHalfExtents.x * sin) + Math.abs(cursorHalfExtents.z * cos);
+    const cos = Math.cos(yaw);
+    const sin = Math.sin(yaw);
+    const worldHalfX = Math.abs(cursorHalfExtents.x * cos) + Math.abs(cursorHalfExtents.z * sin);
+    const worldHalfZ = Math.abs(cursorHalfExtents.x * sin) + Math.abs(cursorHalfExtents.z * cos);
 
-  for (const [center, targetSize, normal] of intersections) {
-    const absX = Math.abs(normal.x);
-    const absY = Math.abs(normal.y);
-    const absZ = Math.abs(normal.z);
-    const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
-    if (locked[axis]) continue;
-    locked[axis] = true;
+    for (const [center, targetSize, normal] of intersections) {
+        const absX = Math.abs(normal.x);
+        const absY = Math.abs(normal.y);
+        const absZ = Math.abs(normal.z);
+        const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
+        if (locked[axis]) continue;
+        locked[axis] = true;
 
-    const dir = Math.sign(normal[axis]);
-    const surface = center[axis] + targetSize[axis] * 0.5 * dir;
-    const half = axis === 'y' ? cursorHalfExtents.y : (axis === 'x' ? worldHalfX : worldHalfZ);
-    out[axis] = surface + half * dir;
-  }
+        const dir = Math.sign(normal[axis]);
+        const surface = center[axis] + targetSize[axis] * 0.5 * dir;
+        const half = axis === 'y' ? cursorHalfExtents.y : (axis === 'x' ? worldHalfX : worldHalfZ);
+        out[axis] = surface + half * dir;
+    }
 
-  return out;
+    return out;
 }
 
 export function buildSnapPlanes(intersections: Intersection[]): SnapPlane[] {
-  return intersections.map(([center, targetSize, normal]) => {
-    const absX = Math.abs(normal.x);
-    const absY = Math.abs(normal.y);
-    const absZ = Math.abs(normal.z);
-    const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
-    const dir = Math.sign(normal[axis]);
-    const surface = center[axis] + targetSize[axis] * 0.5 * dir;
+    return intersections.map(([center, targetSize, normal]) => {
+        const absX = Math.abs(normal.x);
+        const absY = Math.abs(normal.y);
+        const absZ = Math.abs(normal.z);
+        const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
+        const dir = Math.sign(normal[axis]);
+        const surface = center[axis] + targetSize[axis] * 0.5 * dir;
 
-    const point: [number, number, number] = [center.x, center.y, center.z];
-    point[axis === 'x' ? 0 : axis === 'y' ? 1 : 2] = surface;
+        const point: [number, number, number] = [center.x, center.y, center.z];
+        point[axis === 'x' ? 0 : axis === 'y' ? 1 : 2] = surface;
 
-    return { point, normal: [normal.x, normal.y, normal.z] as [number, number, number] };
-  });
+        return { point, normal: [normal.x, normal.y, normal.z] as [number, number, number] };
+    });
 }

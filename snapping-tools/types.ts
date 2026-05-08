@@ -2,7 +2,8 @@ import { ReactNode } from 'react';
 import { ThreeElements } from '@react-three/fiber';
 import { Vector3, Object3D } from 'three';
 import { ThreeEvent } from '@react-three/fiber';
-import { RefObject, MutableRefObject } from 'react';
+import { RefObject } from 'react';
+import { SnapBox } from './utils';
 
 export type Vector3Tuple = [number, number, number] | Vector3;
 export type StoredPointerEvent = ThreeEvent<PointerEvent> | null;
@@ -55,6 +56,11 @@ export interface StoredConstraint {
     userData: SnapConstraintUserDataType;
 }
 
+export interface CursorDataType {
+    snapbox: SnapBox;
+    intersections: SnapBox[];
+}
+
 export interface SnapContextValue {
     debug: boolean;
     pointerEvent: StoredPointerEvent;
@@ -63,9 +69,9 @@ export interface SnapContextValue {
     setCursorVisible: (visible: boolean) => void;
     registerConstraint: (constraint: StoredConstraint) => () => void;
     queryConstraints: (callback: (constraint: StoredConstraint) => void) => void;
-    cursorStateRef: MutableRefObject<CursorLiveState>;
-    updateCursorState: (partial: Partial<CursorLiveState>) => void;
-    getCursorState: () => CursorLiveState;
+    cursorData: CursorDataType;
+    setCursorData: (data: CursorDataType) => void;
+    constraintsMap: Map<string, StoredConstraint>
 }
 
 export type SnapCursorProps = ThreeElements['group'] & {

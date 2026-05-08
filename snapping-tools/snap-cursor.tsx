@@ -1,166 +1,144 @@
-import { useSnapContext } from "@/snapping-tools/snap-provider";
-import { useSnapCursorTransform } from './hooks/use-cursor-transform';
+import { Euler, Group, Matrix4, Quaternion, Vector3 } from 'three';
+import { useSnapContext } from './snap-provider';
 import { SnapCursorProps, Intersection, BoxArgs } from './types';
-import { useFrame } from "@react-three/fiber";
-import { buildSnapPlanes, checkIntersectionFast, computeSnappedPosition, distanceSqToAABB, getDominantIntersectionNormal } from "./utils";
-import { useRef } from "react";
-import { Group, Mesh, Vector3, Box3 } from "three";
-import { useSnapCursor } from "./hooks/use-snap-cursor";
-import { MAGNET_BOOST, MAGNET_DAMPING, MAGNET_DECAY, MAGNET_SMOOTH, MAX_DT, SNAP_RADIUS, THROTTLE } from "./constants";
+import { getYawFromNormal, SnapBox } from './utils';
+import { useEffect, useMemo, useRef } from 'react';
+import { Html } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { Box3, Object3D } from 'three';
+import { useBoundingBox } from './hooks/use-bounding-box';
+import { getDominantXOverlaps, getNonOverlappingXPositions, getOverlapOnWorldAxis, intersectSnapBox } from './utils/intersection-check';
+import { computeMinimalTranslation } from './hooks/minimal-translation';
 
-const _b1 = new Box3();
-const _v1 = new Vector3();
-const _v2 = new Vector3();
-const _v3 = new Vector3();
-const _bConstraint = new Box3();
+function applyYaw(vector: Vector3, yaw: number) {
+  const matrix = new Matrix4().makeRotationY(yaw);
+  return vector.clone().applyMatrix4(matrix);
+}
 
-function createMagnet() {
-  const state = {
-    current: new Vector3(),
-    vel: new Vector3(),
-    wasSnapped: false,
-    stickTimer: 0,
-  };
+function useBounds() {
+  const { constraintsMap } = useSnapContext();
+
+  return [...constraintsMap].map((b: any) => {
+    const [w, h, d] = b[1].halfExtents;
+    return new SnapBox({
+      position: b[1].ref.current.position as Vector3,
+      halfExtents: new Vector3(w, h, d),
+      rotation: b[1].ref.current.rotation as Euler
+    })
+  });
+}
+
+function useIntersections({ cursor, hit, bounds }: {
+  cursor: SnapBox,
+  hit: SnapBox,
+  bounds: SnapBox[]
+}) {
+  const intersections = useRef<SnapBox[]>([])
+
+  useEffect(() => {
+    const int: SnapBox[] = []
+
+    for (const box of bounds) {
+      if (intersectSnapBox(box, hit)) {
+        int.push(box);
+      }
+    }
+
+    intersections.current = int
+  }, [hit, cursor])
+
+  const getSnapCandiatesX = () => {
+    return getDominantXOverlaps(hit, intersections.current)
+  }
+  const getSnapCandiatesY = () => { }
+  const getSnapCandiatesZ = () => { }
 
   return {
-    pos: state.current,
-    update: (targetPos: Vector3, isSnapped: boolean, rawDt: number) => {
-      const dt = Math.min(rawDt, MAX_DT);
-
-      // Сброс таймера при входе в snap
-      if (isSnapped && !state.wasSnapped) state.stickTimer = 0;
-      if (isSnapped) state.stickTimer += dt;
-      state.wasSnapped = isSnapped;
-
-      if (isSnapped) {
-        // ─── Режим примагничивания: пружина с демпфированием ───
-        const boost = MAGNET_BOOST * Math.exp(-state.stickTimer * MAGNET_DECAY);
-        const speed = MAGNET_SMOOTH + boost;
-        const t = 1 - Math.exp(-speed * dt);
-
-        _v1.copy(targetPos).sub(state.current).multiplyScalar(t);
-        state.vel.add(_v1);
-        state.vel.multiplyScalar(Math.exp(-MAGNET_DAMPING * dt));
-        state.current.add(state.vel);
-      } else {
-        // ─── Режим движения: чистый lerp, без физики ───
-        const t = 1 - Math.exp(-MAGNET_SMOOTH * dt);
-        state.current.lerp(targetPos, t);
-
-        // Важно: обнуляем скорость, чтобы при следующем snap
-        // не было рывка от накопленной инерции свободного движения
-        state.vel.set(0, 0, 0);
-      }
-    },
-  };
+    intersections: intersections.current,
+    getSnapCandiatesX,
+    getSnapCandiatesY,
+    getSnapCandiatesZ
+  }
 }
 
 export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
-  const snapContext = useSnapContext();
-  const { position: cursorPos, rotationYaw, boundingBoxRef, halfExtents } = useSnapCursorTransform();
-  const { updateCursorState } = useSnapCursor();
-
+  const { pointerEvent, setCursorData } = useSnapContext()
+  const yaw = getYawFromNormal(pointerEvent?.normal || new Vector3())
+  const point = pointerEvent?.point || new Vector3();
+  const snapVector = new Vector3();
   const visualRef = useRef<Group>(null);
-  const hitboxRef = useRef<Mesh>(null);
-  const previewRef = useRef<Mesh>(null);
-  const frameCount = useRef(0);
-  const magnet = useRef(createMagnet()).current;
+  const bounds = useBounds();
+  const [AABBRef, halfExtents] = useBoundingBox()
+  const [width, height, depth] = halfExtents
+  const treshold = 0.4
+  const cursorBox = new SnapBox({
+    position: point,
+    rotation: new Euler(0, yaw, 0),
+    halfExtents: new Vector3(width, height, depth).addScalar(treshold),
+  })
 
-  const cursorHalf = new Vector3(halfExtents[0], halfExtents[1], halfExtents[2]);
-  const boxArgs = halfExtents.map(n => n * 2) as BoxArgs;
-  const hitboxArgs = boxArgs.map(n => n + SNAP_RADIUS * 2) as BoxArgs;
-
-  useFrame((_state, dt) => {
-    visualRef.current?.position.copy(cursorPos);
-    visualRef.current?.rotation.set(0, rotationYaw, 0);
-    hitboxRef.current?.position.copy(cursorPos);
-    hitboxRef.current?.rotation.set(0, rotationYaw, 0);
-    hitboxRef.current?.updateMatrixWorld();
-
-    if (++frameCount.current % THROTTLE !== 0) return;
-
-    const intersections: Intersection[] = [];
-    const MAX_DIST_SQ = 4; // 2²
-
-    const cursorWorldPos = _v1.copy(cursorPos);
-    visualRef.current?.localToWorld(cursorWorldPos);
-
-    snapContext.queryConstraints(({ ref: constraint, userData }) => {
-      if (!userData.useDistance) return;
-
-      const constraintObj = constraint.current;
-      if (!constraintObj) return;
-
-      _bConstraint.setFromObject(constraintObj);
-      const distSq = distanceSqToAABB(cursorWorldPos, _bConstraint);
-
-      if (distSq > MAX_DIST_SQ) return;
-
-      const [hits, targetCenter, , targetSize] = checkIntersectionFast(constraint, hitboxRef);
-      if (!hits) return;
-
-      const normal = getDominantIntersectionNormal(constraint, hitboxRef);
-      if (!normal) return;
-
-      _v2.copy(normal).transformDirection(constraintObj.matrixWorld).normalize();
-      intersections.push([targetCenter, targetSize, _v2.clone()]);
-    });
-
-    const isSnapped = intersections.length > 0;
-    const snapPos = isSnapped
-      ? computeSnappedPosition(cursorPos, intersections, cursorHalf, rotationYaw, _v3)
-      : cursorPos;
-
-    if (isSnapped) {
-      // ─── Режим snap: магнит с пружиной и затуханием ───
-      magnet.update(snapPos, true, dt);
-      previewRef.current?.position.copy(magnet.pos);
-    } else {
-      // ─── Режим движения: мгновенное следование за курсором ───
-      previewRef.current?.position.copy(cursorPos);
-
-      // Сбрасываем магнит, чтобы при следующем snap не было рывка
-      // от накопленной инерции свободного движения
-      magnet.pos.copy(cursorPos);
-      magnet.update(cursorPos, false, dt); // обнуляет внутреннюю скорость
-    }
-
-    previewRef.current?.rotation.set(0, rotationYaw, 0);
-
-    const snapPlanes = isSnapped ? buildSnapPlanes(intersections) : [];
-
-    updateCursorState({
-      position: cursorPos,
-      rotation: rotationYaw,
-      isSnapped,
-      snapPosition: isSnapped ? snapPos : cursorPos,
-      halfExtents: cursorHalf,
-      snapPlanes,
-    });
+  const {
+    intersections,
+    getSnapCandiatesX,
+    getSnapCandiatesY,
+    getSnapCandiatesZ
+  } = useIntersections({
+    cursor: cursorBox,
+    hit: cursorBox,
+    bounds
   });
+
+  const safeIntersections = intersections.length > 3 ? intersections.filter(i => {
+    if (i.halfExtents.x > 2.5 || i.halfExtents.y > 2.5 || i.halfExtents.z > 2.5) {
+      return true
+    }
+    return false
+  }) : intersections;
+
+  const snap = computeMinimalTranslation(cursorBox, safeIntersections)
+
+  const EPS = 1e-12;
+
+  function safeSignZero(value: number) {
+    return Math.abs(value) < EPS ? 0 : Math.sign(value);
+  }
+
+  const cor = new Vector3(
+    safeSignZero(snap.x) * -treshold,
+    safeSignZero(snap.y) * -treshold,
+    safeSignZero(snap.z) * -treshold,
+  );
+
+  useEffect(() => {
+    setCursorData({
+      snapbox: new SnapBox({
+        position: point,
+        rotation: new Euler(0, yaw, 0),
+        halfExtents: new Vector3(width, height, depth).addScalar(treshold),
+      }),
+      intersections: safeIntersections,
+    })
+  }, [point]);
 
   return (
     <>
-      <group scale={groupProps.scale} visible={false} ref={boundingBoxRef}>
+
+      <group visible={false} rotation={[0, 0, 0]} ref={AABBRef} {...groupProps}>
         {children}
       </group>
 
-      {snapContext.cursorVisible && (
-        <>
-          <group ref={visualRef} scale={groupProps.scale}>
-            {children}
-          </group>
+      <mesh rotation={[0, yaw, 0]} position={point}>
+        <boxGeometry args={[
+          halfExtents.map(n => n * 2 + treshold)[0],
+          halfExtents.map(n => n * 2 + treshold)[1],
+          halfExtents.map(n => n * 2 + treshold)[2]
+        ]} />
+        <meshStandardMaterial wireframe={true} color={"red"} />
+      </mesh>
 
-          <mesh ref={hitboxRef} visible={false}>
-            <boxGeometry args={hitboxArgs} />
-          </mesh>
-
-          <mesh ref={previewRef}>
-            <boxGeometry args={boxArgs} />
-            <meshStandardMaterial wireframe color="violet" />
-          </mesh>
-        </>
-      )}
+      <group rotation={[0, yaw, 0]} position={point.clone().add(snap).add(cor)} {...groupProps}>
+        {children}
+      </group>
     </>
   );
 }

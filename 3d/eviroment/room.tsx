@@ -5,58 +5,50 @@ import { useSnapshot } from 'valtio';
 import { Vector3 } from 'three';
 import { SnapCursor } from "@/snapping-tools/snap-cursor";
 import { SnapPlacedObject } from "@/snapping-tools/placed-constraint";
-import { usePlacementData } from "@/snapping-tools/hooks/use-placement-data";
 import { store } from '@/store';
 import { ModuleEntity, toModuleEntity } from '@/types';
 import { FacadeConfig } from "@/3d/furniture/assembler"
 import { ModuleMenu } from "@/3d/furniture/actions";
 import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
-import { Gltf } from '@react-three/drei';
+import { Gltf, Html } from '@react-three/drei';
+import { CursorRoom } from '@/snapping-tools/cursor-room';
+import { useCursorData } from '@/snapping-tools/hooks/use-cursor-data';
 
 export default function Room() {
     const snap = useSnapshot(store);
-    const getPlacementData = usePlacementData();
-  
+    const CursorModel = snap.currentRawModule?.model ?? null;
+    const cursorData = useCursorData()
+
+    // const { cursorData } = useCursorData()
+    // cursorData.intersectsBounds SnapBoxes[]
+    // cursorData.intersections SnapBoxes[]
+    // cursorData.intersections.length number
+    // cursorData.position
+    // cursorData.rotation
+    // cursorData.halfExtent
+
     useEffect(() => {
         const handlePointerUp = () => {
-            if (!store.currentRawModule) return;
 
-            const result = getPlacementData();
-            if (!result.possible) {
-                console.log('Cannot place:', result.reason);
-                return;
-            }
-            const placement = result.data!;
-            const position = new Vector3(...placement.position);
-            const normal = new Vector3(0, 0, 1);
-
-            const entity = toModuleEntity(store.currentRawModule, position, normal);
-            entity.openAngle = placement.rotation[1];
-            const snapPlanes = placement.snapPlanes.map(plane => ({
-                point: [...plane.point] as [number, number, number],
-                normal: [...plane.normal] as [number, number, number]
-            }));
-
-            entity.snapPlanes = snapPlanes;
-            entity.halfExtents = placement.halfExtents;
-
-            store.modules.push(entity);
-            store.currentRawModule = null;
         };
 
         window.addEventListener('pointerup', handlePointerUp, true);
         return () => window.removeEventListener('pointerup', handlePointerUp, true);
-    }, [getPlacementData]);
+    }, []);
 
-    const CursorModel = snap.currentRawModule?.model ?? null;
     return (
         <>
-            {CursorModel && (
-                <SnapCursor userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
-                    <CursorModel />
-                </SnapCursor>
-            )}
+            <Html>
+                {JSON.stringify(cursorData)}
+            </Html>
+            <CursorRoom width={snap.room.w} height={snap.room.h} depth={snap.room.d}>
+                {CursorModel &&
+                    <SnapCursor userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
+                        <CursorModel />
+                    </SnapCursor>}
+            </CursorRoom>
+
             <RoomWalls />
 
             {snap.modules.map(entity => {

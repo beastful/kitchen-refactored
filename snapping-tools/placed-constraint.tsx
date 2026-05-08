@@ -3,47 +3,6 @@ import { Group, Vector3 } from 'three';
 import { useSnapContext } from './snap-provider';
 import { SnapPlane, SnapPlacedObjectProps } from './types';
 
-const _result = new Vector3();
-const _planePoint = new Vector3();
-const _planeNormal = new Vector3();
-
-function getWorldHalf(half: [number, number, number], yaw: number) {
-  const cos = Math.round(Math.cos(yaw));
-  const sin = Math.round(Math.sin(yaw));
-  return {
-    x: Math.abs(half[0] * cos) + Math.abs(half[2] * sin),
-    y: half[1],
-    z: Math.abs(half[0] * sin) + Math.abs(half[2] * cos),
-  };
-}
-
-function recalculate(group: Group | null, half: [number, number, number], planes: SnapPlane[]) {
-  if (!group || planes.length === 0) return;
-  const yaw = group.rotation.y;
-  const worldHalf = getWorldHalf(half, yaw);
-  const locked = { x: false, y: false, z: false };
-
-  _result.set(group.position.x, group.position.y, group.position.z);
-
-  for (const p of planes) {
-    _planePoint.set(...p.point);
-    _planeNormal.set(...p.normal);
-
-    const absX = Math.abs(_planeNormal.x);
-    const absY = Math.abs(_planeNormal.y);
-    const absZ = Math.abs(_planeNormal.z);
-    const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
-    if (locked[axis]) continue;
-    locked[axis] = true;
-
-    const dir = Math.sign(_planeNormal[axis]);
-    const h = axis === 'x' ? worldHalf.x : axis === 'y' ? worldHalf.y : worldHalf.z;
-    _result[axis] = _planePoint[axis] + h * dir;
-  }
-
-  group.position.copy(_result);
-}
-
 export const SnapPlacedObject = forwardRef<Group, SnapPlacedObjectProps>(
   ({ id, position, rotation = [0, 0, 0], scale = 1, halfExtents, snapPlanes, useDistance = true, children }, forwardedRef) => {
     const groupRef = useRef<Group>(null);
@@ -61,14 +20,6 @@ export const SnapPlacedObject = forwardRef<Group, SnapPlacedObjectProps>(
 
       return unregister;
     }, [id, useDistance, snapContext, halfExtents]);
-
-    useEffect(() => {
-      recalculate(groupRef.current, halfExtents, snapPlanes);
-    }, []); // eslint-disable-line
-
-    useEffect(() => {
-      recalculate(groupRef.current, halfExtents, snapPlanes);
-    }, [rotation[1], halfExtents, snapPlanes]);
 
     return (
       <group ref={groupRef} position={position} rotation={rotation} scale={scale}>

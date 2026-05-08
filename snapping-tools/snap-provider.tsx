@@ -1,12 +1,14 @@
 import { createContext, useContext, useRef, useState, useCallback } from 'react';
-import { Vector3 } from 'three';
+import { Euler, Vector3 } from 'three';
 import {
   StoredPointerEvent,
   SnapContextValue,
   SnapProviderProps,
   StoredConstraint,
   CursorLiveState,
+  CursorDataType
 } from './types';
+import { SnapBox } from './utils';
 
 const SnapContext = createContext<SnapContextValue | null>(null);
 
@@ -14,15 +16,6 @@ export function SnapProvider({ children, debug = false }: SnapProviderProps) {
   const [pointerEvent, setPointerEvent] = useState<StoredPointerEvent>(null);
   const [cursorVisible, setCursorVisible] = useState(false);
   const constraintsMap = useRef<Map<string, StoredConstraint>>(new Map());
-
-  const cursorStateRef = useRef<CursorLiveState>({
-    position: new Vector3(),
-    rotation: 0,
-    isSnapped: false,
-    snapPosition: null,
-    halfExtents: new Vector3(),
-    snapPlanes: [],
-  });
 
   const registerConstraint = (constraint: StoredConstraint) => {
     constraintsMap.current.set(constraint.id, constraint);
@@ -33,20 +26,18 @@ export function SnapProvider({ children, debug = false }: SnapProviderProps) {
     constraintsMap.current.forEach(callback);
   };
 
-  const updateCursorState = useCallback((partial: Partial<CursorLiveState>) => {
-    const s = cursorStateRef.current;
-    if (partial.position) s.position.copy(partial.position);
-    if (partial.snapPosition) {
-      s.snapPosition ??= new Vector3();
-      s.snapPosition.copy(partial.snapPosition);
-    }
-    if (partial.halfExtents) s.halfExtents.copy(partial.halfExtents);
-    if (partial.rotation !== undefined) s.rotation = partial.rotation;
-    if (partial.isSnapped !== undefined) s.isSnapped = partial.isSnapped;
-    if (partial.snapPlanes) s.snapPlanes = partial.snapPlanes;
-  }, []);
+  const cursorData = useRef<CursorDataType>({
+    snapbox: new SnapBox({
+      position: new Vector3(),
+      rotation: new Euler(),
+      halfExtents: new Vector3()
+    }),
+    intersections: []
+  })
 
-  const getCursorState = useCallback(() => cursorStateRef.current, []);
+  const setCursorData = (data: CursorDataType) => {
+    cursorData.current = data
+  }
 
   const value: SnapContextValue = {
     debug,
@@ -56,9 +47,9 @@ export function SnapProvider({ children, debug = false }: SnapProviderProps) {
     setCursorVisible,
     registerConstraint,
     queryConstraints,
-    cursorStateRef,
-    updateCursorState,
-    getCursorState,
+    setCursorData,
+    cursorData: cursorData.current,
+    constraintsMap: constraintsMap.current
   };
 
   return <SnapContext.Provider value={value}>{children}</SnapContext.Provider>;
