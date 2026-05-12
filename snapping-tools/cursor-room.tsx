@@ -1,17 +1,20 @@
-import { ReactNode, useEffect, useMemo, useRef } from "react"
+import { ReactNode, useEffect, useRef } from "react"
 import { useSnapContext } from "./snap-provider"
 import { Html } from "@react-three/drei";
-import { ScreenShare } from "lucide-react";
+import { ScreenShare, MousePointerClick } from "lucide-react";
 import { useThree } from "@react-three/fiber";
+import { motion, AnimatePresence } from "framer-motion";
+import { CursorClickIcon } from "./animated-icons/cursor-click";
 
 interface CursorRoomProps {
     children: ReactNode,
     width: number,
     height: number,
-    depth: number
+    depth: number,
+    show: boolean
 }
 
-export function CursorRoom({ children, width: depth, height, depth: width }: CursorRoomProps) {
+export function CursorRoom({ children, width: depth, height, depth: width, show }: CursorRoomProps) {
     const { pointerEvent, cursorVisible } = useSnapContext()
     const point = pointerEvent?.point;
     const isHovering = useRef(true)
@@ -35,18 +38,30 @@ export function CursorRoom({ children, width: depth, height, depth: width }: Cur
     const outY = point?.y > height * 0.5 + treshold || point?.y < -height * 0.5 - treshold;
     const outZ = point?.z > depth * 0.5 + treshold || point?.z < -depth * 0.5 - treshold;
 
-    const visible = outX || outY || outZ || !cursorVisible;
+    const visible = (outX || outY || outZ || !cursorVisible) && show;
 
     return <>
-        <Html>
-            {visible && isHovering.current && <div className="translate-x-[-50%] translate-y-[-50%] bg-white flex items-center p-3 pr-10 gap-2 rounded-md pointer-events-none">
-                <div className="w-10 h-10 min-w-10 flex justify-center items-center">
-                    <ScreenShare />
-                </div>
-                <div className="text-sm w-56">
-                    Наведите курсор на помещение для редактирования
-                </div>
-            </div>}
+        <Html
+            center
+            position={[0, 0, 0]}
+            style={{ pointerEvents: 'none', userSelect: 'none' }}
+        >
+            <AnimatePresence>
+                {visible && isHovering.current && (
+                    <motion.div
+                        key="hint"
+                        initial={{ opacity: 0, y: 12, scale: 0.92 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 26 }}
+                        className="flex flex-col items-center"
+                    >
+                        <div>
+                            <CursorClickIcon className="text-black opacity-20" size={100} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </Html>
         <group visible={!visible}>
             {children}

@@ -1,6 +1,7 @@
 import { Vector3, Color } from 'three';
 import { CATEGORY_FLOOR, CATEGORY_ROOM, CATEGORY_TECH, CATEGORY_WALL, CONFIGURABLE_FLOOR, EXPLICT_CASE_DOUBLE, EXPLICT_CASE_EXTRA_QPI, EXPLICT_CASE_FOLD, EXPLICT_CASE_STRAIGHT, EXPLICT_CASE_TOP, EXPLICT_CASE_TUNNEL, EXPLICT_CASE_WINDOW, HAS_CONFIGURATION, HAS_TABLETOP, INCONFIGURABLE, ROTATATABLE } from './constants';
 import { SnapPlane } from './snapping-tools/types';
+import { SnapBox } from './snapping-tools/utils';
 
 export type CategoryTag =
     | typeof CATEGORY_ROOM
@@ -71,6 +72,7 @@ export interface ModuleEntity {
     color: Color;
     snapPlanes: SnapPlane[];
     halfExtents: [number, number, number];
+    intersections: SnapBox[];
 }
 
 export function toModuleEntity(def: ModuleDef, position: Vector3, normal?: Vector3): ModuleEntity {
@@ -100,11 +102,12 @@ export function toModuleEntity(def: ModuleDef, position: Vector3, normal?: Vecto
         facade: 'A',
         color: new Color('#CAC0B4'),
         snapPlanes: [],
-        halfExtents: [0, 0, 0]
+        halfExtents: [0, 0, 0],
+        intersections: []
     };
 }
 
 export interface AssemblerProps {
-  children: React.ReactNode;
-  entity: ModuleEntity;
+    entity: ModuleEntity;
+    src: string;
 }

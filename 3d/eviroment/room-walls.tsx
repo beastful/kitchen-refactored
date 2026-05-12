@@ -101,7 +101,7 @@ export function RoomWalls() {
         </SnapConstraint>
         <mesh name="wall" position={[0, 0, -snap.room.w * 0.5 - depth * 0.5]} receiveShadow castShadow>
             <boxGeometry args={[snap.room.d, snap.room.h, depth]} />
-            <meshBasicMaterial color={snap.roomColor} />
+            <meshMatcapMaterial color={snap.roomColor} />
         </mesh>
 
         {/* floor */}

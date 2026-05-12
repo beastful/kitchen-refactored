@@ -341,10 +341,11 @@ export const SegmentRuler = memo(({
 
     return (
         <group>
-            <Line points={linePoints} color={lineColor} lineWidth={2} />
+            <Line  raycast={() => {}} points={linePoints} color={lineColor} lineWidth={2} />
 
             {tickPairs.map((pair, i) => (
                 <Line
+                 raycast={() => {}}
                     key={i}
                     points={pair}
                     color={tickColor}
@@ -354,6 +355,8 @@ export const SegmentRuler = memo(({
 
             <group position={textPos} quaternion={textQuat}>
                 <Text
+
+                 raycast={() => {}}
                     fontSize={thickness * 3}
                     color={textColor}
                     anchorX="center"
@@ -373,7 +376,7 @@ SegmentRuler.displayName = 'SegmentRuler';
 // RaycastRuler — инкрементальный пересчёт с прореживанием
 // ─────────────────────────────────────────────────────────────
 export function RaycastRuler({ from, to, textAngle, threshold = 1 }) {
-    const snap = useSnapshot(store, { sync: true });
+    const snap = useSnapshot(store);
     const [segments, setSegments] = useState([]);
 
     const prevModulesRef = useRef([]);

@@ -12,7 +12,7 @@ import { data } from '@/data'
 import { ModuleCard } from '@/components/moleculas/module-card'
 import { CalculatorComponent } from '../organisms/calculator'
 import { PDFExportButton } from '@/components/moleculas/pdf-button'
-import { CATEGORY_FLOOR, CATEGORY_TECH, CATEGORY_WALL, COLORS, OPEN_ANGLE_SNAP, TABLETOP_OPTIONS, WALL_HEIGHTS } from '@/constants'
+import { CATEGORY_FLOOR, CATEGORY_ROOM, CATEGORY_TECH, CATEGORY_WALL, COLORS, OPEN_ANGLE_SNAP, TABLETOP_OPTIONS, WALL_HEIGHTS } from '@/constants'
 import ModuleConfig from '@/components/organisms/module-editor'
 import { MobileScreen } from '@/components/organisms/mobile-screen'
 import { HintScreen } from '@/components/organisms/hint-screen'
@@ -295,6 +295,9 @@ export default function Configurator() {
                                     onSelect={handleWallHeightSelect}
                                 />
                             </section>
+                            <div className='grid grid-cols-3 gap-[15px]'>
+                                {data.filter(module => module.tags.includes(CATEGORY_ROOM)).map((module) => <ModuleCard key={JSON.stringify(module)} module={module} />)}
+                            </div>
                         </div>
                     </SidebarPage>
                 </Sidebar>

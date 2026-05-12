@@ -52,6 +52,8 @@ export interface SnapConstraintUserDataType {
 export interface StoredConstraint {
     id: string;
     ref: RefObject<Object3D | null>;
+    position: [number, number, number];
+    rotation: [number, number, number];
     halfExtents: [number, number, number];
     userData: SnapConstraintUserDataType;
 }
@@ -77,6 +79,10 @@ export interface SnapContextValue {
 export type SnapCursorProps = ThreeElements['group'] & {
     children?: ReactNode;
     flipToFace?: boolean;
+    lock: Vector3;
+    lockX: boolean;
+    lockY: boolean;
+    lockZ: boolean;
 };
 
 export type Intersection = [center: Vector3, size: Vector3, normal: Vector3];
@@ -87,9 +93,13 @@ export type SnapPlacedObjectProps = {
     rotation?: [number, number, number];
     scale?: number | [number, number, number];
     halfExtents: [number, number, number];
-    snapPlanes: SnapPlane[];
     useDistance?: boolean;
     children: React.ReactNode;
+    intersections: SnapBox[];
+    lockX: boolean;
+    lockY: boolean;
+    lockZ: boolean;
+    lock: Vector3;
 };
 
 export type PlacementResult = {

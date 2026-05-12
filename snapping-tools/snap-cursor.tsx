@@ -1,7 +1,7 @@
 import { Euler, Group, Matrix4, Quaternion, Vector3 } from 'three';
 import { useSnapContext } from './snap-provider';
 import { SnapCursorProps, Intersection, BoxArgs } from './types';
-import { getYawFromNormal, SnapBox } from './utils';
+import { getYawFromNormal, safeSignZero, SnapBox } from './utils';
 import { useEffect, useMemo, useRef } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
@@ -9,6 +9,7 @@ import { Box3, Object3D } from 'three';
 import { useBoundingBox } from './hooks/use-bounding-box';
 import { getDominantXOverlaps, getNonOverlappingXPositions, getOverlapOnWorldAxis, intersectSnapBox } from './utils/intersection-check';
 import { computeMinimalTranslation } from './hooks/minimal-translation';
+import { SNAP_RADIUS } from './constants';
 
 function applyYaw(vector: Vector3, yaw: number) {
   const matrix = new Matrix4().makeRotationY(yaw);
@@ -61,7 +62,7 @@ function useIntersections({ cursor, hit, bounds }: {
   }
 }
 
-export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
+export function SnapCursor({ children, lockX, lockY, lockZ, lock, ...groupProps }: SnapCursorProps) {
   const { pointerEvent, setCursorData } = useSnapContext()
   const yaw = getYawFromNormal(pointerEvent?.normal || new Vector3())
   const point = pointerEvent?.point || new Vector3();
@@ -70,12 +71,13 @@ export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
   const bounds = useBounds();
   const [AABBRef, halfExtents] = useBoundingBox()
   const [width, height, depth] = halfExtents
-  const treshold = 0.4
+  const treshold = SNAP_RADIUS
   const cursorBox = new SnapBox({
     position: point,
     rotation: new Euler(0, yaw, 0),
     halfExtents: new Vector3(width, height, depth).addScalar(treshold),
   })
+  const boundDebug = useBounds()
 
   const {
     intersections,
@@ -95,48 +97,45 @@ export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
     return false
   }) : intersections;
 
-  const snap = computeMinimalTranslation(cursorBox, safeIntersections)
-
-  const EPS = 1e-12;
-
-  function safeSignZero(value: number) {
-    return Math.abs(value) < EPS ? 0 : Math.sign(value);
-  }
-
+  const snap = computeMinimalTranslation(cursorBox, safeIntersections);
   const cor = new Vector3(
     safeSignZero(snap.x) * -treshold,
     safeSignZero(snap.y) * -treshold,
     safeSignZero(snap.z) * -treshold,
   );
 
+  const lockedPoint = new Vector3(
+    lockX == true ? lock.x : point.x,
+    lockY == true ? lock.y + cor.y : point.y,
+    lockZ == true ? lock.z : point.z,
+  );
+
   useEffect(() => {
     setCursorData({
       snapbox: new SnapBox({
-        position: point,
+        position: lockedPoint,
         rotation: new Euler(0, yaw, 0),
-        halfExtents: new Vector3(width, height, depth).addScalar(treshold),
+        halfExtents: new Vector3(width, height, depth),
       }),
       intersections: safeIntersections,
     })
   }, [point]);
 
+  const final = point.clone().add(snap).add(cor);
+
+  const locked = new Vector3(
+    lockX == true ? lock.x : final.x,
+    lockY == true ? lock.y : final.y,
+    lockZ == true ? lock.z : final.z,
+  );
+
   return (
     <>
-
       <group visible={false} rotation={[0, 0, 0]} ref={AABBRef} {...groupProps}>
         {children}
       </group>
 
-      <mesh rotation={[0, yaw, 0]} position={point}>
-        <boxGeometry args={[
-          halfExtents.map(n => n * 2 + treshold)[0],
-          halfExtents.map(n => n * 2 + treshold)[1],
-          halfExtents.map(n => n * 2 + treshold)[2]
-        ]} />
-        <meshStandardMaterial wireframe={true} color={"red"} />
-      </mesh>
-
-      <group rotation={[0, yaw, 0]} position={point.clone().add(snap).add(cor)} {...groupProps}>
+      <group rotation={[0, yaw, 0]} position={locked} {...groupProps}>
         {children}
       </group>
     </>

@@ -3,6 +3,12 @@ import { Box3, Object3D, Matrix4 } from 'three';
 import { MutableRefObject } from 'react';
 import { Intersection, SnapPlane } from "./types";
 
+const EPS = 1e-12;
+
+export function safeSignZero(value: number) {
+    return Math.abs(value) < EPS ? 0 : Math.sign(value);
+}
+
 export function getYawFromNormal(normal: Vector3): number {
     const flatX = normal.x;
     const flatZ = normal.z;
@@ -22,6 +28,28 @@ export class SnapBox {
         this.position = position;
         this.rotation = rotation;
         this.halfExtents = halfExtents;
+    }
+
+    serialize() {
+        return JSON.stringify({
+            position: [...this.position.toArray()],
+            rotation: [...this.rotation.toArray()],
+            halfExtents: [...this.halfExtents.toArray()]
+        })
+    }
+
+    deserialize(json: string) {
+        try {
+            const { rotation, position, halfExtents } = JSON.parse(json)
+            this.position = new Vector3().fromArray(position);
+            this.rotation = new Euler().fromArray(rotation);
+            this.halfExtents = new Vector3().fromArray(halfExtents);
+        } catch {
+            this.position = new Vector3();
+            this.rotation = new Euler();
+            this.halfExtents = new Vector3();
+            console.warn("SnapBox: given JSON data is invalid, all wallues set to 0")
+        }
     }
 }
 

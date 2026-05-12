@@ -37,6 +37,8 @@ export function SnapConstraint({
         const unregister = snapContext.registerConstraint({
             id,
             ref: realRef,
+            position: groupProps.position as [number, number, number],
+            rotation: groupProps.rotation as [number, number, number],
             halfExtents,
             userData
         });

@@ -1,36 +1,62 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { Group, Mesh, Object3D } from "three";
+import { useEffect, useState, useMemo } from "react";
+import { Mesh, Object3D } from "three";
 import { AssemblerProps } from "@/types";
-import { ObjectClassifier } from "@/lib/classifier";
 import { Facade } from "./facade";
 import { Handle } from "./handle";
 import { Shell } from "./shell";
 import { Shelf } from "./shelf";
+import { useGLTF } from "@react-three/drei";
+import { Box3, Vector3 } from "three";
+import { OBB } from "three/examples/jsm/Addons.js";
+
+export class ObjectClassifier {
+  private threshold: number;
+
+  constructor(threshold = 5) {
+    this.threshold = threshold;
+  }
+
+  getSize(obj: Object3D): Vector3 {
+    const box = new Box3().setFromObject(obj);
+    const obb = new OBB();
+    obb.fromBox3(box)
+    obb.applyMatrix4(obj.matrixWorld)
+    const size = new Vector3();
+    obb.getSize(size);
+    return size;
+  }
+
+  isShelf(obj: Object3D): boolean {
+    const size = this.getSize(obj)
+    return !(size.x / size.z > this.threshold || size.z / size.x > this.threshold)
+  }
+
+  isFacade(obj: Object3D): boolean {
+    const size = this.getSize(obj)
+    return size.x / size.z > this.threshold || size.z / size.x > this.threshold
+  }
+}
 
 const classifier = new ObjectClassifier();
 
-export function FacadeConfig({ children, entity }: AssemblerProps) {
-  const rootRef = useRef<Group>(null);
-  const [modules, setModules] = useState<{
-    facades: Object3D[];
-    shelves: Object3D[];
-    handles: Object3D[];
-    modules: Object3D[];
-  }>({ facades: [], shelves: [], handles: [], modules: [] });
+export function FacadeConfig({ src, entity }: AssemblerProps) {
+  const { scene } = useGLTF(src);
+  const model = useMemo(() => scene.clone(), [scene])
+  const [facades, setFacades] = useState<Object3D[]>([]);
+  const [shelves, setShelves] = useState<Object3D[]>([]);
+  const [handles, setHandles] = useState<Object3D[]>([]);
+  const [modules, setModules] = useState<Object3D[]>([]);
 
   useEffect(() => {
-    if (!rootRef.current) return;
-
     const tmpFacades: Object3D[] = [];
     const tmpShelves: Object3D[] = [];
     const tmpHandles: Object3D[] = [];
     const tmpModules: Object3D[] = [];
 
-    rootRef.current.traverse((obj) => {
-      if (obj.name.includes("_F") && (classifier.isFacade(obj) || obj.userData.wasFacade)) {
-        obj.userData.wasFacade = true;
+    model.traverse((obj: Object3D) => {
+      if (obj.name.includes("_F") && classifier.isFacade(obj)) {
         tmpFacades.push(obj);
       } else if (obj.name.includes("_F") && classifier.isShelf(obj) && !obj.name.includes("_IC")) {
         tmpShelves.push(obj);
@@ -43,30 +69,19 @@ export function FacadeConfig({ children, entity }: AssemblerProps) {
       }
     });
 
-    setModules({
-      facades: tmpFacades,
-      shelves: tmpShelves,
-      handles: tmpHandles,
-      modules: tmpModules
-    });
-
-  }, []);
+    setFacades(tmpFacades)
+    setShelves(tmpShelves)
+    setHandles(tmpHandles)
+    setModules(tmpModules)
+  }, [model])
 
   return (
     <>
-      {modules.handles.map((model) => (
-        <Handle key={model.id} entity={entity} model={model as Mesh} />
-      ))}
-      {modules.facades.map((model) => (
-        <Facade key={model.id} entity={entity} model={model as Mesh} />
-      ))}
-      {modules.shelves.map((model) => (
-        <Shelf key={model.id} entity={entity} model={model as Mesh} />
-      ))}
-      {modules.modules.map((model) => (
-        <Shell key={model.id} entity={entity} model={model as Mesh} />
-      ))}
-      <group ref={rootRef}>{children}</group>
+      {facades.map(model => <Facade key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
+      {shelves.map(model => <Shelf key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
+      {handles.map(model => <Handle key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
+      {modules.map(model => <Shell key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
+      <primitive object={model} />
     </>
   );
 }

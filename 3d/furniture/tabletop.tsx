@@ -7,13 +7,13 @@ import { useSnapshot } from "valtio";
 
 export function Tabletop({ children, entity }: { children: ReactNode, entity: ModuleEntity }) {
     const snap = useSnapshot(store)
-  //  const matcapTexture = useTexture('matcaps/mc1.png');
+ const matcapTexture = useTexture('matcaps/mc1.png');
 
     return <>
         <group>
-            {entity.tags.includes(HAS_TABLETOP) && <mesh position={[0, entity.halfExtents[1] * 10 + 0.1, 0]}>
-                <meshMatcapMaterial color={snap.tabletopColor} />
-                <boxGeometry args={[entity.halfExtents[0] * 2 * 10, 0.03 * 10, entity.halfExtents[2] * 2 * 10]} />
+            {entity.tags.includes(HAS_TABLETOP) && <mesh position={[0, 4.4, -entity.halfExtents[2] * 10 + 3.3]}>
+                <meshMatcapMaterial matcap={matcapTexture} color={snap.tabletopColor} />
+                <boxGeometry args={[entity.halfExtents[0] * 2 * 10, 0.03 * 10, 0.7 * 10]} />
             </mesh>}
             {children}
         </group>
