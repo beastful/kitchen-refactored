@@ -24,8 +24,8 @@ function recalculate(
   group: Group | null,
   half: [number, number, number],
   planes: SnapPlane[],
-  lock?: Vector3,
-  lockY?: boolean
+  lock: Vector3,
+  lockY: boolean
 ) {
   if (!group) return;
 
@@ -54,10 +54,6 @@ function recalculate(
     }
 
     group.position.copy(_result);
-     group.position.y = lock.y;
-  }
-
-  if (lockY && lock) {
     group.position.y = lock.y;
   }
 }
@@ -91,9 +87,6 @@ export const SnapPlacedObject = forwardRef<Group, SnapPlacedObjectProps>(
 
     return (
       <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
-        <Html>
-          {lock.y}
-        </Html>
         {children}
       </group>
     );
