@@ -105,6 +105,6 @@ export function toModuleEntity(def: ModuleDef, position: Vector3, normal?: Vecto
 }
 
 export interface AssemblerProps {
-  children: React.ReactNode;
+  src: string;
   entity: ModuleEntity;
 }

@@ -114,9 +114,7 @@ export default function Room() {
                         >
                             {EntityModel && <ModuleMenu entity={entity as ModuleEntity}>
                                 <Tabletop entity={entity as ModuleEntity}>
-                                    <FacadeConfig entity={entity as ModuleEntity}>
-                                        <Gltf src={`/${entity.name}.glb`} />
-                                    </FacadeConfig>
+                                    <FacadeConfig src={`/${entity.name}.glb`} entity={entity as ModuleEntity} />
                                 </Tabletop>
                             </ModuleMenu>}
                         </SnapPlacedObject>
