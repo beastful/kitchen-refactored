@@ -81,10 +81,10 @@ export function RoomWalls() {
                 <meshMatcapMaterial color={snap.roomColor} />
             </mesh>
         </SnapConstraint>
-        <SnapConstraint useCursor useDistance rotation={[-Math.PI / 2, 0, 0]} position={[0, -snap.room.h / 2 - 0.001, 0]}>
+        <SnapConstraint useCursor useDistance rotation={[0, 0, 0]} position={[0, -snap.room.h / 2 - 0.001 + (depth / 2), 0]}>
             <Suspense fallback={null}>
                 <mesh name="floor" receiveShadow>
-                    <planeGeometry args={[snap.room.d, snap.room.w, 100, 100]} />
+                    <boxGeometry args={[snap.room.d, depth, snap.room.w]} />
                     <meshStandardMaterial map={colorMap} roughness={0.35} displacementScale={0.01} transparent />
                 </mesh>
             </Suspense>

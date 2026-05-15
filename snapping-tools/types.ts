@@ -70,6 +70,8 @@ export interface SnapContextValue {
 
 export type SnapCursorProps = ThreeElements['group'] & {
     children?: ReactNode;
+    lockY: boolean;
+    lock: Vector3;
     flipToFace?: boolean;
 };
 
@@ -84,6 +86,8 @@ export type SnapPlacedObjectProps = {
     snapPlanes: SnapPlane[];
     useDistance?: boolean;
     children: React.ReactNode;
+    lockY: boolean;
+    lock: Vector3;
 };
 
 export type PlacementResult = {

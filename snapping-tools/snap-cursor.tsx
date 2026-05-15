@@ -6,71 +6,33 @@ import { buildSnapPlanes, checkIntersectionFast, computeSnappedPosition, distanc
 import { useRef } from "react";
 import { Group, Mesh, Vector3, Box3 } from "three";
 import { useSnapCursor } from "./hooks/use-snap-cursor";
-import { MAGNET_BOOST, MAGNET_DAMPING, MAGNET_DECAY, MAGNET_SMOOTH, MAX_DT, SNAP_RADIUS, THROTTLE } from "./constants";
+import { SNAP_RADIUS, THROTTLE } from "./constants";
 
-const _b1 = new Box3();
 const _v1 = new Vector3();
 const _v2 = new Vector3();
 const _v3 = new Vector3();
 const _bConstraint = new Box3();
 
-function createMagnet() {
-  const state = {
-    current: new Vector3(),
-    vel: new Vector3(),
-    wasSnapped: false,
-    stickTimer: 0,
-  };
-
-  return {
-    pos: state.current,
-    update: (targetPos: Vector3, isSnapped: boolean, rawDt: number) => {
-      const dt = Math.min(rawDt, MAX_DT);
-
-      // Сброс таймера при входе в snap
-      if (isSnapped && !state.wasSnapped) state.stickTimer = 0;
-      if (isSnapped) state.stickTimer += dt;
-      state.wasSnapped = isSnapped;
-
-      if (isSnapped) {
-        // ─── Режим примагничивания: пружина с демпфированием ───
-        const boost = MAGNET_BOOST * Math.exp(-state.stickTimer * MAGNET_DECAY);
-        const speed = MAGNET_SMOOTH + boost;
-        const t = 1 - Math.exp(-speed * dt);
-
-        _v1.copy(targetPos).sub(state.current).multiplyScalar(t);
-        state.vel.add(_v1);
-        state.vel.multiplyScalar(Math.exp(-MAGNET_DAMPING * dt));
-        state.current.add(state.vel);
-      } else {
-        // ─── Режим движения: чистый lerp, без физики ───
-        const t = 1 - Math.exp(-MAGNET_SMOOTH * dt);
-        state.current.lerp(targetPos, t);
-
-        // Важно: обнуляем скорость, чтобы при следующем snap
-        // не было рывка от накопленной инерции свободного движения
-        state.vel.set(0, 0, 0);
-      }
-    },
-  };
-}
-
-export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
+export function SnapCursor({ children, lockY = true, lock, ...groupProps }: SnapCursorProps) {
   const snapContext = useSnapContext();
-  const { position: cursorPos, rotationYaw, boundingBoxRef, halfExtents } = useSnapCursorTransform();
+  const { position: cursorActualPos, rotationYaw, boundingBoxRef, halfExtents } = useSnapCursorTransform();
   const { updateCursorState } = useSnapCursor();
 
   const visualRef = useRef<Group>(null);
   const hitboxRef = useRef<Mesh>(null);
   const previewRef = useRef<Mesh>(null);
   const frameCount = useRef(0);
-  const magnet = useRef(createMagnet()).current;
 
   const cursorHalf = new Vector3(halfExtents[0], halfExtents[1], halfExtents[2]);
   const boxArgs = halfExtents.map(n => n * 2) as BoxArgs;
   const hitboxArgs = boxArgs.map(n => n + SNAP_RADIUS * 2) as BoxArgs;
+  const cursorPos = new Vector3(
+    cursorActualPos.x,
+    lockY == true ? lock.y :  cursorActualPos.y,
+    cursorActualPos.z,
+  )
 
-  useFrame((_state, dt) => {
+  useFrame((_state, _dt) => {
     visualRef.current?.position.copy(cursorPos);
     visualRef.current?.rotation.set(0, rotationYaw, 0);
     hitboxRef.current?.position.copy(cursorPos);
@@ -83,6 +45,7 @@ export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
     const MAX_DIST_SQ = 4; // 2²
 
     const cursorWorldPos = _v1.copy(cursorPos);
+
     visualRef.current?.localToWorld(cursorWorldPos);
 
     snapContext.queryConstraints(({ ref: constraint, userData }) => {
@@ -111,20 +74,9 @@ export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
       ? computeSnappedPosition(cursorPos, intersections, cursorHalf, rotationYaw, _v3)
       : cursorPos;
 
-    if (isSnapped) {
-      // ─── Режим snap: магнит с пружиной и затуханием ───
-      magnet.update(snapPos, true, dt);
-      previewRef.current?.position.copy(magnet.pos);
-    } else {
-      // ─── Режим движения: мгновенное следование за курсором ───
-      previewRef.current?.position.copy(cursorPos);
+    const snapPosition = isSnapped ? snapPos : cursorPos;
 
-      // Сбрасываем магнит, чтобы при следующем snap не было рывка
-      // от накопленной инерции свободного движения
-      magnet.pos.copy(cursorPos);
-      magnet.update(cursorPos, false, dt); // обнуляет внутреннюю скорость
-    }
-
+    previewRef.current?.position.copy(snapPosition);
     previewRef.current?.rotation.set(0, rotationYaw, 0);
 
     const snapPlanes = isSnapped ? buildSnapPlanes(intersections) : [];
@@ -133,7 +85,7 @@ export function SnapCursor({ children, ...groupProps }: SnapCursorProps) {
       position: cursorPos,
       rotation: rotationYaw,
       isSnapped,
-      snapPosition: isSnapped ? snapPos : cursorPos,
+      snapPosition: snapPosition,
       halfExtents: cursorHalf,
       snapPlanes,
     });

@@ -1,0 +1,15 @@
+
+- [ ] Correct all modules
+- [ ] Correct pictures for modules
+- [x] Correct ruler
+- [ ] Create local ruler
+- [ ] Make gaps for modules
+- [ ] Make pictures for tech
+- [ ] Make pictures for door and window
+- [X] Correct collision
+- [ ] Correct local storage save
+- [ ] Make layer for database
+- [ ] Make sign up window
+- [ ] Make sign up check
+- [x] Make intersection check
+- [ ] Finish module select

@@ -2,6 +2,9 @@ import { forwardRef, useEffect, useRef } from 'react';
 import { Group, Vector3 } from 'three';
 import { useSnapContext } from './snap-provider';
 import { SnapPlane, SnapPlacedObjectProps } from './types';
+import { useSnapshot } from 'valtio';
+import { store } from '@/store';
+import { Html } from '@react-three/drei';
 
 const _result = new Vector3();
 const _planePoint = new Vector3();
@@ -17,37 +20,53 @@ function getWorldHalf(half: [number, number, number], yaw: number) {
   };
 }
 
-function recalculate(group: Group | null, half: [number, number, number], planes: SnapPlane[]) {
-  if (!group || planes.length === 0) return;
-  const yaw = group.rotation.y;
-  const worldHalf = getWorldHalf(half, yaw);
-  const locked = { x: false, y: false, z: false };
+function recalculate(
+  group: Group | null,
+  half: [number, number, number],
+  planes: SnapPlane[],
+  lock?: Vector3,
+  lockY?: boolean
+) {
+  if (!group) return;
 
-  _result.set(group.position.x, group.position.y, group.position.z);
+  // Only run plane snapping when there are planes
+  if (planes.length > 0) {
+    const yaw = group.rotation.y;
+    const worldHalf = getWorldHalf(half, yaw);
+    const locked = { x: false, y: false, z: false };
 
-  for (const p of planes) {
-    _planePoint.set(...p.point);
-    _planeNormal.set(...p.normal);
+    _result.set(group.position.x, group.position.y, group.position.z);
 
-    const absX = Math.abs(_planeNormal.x);
-    const absY = Math.abs(_planeNormal.y);
-    const absZ = Math.abs(_planeNormal.z);
-    const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
-    if (locked[axis]) continue;
-    locked[axis] = true;
+    for (const p of planes) {
+      _planePoint.set(...p.point);
+      _planeNormal.set(...p.normal);
 
-    const dir = Math.sign(_planeNormal[axis]);
-    const h = axis === 'x' ? worldHalf.x : axis === 'y' ? worldHalf.y : worldHalf.z;
-    _result[axis] = _planePoint[axis] + h * dir;
+      const absX = Math.abs(_planeNormal.x);
+      const absY = Math.abs(_planeNormal.y);
+      const absZ = Math.abs(_planeNormal.z);
+      const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
+      if (locked[axis]) continue;
+      locked[axis] = true;
+
+      const dir = Math.sign(_planeNormal[axis]);
+      const h = axis === 'x' ? worldHalf.x : axis === 'y' ? worldHalf.y : worldHalf.z;
+      _result[axis] = _planePoint[axis] + h * dir;
+    }
+
+    group.position.copy(_result);
+     group.position.y = lock.y;
   }
 
-  group.position.copy(_result);
+  if (lockY && lock) {
+    group.position.y = lock.y;
+  }
 }
 
 export const SnapPlacedObject = forwardRef<Group, SnapPlacedObjectProps>(
-  ({ id, position, rotation = [0, 0, 0], scale = 1, halfExtents, snapPlanes, useDistance = true, children }, forwardedRef) => {
+  ({ id, position, rotation = [0, 0, 0], scale = 1, halfExtents, snapPlanes, useDistance = true, children, lock, lockY }, forwardedRef) => {
     const groupRef = useRef<Group>(null);
     const snapContext = useSnapContext();
+    const snap = useSnapshot(store)
 
     useEffect(() => {
       if (!snapContext.registerConstraint || !groupRef.current) return;
@@ -63,15 +82,18 @@ export const SnapPlacedObject = forwardRef<Group, SnapPlacedObjectProps>(
     }, [id, useDistance, snapContext, halfExtents]);
 
     useEffect(() => {
-      recalculate(groupRef.current, halfExtents, snapPlanes);
-    }, []); // eslint-disable-line
+      recalculate(groupRef.current, halfExtents, snapPlanes, lock, lockY);
+    }, [lock.y, lockY]); // eslint-disable-line
 
     useEffect(() => {
-      recalculate(groupRef.current, halfExtents, snapPlanes);
-    }, [rotation[1], halfExtents, snapPlanes]);
+      recalculate(groupRef.current, halfExtents, snapPlanes, lock, lockY);
+    }, [rotation[1], halfExtents, snapPlanes, lock.y, lockY, snap]);
 
     return (
       <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
+        <Html>
+          {lock.y}
+        </Html>
         {children}
       </group>
     );
