@@ -1,261 +1,3 @@
-import { Model as M_UMB_1 } from '@/modules/UMB_JSX/M_UMB_1';
-import { Model as M_UMB_2 } from '@/modules/UMB_JSX/M_UMB_2';
-import { Model as M_UMB_3 } from '@/modules/UMB_JSX/M_UMB_3';
-import { Model as M_UMB_4 } from '@/modules/UMB_JSX/M_UMB_4';
-import { Model as M_UMB_5 } from '@/modules/UMB_JSX/M_UMB_5';
-import { Model as M_UMB_6 } from '@/modules/UMB_JSX/M_UMB_6';
-import { Model as M_UMB_7 } from '@/modules/UMB_JSX/M_UMB_7';
-import { Model as M_UMB_8 } from '@/modules/UMB_JSX/M_UMB_8';
-import { Model as M_UMB_9 } from '@/modules/UMB_JSX/M_UMB_9';
-import { Model as M_UMB_10 } from '@/modules/UMB_JSX/M_UMB_10';
-import { Model as M_UMB_11 } from '@/modules/UMB_JSX/M_UMB_11';
-import { Model as M_UMB_12 } from '@/modules/UMB_JSX/M_UMB_12';
-import { Model as M_UMB_13 } from '@/modules/UMB_JSX/M_UMB_13';
-
-import { Model as M_2YNSD_1 } from '@/modules/2YNSD_JSX/M_2YNSD_1';
-import { Model as M_2YNSD_2 } from '@/modules/2YNSD_JSX/M_2YNSD_2';
-import { Model as M_2YNSD_3 } from '@/modules/2YNSD_JSX/M_2YNSD_3';
-import { Model as M_2YNSD_4 } from '@/modules/2YNSD_JSX/M_2YNSD_4';
-import { Model as M_2YNSD_5 } from '@/modules/2YNSD_JSX/M_2YNSD_5';
-import { Model as M_2YNSD_6 } from '@/modules/2YNSD_JSX/M_2YNSD_6';
-import { Model as M_2YNSD_7 } from '@/modules/2YNSD_JSX/M_2YNSD_7';
-import { Model as M_2YNSD_8 } from '@/modules/2YNSD_JSX/M_2YNSD_8';
-import { Model as M_2YNSD_9 } from '@/modules/2YNSD_JSX/M_2YNSD_9';
-import { Model as M_2YNSD_10 } from '@/modules/2YNSD_JSX/M_2YNSD_10';
-import { Model as M_2YNSD_11 } from '@/modules/2YNSD_JSX/M_2YNSD_11';
-
-import { Model as Microwave } from '@/modules/TECH/Microwave';
-import { Model as Blender } from '@/modules/TECH/Blender';
-import { Model as CoffeMachine } from '@/modules/TECH/CoffeeMachine';
-import { Model as KitchenHoodLarge } from '@/modules/TECH/KitchenHoodLarge';
-import { Model as Refrigirator } from '@/modules/TECH/Refrigirator';
-import { Model as Stove } from '@/modules/TECH/Stove';
-import { Model as FridgeWithDisplay } from '@/modules/TECH/FridgeWithDisplay';
-import { Model as Window } from '@/modules/DOOR_WINDOW_COLOR/Window';
-
-import { Model as M_DSY_1_F_1_NN } from '@/modules/DSY_JSX/M_DSY_1_F_1_NN';
-import { Model as M_DSY_1_F_2_NN } from '@/modules/DSY_JSX/M_DSY_1_F_2_NN';
-
-import { Model as M_SPL_1 } from '@/modules/SPL_JSX/M_SPL_1';
-import { Model as M_SPL_2 } from '@/modules/SPL_JSX/M_SPL_2';
-import { Model as M_SPL_3 } from '@/modules/SPL_JSX/M_SPL_3';
-import { Model as M_SPL_4 } from '@/modules/SPL_JSX/M_SPL_4';
-import { Model as M_SPL_5 } from '@/modules/SPL_JSX/M_SPL_5';
-import { Model as M_SPL_6 } from '@/modules/SPL_JSX/M_SPL_6';
-import { Model as M_SPL_7 } from '@/modules/SPL_JSX/M_SPL_7';
-import { Model as M_SPL_8 } from '@/modules/SPL_JSX/M_SPL_8';
-import { Model as M_SPL_9 } from '@/modules/SPL_JSX/M_SPL_9';
-import { Model as M_SPL_10 } from '@/modules/SPL_JSX/M_SPL_10';
-import { Model as M_SPL_11 } from '@/modules/SPL_JSX/M_SPL_11';
-import { Model as M_SPL_12 } from '@/modules/SPL_JSX/M_SPL_12';
-import { Model as M_SPL_13 } from '@/modules/SPL_JSX/M_SPL_13';
-import { Model as M_SPL_14 } from '@/modules/SPL_JSX/M_SPL_14';
-
-import { Model as M_MU_1_F_2_NN } from '@/modules/MU_JSX/M_MU_1_F_2_NN';
-
-import { Model as M_UMA_1 } from '@/modules/UMA_JSX/M_UMA_1';
-import { Model as M_UMA_2 } from '@/modules/UMA_JSX/M_UMA_2';
-import { Model as M_UMA_3 } from '@/modules/UMA_JSX/M_UMA_3';
-import { Model as M_UMA_4 } from '@/modules/UMA_JSX/M_UMA_4';
-import { Model as M_UMA_5 } from '@/modules/UMA_JSX/M_UMA_5';
-import { Model as M_UMA_6 } from '@/modules/UMA_JSX/M_UMA_6';
-import { Model as M_UMA_7 } from '@/modules/UMA_JSX/M_UMA_7';
-import { Model as M_UMA_8 } from '@/modules/UMA_JSX/M_UMA_8';
-import { Model as M_UMA_9 } from '@/modules/UMA_JSX/M_UMA_9';
-import { Model as M_UMA_10 } from '@/modules/UMA_JSX/M_UMA_10';
-import { Model as M_UMA_11 } from '@/modules/UMA_JSX/M_UMA_11';
-import { Model as M_UMA_12 } from '@/modules/UMA_JSX/M_UMA_12';
-import { Model as M_UMA_13 } from '@/modules/UMA_JSX/M_UMA_13';
-
-import { Model as M_UMC_1 } from '@/modules/UMC_JSX/M_UMC_1';
-import { Model as M_UMC_2 } from '@/modules/UMC_JSX/M_UMC_2';
-import { Model as M_UMC_3 } from '@/modules/UMC_JSX/M_UMC_3';
-import { Model as M_UMC_7 } from '@/modules/UMC_JSX/M_UMC_7';
-import { Model as M_UMC_8 } from '@/modules/UMC_JSX/M_UMC_8';
-import { Model as M_UMC_9 } from '@/modules/UMC_JSX/M_UMC_9';
-import { Model as M_UMC_10 } from '@/modules/UMC_JSX/M_UMC_10';
-
-import { Model as M_UMD_1_F_1 } from '@/modules/UMD_JSX/M_UMD_1';
-import { Model as M_UMD_1_F_2 } from '@/modules/UMD_JSX/M_UMD_2';
-import { Model as M_UMD_1_F_3 } from '@/modules/UMD_JSX/M_UMD_3';
-import { Model as M_UMD_1_F_4 } from '@/modules/UMD_JSX/M_UMD_1_F_4';
-import { Model as M_UMD_1_F_5 } from '@/modules/UMD_JSX/M_UMD_1_F_5';
-import { Model as M_UMD_1_F_6 } from '@/modules/UMD_JSX/M_UMD_1_F_6';
-import { Model as M_UMD_1_F_7 } from '@/modules/UMD_JSX/M_UMD_1_F_7';
-import { Model as M_UMD_1_F_8 } from '@/modules/UMD_JSX/M_UMD_8';
-import { Model as M_UMD_1_F_9 } from '@/modules/UMD_JSX/M_UMD_9';
-import { Model as M_UMD_1_F_10 } from '@/modules/UMD_JSX/M_UMD_1_F_10';
-import { Model as M_UMD_1_F_11 } from '@/modules/UMD_JSX/M_UMD_1_F_11';
-import { Model as M_UMD_1_F_12 } from '@/modules/UMD_JSX/M_UMD_1_F_12';
-import { Model as M_UMD_1_F_13 } from '@/modules/UMD_JSX/M_UMD_1_F_13';
-
-import { Model as M_UMF_1 } from '@/modules/UMF_JSX/M_UMF_1';
-import { Model as M_UMF_2 } from '@/modules/UMF_JSX/M_UMF_2';
-import { Model as M_UMF_3 } from '@/modules/UMF_JSX/M_UMF_3';
-import { Model as M_UMF_4 } from '@/modules/UMF_JSX/M_UMF_4';
-
-import { Model as M_UMG_1 } from '@/modules/UMG_JSX/M_UMG_1';
-import { Model as M_UMG_2 } from '@/modules/UMG_JSX/M_UMG_2';
-import { Model as M_UMG_3 } from '@/modules/UMG_JSX/M_UMG_3';
-import { Model as M_UMG_4 } from '@/modules/UMG_JSX/M_UMG_4';
-import { Model as M_UMG_5 } from '@/modules/UMG_JSX/M_UMG_5';
-import { Model as M_UMG_6 } from '@/modules/UMG_JSX/M_UMG_6';
-import { Model as M_UMG_7 } from '@/modules/UMG_JSX/M_UMG_7';
-
-import { Model as M_UMH_1 } from '@/modules/UMH_JSX/M_UMH_1';
-import { Model as M_UMH_2 } from '@/modules/UMH_JSX/M_UMH_2';
-import { Model as M_UMH_3 } from '@/modules/UMH_JSX/M_UMH_3';
-import { Model as M_UMH_4 } from '@/modules/UMH_JSX/M_UMH_4';
-import { Model as M_UMH_5 } from '@/modules/UMH_JSX/M_UMH_5';
-import { Model as M_UMH_6 } from '@/modules/UMH_JSX/M_UMH_6';
-import { Model as M_UMH_7 } from '@/modules/UMH_JSX/M_UMH_7';
-
-import { Model as M_UMM_1 } from '@/modules/UMM_JSX/M_UMM_1';
-import { Model as M_UMM_2 } from '@/modules/UMM_JSX/M_UMM_2';
-import { Model as M_UMM_3 } from '@/modules/UMM_JSX/M_UMM_1_F_3';
-import { Model as M_UMM_4 } from '@/modules/UMM_JSX/M_UMM_4';
-
-import { Model as M_UMJ_1 } from '@/modules/UMJ_JSX/M_UMJ_1';
-import { Model as M_UMJ_2 } from '@/modules/UMJ_JSX/M_UMJ_2';
-import { Model as M_UMJ_3 } from '@/modules/UMJ_JSX/M_UMJ_3';
-import { Model as M_UMJ_4 } from '@/modules/UMJ_JSX/M_UMJ_4';
-import { Model as M_UMJ_5 } from '@/modules/UMJ_JSX/M_UMJ_5';
-import { Model as M_UMJ_6 } from '@/modules/UMJ_JSX/M_UMJ_6';
-import { Model as M_UMJ_7 } from '@/modules/UMJ_JSX/M_UMJ_7';
-
-import { Model as M_UMK_1 } from '@/modules/UMK_JSX/M_UMK_1';
-import { Model as M_UMK_2 } from '@/modules/UMK_JSX/M_UMK_2';
-import { Model as M_UMK_1_F_3 } from '@/modules/UMK_JSX/M_UMK_1_F_3';
-import { Model as M_UMK_1_F_4 } from '@/modules/UMK_JSX/M_UMK_1_F_4';
-
-import { Model as M_UML_1_F_1 } from '@/modules/UML_JSX/M_UML_1_F_1';
-import { Model as M_UML_1_F_2 } from '@/modules/UML_JSX/M_UML_1_F_2';
-import { Model as M_UML_1_F_3 } from '@/modules/UML_JSX/M_UML_1_F_3';
-import { Model as M_UML_1_F_4 } from '@/modules/UML_JSX/M_UML_1_F_4';
-
-import { Model as M_UMN_2 } from '@/modules/UMN_JSX/M_UMN_2';
-import { Model as M_UMN_3 } from '@/modules/UMN_JSX/M_UMN_3';
-import { Model as M_UMN_4 } from '@/modules/UMN_JSX/M_UMN_4';
-
-import { Model as M_BTL_1 } from '@/modules/BTL_JSX/M_BTL_1';
-import { Model as M_BTL_2 } from '@/modules/BTL_JSX/M_BTL_2';
-import { Model as M_BTL_3 } from '@/modules/BTL_JSX/M_BTL_3';
-import { Model as M_BTL_4 } from '@/modules/BTL_JSX/M_BTL_4';
-
-import { Model as M_UMP_1 } from '@/modules/UMP_JSX/M_UMP_1';
-import { Model as M_UMP_2 } from '@/modules/UMP_JSX/M_UMP_2';
-import { Model as M_UMP_3 } from '@/modules/UMP_JSX/M_UMP_3';
-import { Model as M_UMP_4 } from '@/modules/UMP_JSX/M_UMP_4';
-import { Model as M_UMP_5 } from '@/modules/UMP_JSX/M_UMP_5';
-import { Model as M_UMP_6 } from '@/modules/UMP_JSX/M_UMP_6';
-import { Model as M_UMP_7 } from '@/modules/UMP_JSX/M_UMP_7';
-import { Model as M_UMP_8 } from '@/modules/UMP_JSX/M_UMP_8';
-
-import { Model as M_UMS_1 } from '@/modules/UMS_JSX/M_UMS_1';
-import { Model as M_UMS_2 } from '@/modules/UMS_JSX/M_UMS_2';
-import { Model as M_UMS_3 } from '@/modules/UMS_JSX/M_UMS_3';
-import { Model as M_UMS_5 } from '@/modules/UMS_JSX/M_UMS_5';
-import { Model as M_UMS_6 } from '@/modules/UMS_JSX/M_UMS_6';
-import { Model as M_UMS_7 } from '@/modules/UMS_JSX/M_UMS_7';
-
-import { Model as M_UMT_1 } from '@/modules/UMT_JSX/M_UMT_1';
-import { Model as M_UMT_2 } from '@/modules/UMT_JSX/M_UMT_2';
-import { Model as M_UMT_3 } from '@/modules/UMT_JSX/M_UMT_3';
-import { Model as M_UMT_4 } from '@/modules/UMT_JSX/M_UMT_4';
-import { Model as M_UMT_5 } from '@/modules/UMT_JSX/M_UMT_5';
-import { Model as M_UMT_6 } from '@/modules/UMT_JSX/M_UMT_6';
-import { Model as M_UMT_7 } from '@/modules/UMT_JSX/M_UMT_7';
-
-import { Model as M_UMT1_1 } from '@/modules/UMT1_JSX/M_UMT1_1';
-import { Model as M_UMT1_2 } from '@/modules/UMT1_JSX/M_UMT1_2';
-import { Model as M_UMT1_3 } from '@/modules/UMT1_JSX/M_UMT1_3';
-import { Model as M_UMT1_4 } from '@/modules/UMT1_JSX/M_UMT1_4';
-import { Model as M_UMT1_5 } from '@/modules/UMT1_JSX/M_UMT1_5';
-import { Model as M_UMT1_6 } from '@/modules/UMT1_JSX/M_UMT1_6';
-import { Model as M_UMT1_7 } from '@/modules/UMT1_JSX/M_UMT1_7';
-
-import { Model as M_UMT2_1 } from '@/modules/UMT2_JSX/M_UMT2_1';
-import { Model as M_UMT2_2 } from '@/modules/UMT2_JSX/M_UMT2_2';
-import { Model as M_UMT2_3 } from '@/modules/UMT2_JSX/M_UMT2_3';
-import { Model as M_UMT2_4 } from '@/modules/UMT2_JSX/M_UMT2_4';
-import { Model as M_UMT2_5 } from '@/modules/UMT2_JSX/M_UMT2_5';
-import { Model as M_UMT2_6 } from '@/modules/UMT2_JSX/M_UMT2_6';
-import { Model as M_UMT2_7 } from '@/modules/UMT2_JSX/M_UMT2_7';
-
-import { Model as M_UMU1_1 } from '@/modules/UMU1_JSX/M_UMU1_1';
-import { Model as M_UMU1_2 } from '@/modules/UMU1_JSX/M_UMU1_2';
-import { Model as M_UMU1_3 } from '@/modules/UMU1_JSX/M_UMU1_3';
-import { Model as M_UMU1_4 } from '@/modules/UMU1_JSX/M_UMU1_4';
-import { Model as M_UMU1_5 } from '@/modules/UMU1_JSX/M_UMU1_5';
-import { Model as M_UMU1_6 } from '@/modules/UMU1_JSX/M_UMU1_6';
-import { Model as M_UMU1_7 } from '@/modules/UMU1_JSX/M_UMU1_7';
-
-import { Model as M_UMU3_1 } from '@/modules/UMU3_JSX/M_UMU3_1';
-import { Model as M_UMU3_2 } from '@/modules/UMU3_JSX/M_UMU3_2';
-import { Model as M_UMU3_3 } from '@/modules/UMU3_JSX/M_UMU3_3';
-import { Model as M_UMU3_4 } from '@/modules/UMU3_JSX/M_UMU3_4';
-import { Model as M_UMU3_5 } from '@/modules/UMU3_JSX/M_UMU3_5';
-import { Model as M_UMU3_6 } from '@/modules/UMU3_JSX/M_UMU3_6';
-import { Model as M_UMU3_7 } from '@/modules/UMU3_JSX/M_UMU3_7';
-
-import { Model as M_UMY_1 } from '@/modules/UMY_JSX/M_UMY_1';
-import { Model as M_UMY_2 } from '@/modules/UMY_JSX/M_UMY_2';
-import { Model as M_UMY_3 } from '@/modules/UMY_JSX/M_UMY_3';
-import { Model as M_UMY_4 } from '@/modules/UMY_JSX/M_UMY_4';
-import { Model as M_UMY_5 } from '@/modules/UMY_JSX/M_UMY_5';
-import { Model as M_UMY_6 } from '@/modules/UMY_JSX/M_UMY_6';
-import { Model as M_UMY_7 } from '@/modules/UMY_JSX/M_UMY_7';
-
-import { Model as M_3YNSD_1 } from '@/modules/3YNSD_JSX/M_3YNSD_1';
-import { Model as M_3YNSD_2 } from '@/modules/3YNSD_JSX/M_3YNSD_2';
-import { Model as M_3YNSD_3 } from '@/modules/3YNSD_JSX/M_3YNSD_3';
-import { Model as M_3YNSD_4 } from '@/modules/3YNSD_JSX/M_3YNSD_4';
-import { Model as M_3YNSD_5 } from '@/modules/3YNSD_JSX/M_3YNSD_5';
-import { Model as M_3YNSD_6 } from '@/modules/3YNSD_JSX/M_3YNSD_6';
-import { Model as M_3YNSD_7 } from '@/modules/3YNSD_JSX/M_3YNSD_7';
-import { Model as M_3YNSD_8 } from '@/modules/3YNSD_JSX/M_3YNSD_8';
-import { Model as M_3YNSD_9 } from '@/modules/3YNSD_JSX/M_3YNSD_9';
-import { Model as M_3YNSD_10 } from '@/modules/3YNSD_JSX/M_3YNSD_10';
-import { Model as M_3YNSD_11 } from '@/modules/3YNSD_JSX/M_3YNSD_11';
-
-import { Model as M_UMO_1 } from '@/modules/UMO_JSX/M_UMO_1';
-import { Model as M_UMO_2 } from '@/modules/UMO_JSX/M_UMO_2';
-import { Model as M_UMO_3 } from '@/modules/UMO_JSX/M_UMO_3';
-
-import { Model as M_UMO1_1 } from '@/modules/UMO1_JSX/M_UMO1_1';
-import { Model as M_UMO1_2 } from '@/modules/UMO1_JSX/M_UMO1_2';
-import { Model as M_UMO1_3 } from '@/modules/UMO1_JSX/M_UMO1_3';
-
-import { Model as M_UMO2_1 } from '@/modules/UMO2_JSX/M_UMO2_1';
-import { Model as M_UMO2_2 } from '@/modules/UMO2_JSX/M_UMO2_2';
-import { Model as M_UMO2_3 } from '@/modules/UMO2_JSX/M_UMO2_3';
-
-import { Model as M_UMO3_1 } from '@/modules/UMO3_JSX/M_UMO3_1';
-import { Model as M_UMO3_2 } from '@/modules/UMO3_JSX/M_UMO3_2';
-import { Model as M_UMO3_3 } from '@/modules/UMO3_JSX/M_UMO3_3';
-
-import { Model as M_CL_1 } from '@/modules/CL_JSX/M_CL_1';
-import { Model as M_CL_2 } from '@/modules/CL_JSX/M_CL_2';
-import { Model as M_CL_3 } from '@/modules/CL_JSX/M_CL_3';
-import { Model as M_CL_4 } from '@/modules/CL_JSX/M_CL_4';
-import { Model as M_CL_5 } from '@/modules/CL_JSX/M_CL_5';
-import { Model as M_CL_6 } from '@/modules/CL_JSX/M_CL_6';
-import { Model as M_CL_7 } from '@/modules/CL_JSX/M_CL_7';
-
-import { Model as M_UMU2_1 } from '@/modules/UMU2_JSX/M_UMU2_1.jsx'
-import { Model as M_UMU2_2 } from '@/modules/UMU2_JSX/M_UMU2_2.jsx'
-import { Model as M_UMU2_3 } from '@/modules/UMU2_JSX/M_UMU2_3.jsx'
-import { Model as M_UMU2_4 } from '@/modules/UMU2_JSX/M_UMU2_4.jsx'
-import { Model as M_UMU2_5 } from '@/modules/UMU2_JSX/M_UMU2_5.jsx'
-import { Model as M_UMU2_6 } from '@/modules/UMU2_JSX/M_UMU2_6.jsx'
-import { Model as M_UMU2_7 } from '@/modules/UMU2_JSX/M_UMU2_7.jsx'
-import { Model as M_UMU2_8 } from '@/modules/UMU2_JSX/M_UMU2_8.jsx'
-import { Model as M_UMU2_9 } from '@/modules/UMU2_JSX/M_UMU2_9.jsx'
-import { Model as M_UMU2_10 } from '@/modules/UMU2_JSX/M_UMU2_10.jsx'
-import { Model as M_UMU2_11 } from '@/modules/UMU2_JSX/M_UMU2_11.jsx'
-import { Model as M_UMU2_12 } from '@/modules/UMU2_JSX/M_UMU2_12.jsx'
-import { Model as M_UMU2_13 } from '@/modules/UMU2_JSX/M_UMU2_13.jsx'
-import { Model as Door } from '@/modules/DOOR_WINDOW_COLOR/Door';
 import { CATEGORY_FLOOR, CATEGORY_ROOM, CATEGORY_TECH, CATEGORY_WALL, EXPLICT_CASE_DOUBLE, EXPLICT_CASE_EXTRA_QPI, EXPLICT_CASE_FOLD, EXPLICT_CASE_STRAIGHT, EXPLICT_CASE_TOP, EXPLICT_CASE_TUNNEL, EXPLICT_CASE_WINDOW, HAS_CONFIGURATION, HAS_TABLETOP, INCONFIGURABLE, ROTATATABLE } from '@/constants';
 import { ModuleDef } from './types';
 import * as THREE from "three";
@@ -281,127 +23,127 @@ function ModuleExample() {
 const floor_data: ModuleDef[] = [
 
     {
-        model: M_3YNSD_1,
+        model: ModuleExample,
         type: 'floor',
         price: 5600,
         name: 'M_3YNSD_1',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_1_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_1.png',
         displayName: 'Шкаф с 3мя ящиками 30см',
         displaySize: '300'
     },
     {
-        model: M_3YNSD_2,
+        model: ModuleExample,
         type: 'floor',
         price: 5810,
         name: 'M_3YNSD_2',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_2_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_2.png',
         displayName: 'Шкаф с 3мя ящиками 35см',
         displaySize: '350'
     },
     {
-        model: M_3YNSD_3,
+        model: ModuleExample,
         type: 'floor',
         price: 6040,
         name: 'M_3YNSD_3',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_3_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_3.png',
         displayName: 'Шкаф с 3мя ящиками 40см',
         displaySize: '400'
     },
     {
-        model: M_3YNSD_4,
+        model: ModuleExample,
         type: 'floor',
         price: 6240,
         name: 'M_3YNSD_4',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_4_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_4.png',
         displayName: 'Шкаф с 3мя ящиками 45см',
         displaySize: '450'
     },
     {
-        model: M_3YNSD_5,
+        model: ModuleExample,
         type: 'floor',
         price: 6460,
         name: 'M_3YNSD_5',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_5_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_5.png',
         displayName: 'Шкаф с 3мя ящиками 50см',
         displaySize: '500'
     },
     {
-        model: M_3YNSD_6,
+        model: ModuleExample,
         type: 'floor',
         price: 6690,
         name: 'M_3YNSD_6',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_6_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_6.png',
         displayName: 'Шкаф с 3мя ящиками 55см',
         displaySize: '550'
     },
     {
-        model: M_3YNSD_7,
+        model: ModuleExample,
         type: 'floor',
         price: 6910,
         name: 'M_3YNSD_7',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_7_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_7.png',
         displayName: 'Шкаф с 3мя ящиками 60см',
         displaySize: '600'
     },
     {
-        model: M_3YNSD_8,
+        model: ModuleExample,
         type: 'floor',
         price: 7110,
         name: 'M_3YNSD_8',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_8_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_8.png',
         displayName: 'Шкаф с 3мя ящиками 65см',
         displaySize: '650'
     },
     {
-        model: M_3YNSD_9,
+        model: ModuleExample,
         type: 'floor',
         price: 7330,
         name: 'M_3YNSD_9',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_9_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_9.png',
         displayName: 'Шкаф с 3мя ящиками 70см',
         displaySize: '700'
     },
     {
-        model: M_3YNSD_10,
+        model: ModuleExample,
         type: 'floor',
         price: 7540,
         name: 'M_3YNSD_10',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_10_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_10.png',
         displayName: 'Шкаф с 3мя ящиками 75см',
         displaySize: '750'
     },
     {
-        model: M_3YNSD_11,
+        model: ModuleExample,
         type: 'floor',
         price: 7780,
         name: 'M_3YNSD_11',
         tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
-        image: '/3YNSD/M_3YNSD_1_F_11_NN.obj.png',
+        image: '/3YNSD/M_3YNSD_11.png',
         displayName: 'Шкаф с 3мя ящиками 80см',
         displaySize: '800'
     },
     {
-        model: M_CL_1,
+        model: ModuleExample,
         type: 'floor',
         price: 2440,
         name: 'M_CL_1',
         tags: [CATEGORY_FLOOR, HAS_CONFIGURATION, HAS_TABLETOP],
-        image: '/CL/M_CL_1_F_1_NN.obj.png',
+        image: '/CL/M_CL_12.png',
         displayName: 'Шкаф под мойку 50см',
         displaySize: '500'
     },
     {
-        model: M_CL_2,
+        model: ModuleExample,
         type: 'floor',
         price: 2500,
         name: 'M_CL_2',
@@ -411,7 +153,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '550'
     },
     {
-        model: M_CL_3,
+        model: ModuleExample,
         type: 'floor',
         price: 2740,
         name: 'M_CL_3',
@@ -421,7 +163,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '600'
     },
     {
-        model: M_CL_4,
+        model: ModuleExample,
         type: 'floor',
         price: 2780,
         name: 'M_CL_4',
@@ -431,17 +173,17 @@ const floor_data: ModuleDef[] = [
         displaySize: '650'
     },
     {
-        model: M_CL_5,
+        model: ModuleExample,
         type: 'floor',
         price: 2870,
-        name: 'M_CL_5_NN',
+        name: 'M_CL_5',
         tags: [CATEGORY_FLOOR, HAS_CONFIGURATION, HAS_TABLETOP],
         image: '/CL/M_CL_1_F_5_NN.obj.png',
         displayName: 'Шкаф под мойку 70см',
         displaySize: '700'
     },
     {
-        model: M_CL_6,
+        model: ModuleExample,
         type: 'floor',
         price: 2920,
         name: 'M_CL_6',
@@ -451,7 +193,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '750'
     },
     {
-        model: M_CL_7,
+        model: ModuleExample,
         type: 'floor',
         price: 2990,
         name: 'M_CL_7',
@@ -461,7 +203,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '800'
     },
     {
-        model: M_SPL_1,
+        model: ModuleExample,
         type: 'floor',
         price: 2580,
         name: 'M_SPL_1',
@@ -471,7 +213,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '200'
     },
     {
-        model: M_SPL_2,
+        model: ModuleExample,
         type: 'floor',
         price: 2330,
         name: 'M_SPL_2',
@@ -481,7 +223,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '250'
     },
     {
-        model: M_SPL_3,
+        model: ModuleExample,
         type: 'floor',
         price: 2410,
         name: 'M_SPL_3',
@@ -491,7 +233,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '300'
     },
     {
-        model: M_SPL_4,
+        model: ModuleExample,
         type: 'floor',
         price: 2540,
         name: 'M_SPL_4',
@@ -501,7 +243,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '350'
     },
     {
-        model: M_SPL_5,
+        model: ModuleExample,
         type: 'floor',
         price: 2650,
         name: 'M_SPL_5',
@@ -511,7 +253,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '400'
     },
     {
-        model: M_SPL_6,
+        model: ModuleExample,
         type: 'floor',
         price: 2750,
         name: 'M_SPL_6',
@@ -521,7 +263,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '450'
     },
     {
-        model: M_SPL_7,
+        model: ModuleExample,
         type: 'floor',
         price: 2870,
         name: 'M_SPL_7',
@@ -531,7 +273,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '500'
     },
     {
-        model: M_SPL_8,
+        model: ModuleExample,
         type: 'floor',
         price: 3040,
         name: 'M_SPL_8',
@@ -541,7 +283,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '550'
     },
     {
-        model: M_SPL_9,
+        model: ModuleExample,
         type: 'floor',
         price: 3220,
         name: 'M_SPL_9',
@@ -551,7 +293,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '600'
     },
     {
-        model: M_SPL_10,
+        model: ModuleExample,
         type: 'floor',
         price: 3320,
         name: 'M_SPL_10',
@@ -561,7 +303,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '650'
     },
     {
-        model: M_SPL_11,
+        model: ModuleExample,
         type: 'floor',
         price: 3430,
         name: 'M_SPL_11',
@@ -571,7 +313,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '700'
     },
     {
-        model: M_SPL_12,
+        model: ModuleExample,
         type: 'floor',
         price: 3540,
         name: 'M_SPL_12',
@@ -581,7 +323,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '750'
     },
     {
-        model: M_SPL_13,
+        model: ModuleExample,
         type: 'floor',
         price: 3660,
         name: 'M_SPL_13',
@@ -591,17 +333,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '800'
     },
     {
-        model: M_SPL_14,
-        type: 'floor',
-        price: 14500,
-        name: 'M_SPL_14',
-        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION],
-        image: '3YNSD/M_3YNSD_1_F_14_NN.obj.png',
-        displayName: 'Шкаф нижний с полкой (нестандарт)',
-        displaySize: ''
-    },
-    {
-        model: M_BTL_1,
+        model: ModuleExample,
         type: 'floor',
         price: 1720,
         name: 'M_BTL_1',
@@ -611,7 +343,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '150'
     },
     {
-        model: M_BTL_2,
+        model: ModuleExample,
         type: 'floor',
         price: 1920,
         name: 'M_BTL_2',
@@ -621,7 +353,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '200'
     },
     {
-        model: M_BTL_3,
+        model: ModuleExample,
         type: 'floor',
         price: 1980,
         name: 'M_BTL_3',
@@ -631,7 +363,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '250'
     },
     {
-        model: M_BTL_4,
+        model: ModuleExample,
         type: 'floor',
         price: 2040,
         name: 'M_BTL_4',
@@ -641,7 +373,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '300'
     },
     {
-        model: M_2YNSD_1,
+        model: ModuleExample,
         type: 'floor',
         price: 4670,
         name: 'M_2YNSD_1',
@@ -651,7 +383,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '300'
     },
     {
-        model: M_2YNSD_2,
+        model: ModuleExample,
         type: 'floor',
         price: 4850,
         name: 'M_2YNSD_2',
@@ -661,7 +393,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '350'
     },
     {
-        model: M_2YNSD_3,
+        model: ModuleExample,
         type: 'floor',
         price: 5040,
         name: 'M_2YNSD_3',
@@ -671,7 +403,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '400'
     },
     {
-        model: M_2YNSD_4,
+        model: ModuleExample,
         type: 'floor',
         price: 5220,
         name: 'M_2YNSD_4',
@@ -681,7 +413,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '450'
     },
     {
-        model: M_2YNSD_5,
+        model: ModuleExample,
         type: 'floor',
         price: 5410,
         name: 'M_2YNSD_5',
@@ -691,7 +423,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '500'
     },
     {
-        model: M_2YNSD_6,
+        model: ModuleExample,
         type: 'floor',
         price: 5590,
         name: 'M_2YNSD_6',
@@ -701,7 +433,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '550'
     },
     {
-        model: M_2YNSD_7,
+        model: ModuleExample,
         type: 'floor',
         price: 6020,
         name: 'M_2YNSD_7',
@@ -711,7 +443,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '600'
     },
     {
-        model: M_2YNSD_8,
+        model: ModuleExample,
         type: 'floor',
         price: 5950,
         name: 'M_2YNSD_8',
@@ -721,7 +453,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '650'
     },
     {
-        model: M_2YNSD_9,
+        model: ModuleExample,
         type: 'floor',
         price: 6130,
         name: 'M_2YNSD_9',
@@ -731,7 +463,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '700'
     },
     {
-        model: M_2YNSD_10,
+        model: ModuleExample,
         type: 'floor',
         price: 6560,
         name: 'M_2YNSD_10',
@@ -741,7 +473,7 @@ const floor_data: ModuleDef[] = [
         displaySize: '750'
     },
     {
-        model: M_2YNSD_11,
+        model: ModuleExample,
         type: 'floor',
         price: 6500,
         name: 'M_2YNSD_11',
@@ -753,7 +485,7 @@ const floor_data: ModuleDef[] = [
 ]
 const wall_data: ModuleDef[] = [
     {
-        model: M_UMB_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1810,
         name: 'M_UMB_1',
@@ -763,7 +495,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x200x320'
     },
     {
-        model: M_UMB_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1900,
         name: 'M_UMB_2',
@@ -773,7 +505,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x250x320'
     },
     {
-        model: M_UMB_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1970,
         name: 'M_UMB_3',
@@ -783,7 +515,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x300x320'
     },
     {
-        model: M_UMB_4,
+        model: ModuleExample,
         type: 'wall',
         price: 2030,
         name: 'M_UMB_4',
@@ -793,7 +525,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x350x320'
     },
     {
-        model: M_UMB_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2150,
         name: 'M_UMB_5',
@@ -803,7 +535,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x400x320'
     },
     {
-        model: M_UMB_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2210,
         name: 'M_UMB_6',
@@ -813,7 +545,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x450x320'
     },
     {
-        model: M_UMB_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2280,
         name: 'M_UMB_7',
@@ -823,7 +555,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x500x320'
     },
     {
-        model: M_UMB_8,
+        model: ModuleExample,
         type: 'wall',
         price: 2370,
         name: 'M_UMB_8',
@@ -833,7 +565,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x550x320'
     },
     {
-        model: M_UMB_9,
+        model: ModuleExample,
         type: 'wall',
         price: 2600,
         name: 'M_UMB_9',
@@ -843,7 +575,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x600x320'
     },
     {
-        model: M_UMB_10,
+        model: ModuleExample,
         type: 'wall',
         price: 2690,
         name: 'M_UMB_10',
@@ -853,7 +585,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x650x320'
     },
     {
-        model: M_UMB_11,
+        model: ModuleExample,
         type: 'wall',
         price: 2760,
         name: 'M_UMB_11',
@@ -863,7 +595,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x700x320'
     },
     {
-        model: M_UMB_12,
+        model: ModuleExample,
         type: 'wall',
         price: 2820,
         name: 'M_UMB_12',
@@ -873,7 +605,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x750x320'
     },
     {
-        model: M_UMB_13,
+        model: ModuleExample,
         type: 'wall',
         price: 2900,
         name: 'M_UMB_13',
@@ -883,7 +615,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x800x320'
     },
     {
-        model: M_UMA_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1720,
         name: 'M_UMA_1',
@@ -893,7 +625,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x200x320'
     },
     {
-        model: M_UMA_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1780,
         name: 'M_UMA_2',
@@ -903,7 +635,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x250x320'
     },
     {
-        model: M_UMA_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1840,
         name: 'M_UMA_3',
@@ -913,7 +645,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x300x320'
     },
     {
-        model: M_UMA_4,
+        model: ModuleExample,
         type: 'wall',
         price: 1930,
         name: 'M_UMA_4',
@@ -923,7 +655,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x350x320'
     },
     {
-        model: M_UMA_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2010,
         name: 'M_UMA_5',
@@ -933,7 +665,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x400x320'
     },
     {
-        model: M_UMA_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2110,
         name: 'M_UMA_6',
@@ -943,7 +675,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x450x320'
     },
     {
-        model: M_UMA_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2170,
         name: 'M_UMA_7',
@@ -953,7 +685,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x500x320'
     },
     {
-        model: M_UMA_8,
+        model: ModuleExample,
         type: 'wall',
         price: 2230,
         name: 'M_UMA_8',
@@ -963,7 +695,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x550x320'
     },
     {
-        model: M_UMA_9,
+        model: ModuleExample,
         type: 'wall',
         price: 2480,
         name: 'M_UMA_9',
@@ -973,7 +705,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x600x320'
     },
     {
-        model: M_UMA_10,
+        model: ModuleExample,
         type: 'wall',
         price: 2550,
         name: 'M_UMA_10',
@@ -983,7 +715,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x650x320'
     },
     {
-        model: M_UMA_11,
+        model: ModuleExample,
         type: 'wall',
         price: 2610,
         name: 'M_UMA_11',
@@ -993,7 +725,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x700x320'
     },
     {
-        model: M_UMA_12,
+        model: ModuleExample,
         type: 'wall',
         price: 2700,
         name: 'M_UMA_12',
@@ -1003,7 +735,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x750x320'
     },
     {
-        model: M_UMA_13,
+        model: ModuleExample,
         type: 'wall',
         price: 2720,
         name: 'M_UMA_13',
@@ -1013,7 +745,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x800x320'
     },
     {
-        model: M_UMC_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2030,
         name: 'M_UMC_1',
@@ -1023,7 +755,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x200x320'
     },
     {
-        model: M_UMC_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2060,
         name: 'M_UMC_2',
@@ -1033,7 +765,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x250x320'
     },
     {
-        model: M_UMC_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2230,
         name: 'M_UMC_3',
@@ -1043,7 +775,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x300x320'
     },
     {
-        model: M_UMC_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2640,
         name: 'M_UMC_7',
@@ -1053,7 +785,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x500x320'
     },
     {
-        model: M_UMC_8,
+        model: ModuleExample,
         type: 'wall',
         price: 2760,
         name: 'M_UMC_8',
@@ -1063,7 +795,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x550x320'
     },
     {
-        model: M_UMC_9,
+        model: ModuleExample,
         type: 'wall',
         price: 3010,
         name: 'M_UMC_9',
@@ -1073,7 +805,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x600x320'
     },
     {
-        model: M_UMC_10,
+        model: ModuleExample,
         type: 'wall',
         price: 3120,
         name: 'M_UMC_10',
@@ -1083,7 +815,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x650x320'
     },
     {
-        model: M_UMO_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1250,
         name: 'M_UMO_1',
@@ -1093,7 +825,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x200x320'
     },
     {
-        model: M_UMO_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1280,
         name: 'M_UMO_2',
@@ -1103,7 +835,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x250x320'
     },
     {
-        model: M_UMO_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1380,
         name: 'M_UMO_3',
@@ -1113,7 +845,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x300x320'
     },
     {
-        model: M_UMO1_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1270,
         name: 'M_UMO1_1',
@@ -1123,7 +855,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x200x320'
     },
     {
-        model: M_UMO1_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1370,
         name: 'M_UMO1_2',
@@ -1133,7 +865,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x250x320'
     },
     {
-        model: M_UMO1_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1490,
         name: 'M_UMO1_3',
@@ -1143,7 +875,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x300x320'
     },
     {
-        model: M_UMF_1,
+        model: ModuleExample,
         type: 'wall',
         price: 3770,
         name: 'M_UMF_1',
@@ -1153,7 +885,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x600x600'
     },
     {
-        model: M_UMF_2,
+        model: ModuleExample,
         type: 'wall',
         price: 3970,
         name: 'M_UMF_2',
@@ -1163,7 +895,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x600x600'
     },
     {
-        model: M_UMF_3,
+        model: ModuleExample,
         type: 'wall',
         price: 4660,
         name: 'M_UMF_3',
@@ -1173,7 +905,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x600x600'
     },
     {
-        model: M_UMF_4,
+        model: ModuleExample,
         type: 'wall',
         price: 4600,
         name: 'M_UMF_4',
@@ -1183,7 +915,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x600x600'
     },
     {
-        model: M_UMO2_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1480,
         name: 'M_UMO2_1',
@@ -1193,7 +925,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x200x320'
     },
     {
-        model: M_UMO2_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1630,
         name: 'M_UMO2_2',
@@ -1203,7 +935,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x250x320'
     },
     {
-        model: M_UMO2_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1750,
         name: 'M_UMO2_3',
@@ -1213,7 +945,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x300x320'
     },
     {
-        model: M_UMO3_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1540,
         name: 'M_UMO3_1',
@@ -1223,7 +955,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x200x320'
     },
     {
-        model: M_UMO3_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1680,
         name: 'M_UMO3_2',
@@ -1233,7 +965,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x250x320'
     },
     {
-        model: M_UMO3_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1830,
         name: 'M_UMO3_3',
@@ -1243,7 +975,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x300x320'
     },
     {
-        model: M_UMM_1,
+        model: ModuleExample,
         type: 'wall',
         price: 3890,
         name: 'M_UMM_1',
@@ -1253,7 +985,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x500x320'
     },
     {
-        model: M_UMM_2,
+        model: ModuleExample,
         type: 'wall',
         price: 4440,
         name: 'M_UMM_2',
@@ -1263,7 +995,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x600x320'
     },
     {
-        model: M_UMM_3,
+        model: ModuleExample,
         type: 'wall',
         price: 4940,
         name: 'M_UMM_3',
@@ -1273,7 +1005,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x700x320'
     },
     {
-        model: M_UMM_4,
+        model: ModuleExample,
         type: 'wall',
         price: 5340,
         name: 'M_UMM_4',
@@ -1283,137 +1015,137 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x800x320'
     },
     {
-        model: M_UMD_1_F_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2090,
-        name: 'M_UMD_1_F_1',
+        name: 'M_UMD_1',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_1_F_1.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х20см',
         displaySize: '920x200x320'
     },
     {
-        model: M_UMD_1_F_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2210,
-        name: 'M_UMD_1_F_2',
+        name: 'M_UMD_2',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_2_F_2.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х25см',
         displaySize: '920x250x320'
     },
     {
-        model: M_UMD_1_F_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2290,
-        name: 'M_UMD_1_F_3',
+        name: 'M_UMD_3',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_3_F_3.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х30см',
         displaySize: '920x300x320'
     },
     {
-        model: M_UMD_1_F_4,
+        model: ModuleExample,
         type: 'wall',
         price: 2430,
-        name: 'M_UMD_1_F_4',
+        name: 'M_UMD_4',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_4_F_4.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х35см',
         displaySize: '920x350x320'
     },
     {
-        model: M_UMD_1_F_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2520,
-        name: 'M_UMD_1_F_5',
+        name: 'M_UMD_5',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_5_F_5.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х40см',
         displaySize: '920x400x320'
     },
     {
-        model: M_UMD_1_F_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2630,
-        name: 'M_UMD_1_F_6',
+        name: 'M_UMD_6',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_6_F_6.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х45см',
         displaySize: '920x450x320'
     },
     {
-        model: M_UMD_1_F_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2720,
-        name: 'M_UMD_1_F_7',
+        name: 'M_UMD_7',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_7_F_7.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х50см',
         displaySize: '920x500x320'
     },
     {
-        model: M_UMD_1_F_8,
+        model: ModuleExample,
         type: 'wall',
         price: 2830,
-        name: 'M_UMD_1_F_8',
+        name: 'M_UMD_8',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_8_F_8.obj.png',
         displayName: 'Шкаф навесной с двумя полками 92х55см',
         displaySize: '920x550x320'
     },
     {
-        model: M_UMD_1_F_9,
+        model: ModuleExample,
         type: 'wall',
         price: 3070,
-        name: 'M_UMD_1_F_9',
+        name: 'M_UMD_9',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_9_F_9.obj.png',
         displayName: 'Шкаф навесной с двумя полками 2 дверки 92х60см',
         displaySize: '920x600x320'
     },
     {
-        model: M_UMD_1_F_10,
+        model: ModuleExample,
         type: 'wall',
         price: 3190,
-        name: 'M_UMD_1_F_10',
+        name: 'M_UMD_10',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_9_F_9.obj.png',
         displayName: 'Шкаф навесной с двумя полками 2 дверки 92х65см',
         displaySize: '920x650x320'
     },
     {
-        model: M_UMD_1_F_11,
+        model: ModuleExample,
         type: 'wall',
         price: 3270,
-        name: 'M_UMD_1_F_11',
+        name: 'M_UMD_11',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_9_F_9.obj.png',
         displayName: 'Шкаф навесной с двумя полками 2 дверки 92х70см',
         displaySize: '920x700x320'
     },
     {
-        model: M_UMD_1_F_12,
+        model: ModuleExample,
         type: 'wall',
         price: 3390,
-        name: 'M_UMD_1_F_12',
+        name: 'M_UMD_12',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_9_F_9.obj.png',
         displayName: 'Шкаф навесной с двумя полками 2 дверки 92х75см',
         displaySize: '920x750x320'
     },
     {
-        model: M_UMD_1_F_13,
+        model: ModuleExample,
         type: 'wall',
         price: 3500,
-        name: 'M_UMD_1_F_13',
+        name: 'M_UMD_13',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMD/M_UMD_9_F_9.obj.png',
         displayName: 'Шкаф навесной с двумя полками 2 дверки 92х80см',
         displaySize: '920x800x320'
     },
     {
-        model: M_UMG_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2820,
         name: 'M_UMG_1',
@@ -1423,7 +1155,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x500x320'
     },
     {
-        model: M_UMG_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2890,
         name: 'M_UMG_2',
@@ -1433,7 +1165,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x550x320'
     },
     {
-        model: M_UMG_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2980,
         name: 'M_UMG_3',
@@ -1443,7 +1175,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x600x320'
     },
     {
-        model: M_UMG_4,
+        model: ModuleExample,
         type: 'wall',
         price: 3040,
         name: 'M_UMG_4',
@@ -1453,7 +1185,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x650x320'
     },
     {
-        model: M_UMG_5,
+        model: ModuleExample,
         type: 'wall',
         price: 3100,
         name: 'M_UMG_5',
@@ -1463,7 +1195,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x700x320'
     },
     {
-        model: M_UMG_6,
+        model: ModuleExample,
         type: 'wall',
         price: 3200,
         name: 'M_UMG_6',
@@ -1473,7 +1205,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x750x320'
     },
     {
-        model: M_UMG_7,
+        model: ModuleExample,
         type: 'wall',
         price: 3250,
         name: 'M_UMG_7',
@@ -1483,7 +1215,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x800x320'
     },
     {
-        model: M_UMH_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2950,
         name: 'M_UMH_1',
@@ -1493,7 +1225,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x500x320'
     },
     {
-        model: M_UMH_2,
+        model: ModuleExample,
         type: 'wall',
         price: 3020,
         name: 'M_UMH_2',
@@ -1503,7 +1235,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x550x320'
     },
     {
-        model: M_UMH_3,
+        model: ModuleExample,
         type: 'wall',
         price: 3080,
         name: 'M_UMH_3',
@@ -1513,7 +1245,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x600x320'
     },
     {
-        model: M_UMH_4,
+        model: ModuleExample,
         type: 'wall',
         price: 3170,
         name: 'M_UMH_4',
@@ -1523,7 +1255,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x650x320'
     },
     {
-        model: M_UMH_5,
+        model: ModuleExample,
         type: 'wall',
         price: 3250,
         name: 'M_UMH_5',
@@ -1533,7 +1265,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x700x320'
     },
     {
-        model: M_UMH_6,
+        model: ModuleExample,
         type: 'wall',
         price: 3310,
         name: 'M_UMH_6',
@@ -1543,7 +1275,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x750x320'
     },
     {
-        model: M_UMH_7,
+        model: ModuleExample,
         type: 'wall',
         price: 3410,
         name: 'M_UMH_7',
@@ -1553,7 +1285,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x800x320'
     },
     {
-        model: M_UMJ_1,
+        model: ModuleExample,
         type: 'wall',
         price: 3490,
         name: 'M_UMJ_1',
@@ -1563,7 +1295,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x500x320'
     },
     {
-        model: M_UMJ_2,
+        model: ModuleExample,
         type: 'wall',
         price: 3560,
         name: 'M_UMJ_2',
@@ -1573,7 +1305,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x550x320'
     },
     {
-        model: M_UMJ_3,
+        model: ModuleExample,
         type: 'wall',
         price: 3630,
         name: 'M_UMJ_3',
@@ -1583,7 +1315,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x600x320'
     },
     {
-        model: M_UMJ_4,
+        model: ModuleExample,
         type: 'wall',
         price: 3740,
         name: 'M_UMJ_4',
@@ -1593,7 +1325,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x650x320'
     },
     {
-        model: M_UMJ_5,
+        model: ModuleExample,
         type: 'wall',
         price: 3800,
         name: 'M_UMJ_5',
@@ -1603,7 +1335,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x700x320'
     },
     {
-        model: M_UMJ_6,
+        model: ModuleExample,
         type: 'wall',
         price: 3870,
         name: 'M_UMJ_6',
@@ -1613,7 +1345,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x750x320'
     },
     {
-        model: M_UMJ_7,
+        model: ModuleExample,
         type: 'wall',
         price: 3960,
         name: 'M_UMJ_7',
@@ -1623,87 +1355,87 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x800x320'
     },
     {
-        model: M_UMK_1,
+        model: ModuleExample,
         type: 'wall',
         price: 3500,
-        name: 'M_UMK_1_F_1',
+        name: 'M_UMK_1',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMK/M_UMK_1_F_1.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 60х50см',
         displaySize: '600x500x320'
     },
     {
-        model: M_UMK_2,
+        model: ModuleExample,
         type: 'wall',
         price: 4020,
-        name: 'M_UMK_1_F_2',
+        name: 'M_UMK_2',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMK/M_UMK_1_F_2.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 60х60см',
         displaySize: '600x600x320'
     },
     {
-        model: M_UMK_1_F_3,
+        model: ModuleExample,
         type: 'wall',
         price: 4450,
-        name: 'M_UMK_1_F_3',
+        name: 'M_UMK_3',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMK/M_UMK_1_F_3.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 60х70см',
         displaySize: '600x700x320'
     },
     {
-        model: M_UMK_1_F_4,
+        model: ModuleExample,
         type: 'wall',
         price: 4830,
-        name: 'M_UMK_1_F_4',
+        name: 'M_UMK_4',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UMK/M_UMK_1_F_4.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 60х80см',
         displaySize: '600x800x320'
     },
     {
-        model: M_UML_1_F_1,
+        model: ModuleExample,
         type: 'wall',
         price: 3590,
-        name: 'M_UML_1_F_1',
+        name: 'M_UML_1',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UML/M_UML_1_F_1.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 72х50см',
         displaySize: '720x500x320'
     },
     {
-        model: M_UML_1_F_2,
+        model: ModuleExample,
         type: 'wall',
         price: 4140,
-        name: 'M_UML_1_F_2',
+        name: 'M_UML_2',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UML/M_UML_1_F_2.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 72х60см',
         displaySize: '720x600x320'
     },
     {
-        model: M_UML_1_F_3,
+        model: ModuleExample,
         type: 'wall',
         price: 4600,
-        name: 'M_UML_1_F_3',
+        name: 'M_UML_3',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UML/M_UML_1_F_3.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 72х70см',
         displaySize: '720x700x320'
     },
     {
-        model: M_UML_1_F_4,
+        model: ModuleExample,
         type: 'wall',
         price: 4930,
-        name: 'M_UML_1_F_4',
+        name: 'M_UML_4',
         tags: [CATEGORY_WALL, HAS_CONFIGURATION],
         image: '/UML/M_UML_1_F_4.obj.png',
         displayName: 'Шкаф навесной под посудосушитель 72х80см',
         displaySize: '720x800x320'
     },
     {
-        model: M_UMN_2,
+        model: ModuleExample,
         type: 'wall',
         price: 4610,
         name: 'M_UMN_2',
@@ -1713,7 +1445,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x600x320'
     },
     {
-        model: M_UMN_3,
+        model: ModuleExample,
         type: 'wall',
         price: 5100,
         name: 'M_UMN_3',
@@ -1723,7 +1455,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x700x320'
     },
     {
-        model: M_UMN_4,
+        model: ModuleExample,
         type: 'wall',
         price: 5500,
         name: 'M_UMN_4',
@@ -1733,7 +1465,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x800x320'
     },
     {
-        model: M_UMP_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1830,
         name: 'M_UMP_1',
@@ -1743,7 +1475,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '300x500'
     },
     {
-        model: M_UMP_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1940,
         name: 'M_UMP_2',
@@ -1753,7 +1485,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '300x600'
     },
     {
-        model: M_UMP_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1910,
         name: 'M_UMP_3',
@@ -1763,7 +1495,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '360x500'
     },
     {
-        model: M_UMP_4,
+        model: ModuleExample,
         type: 'wall',
         price: 2000,
         name: 'M_UMP_4',
@@ -1773,7 +1505,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '360x600'
     },
     {
-        model: M_UMP_5,
+        model: ModuleExample,
         type: 'wall',
         price: 1970,
         name: 'M_UMP_5',
@@ -1783,7 +1515,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '425x500'
     },
     {
-        model: M_UMP_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2090,
         name: 'M_UMP_6',
@@ -1793,7 +1525,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '425x600'
     },
     {
-        model: M_UMP_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2010,
         name: 'M_UMP_7',
@@ -1803,7 +1535,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '460x500'
     },
     {
-        model: M_UMP_8,
+        model: ModuleExample,
         type: 'wall',
         price: 2120,
         name: 'M_UMP_8',
@@ -1813,7 +1545,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '460x600'
     },
     {
-        model: M_UMS_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1940,
         name: 'M_UMS_1',
@@ -1823,7 +1555,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x500x320'
     },
     {
-        model: M_UMS_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2000,
         name: 'M_UMS_2',
@@ -1833,7 +1565,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x550x320'
     },
     {
-        model: M_UMS_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2060,
         name: 'M_UMS_3',
@@ -1843,7 +1575,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x600x320'
     },
     {
-        model: M_UMS_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2190,
         name: 'M_UMS_5',
@@ -1853,7 +1585,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x650x320'
     },
     {
-        model: M_UMS_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2210,
         name: 'M_UMS_6',
@@ -1863,7 +1595,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x700x320'
     },
     {
-        model: M_UMS_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2280,
         name: 'M_UMS_7',
@@ -1873,7 +1605,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '600x750x320'
     },
     {
-        model: M_UMT_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2050,
         name: 'M_UMT_1',
@@ -1883,7 +1615,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x500x320'
     },
     {
-        model: M_UMT_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2140,
         name: 'M_UMT_2',
@@ -1893,7 +1625,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x550x320'
     },
     {
-        model: M_UMT_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2200,
         name: 'M_UMT_3',
@@ -1903,7 +1635,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x600x320'
     },
     {
-        model: M_UMT_4,
+        model: ModuleExample,
         type: 'wall',
         price: 2230,
         name: 'M_UMT_4',
@@ -1913,7 +1645,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x650x320'
     },
     {
-        model: M_UMT_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2330,
         name: 'M_UMT_5',
@@ -1923,7 +1655,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x700x320'
     },
     {
-        model: M_UMT_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2410,
         name: 'M_UMT_6',
@@ -1933,7 +1665,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x750x320'
     },
     {
-        model: M_UMT_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2490,
         name: 'M_UMT_7',
@@ -1943,7 +1675,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '720x800x320'
     },
     {
-        model: M_UMT1_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2370,
         name: 'M_UMT1_1',
@@ -1953,7 +1685,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x500x320'
     },
     {
-        model: M_UMT1_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2490,
         name: 'M_UMT1_2',
@@ -1963,7 +1695,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x550x320'
     },
     {
-        model: M_UMT1_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2570,
         name: 'M_UMT1_3',
@@ -1973,7 +1705,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x600x320'
     },
     {
-        model: M_UMT1_4,
+        model: ModuleExample,
         type: 'wall',
         price: 2640,
         name: 'M_UMT1_4',
@@ -1983,7 +1715,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x650x320'
     },
     {
-        model: M_UMT1_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2750,
         name: 'M_UMT1_5',
@@ -1993,7 +1725,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x700x320'
     },
     {
-        model: M_UMT1_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2840,
         name: 'M_UMT1_6',
@@ -2003,7 +1735,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x750x320'
     },
     {
-        model: M_UMT1_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2950,
         name: 'M_UMT1_7',
@@ -2013,7 +1745,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x800x320'
     },
     {
-        model: M_UMT2_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2470,
         name: 'M_UMT2_1',
@@ -2023,7 +1755,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x500x320'
     },
     {
-        model: M_UMT2_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2550,
         name: 'M_UMT2_2',
@@ -2033,7 +1765,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x550x320'
     },
     {
-        model: M_UMT2_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2630,
         name: 'M_UMT2_3',
@@ -2043,7 +1775,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x600x320'
     },
     {
-        model: M_UMT2_4,
+        model: ModuleExample,
         type: 'wall',
         price: 2740,
         name: 'M_UMT2_4',
@@ -2053,7 +1785,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x650x320'
     },
     {
-        model: M_UMT2_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2830,
         name: 'M_UMT2_5',
@@ -2063,7 +1795,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x700x320'
     },
     {
-        model: M_UMT2_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2940,
         name: 'M_UMT2_6',
@@ -2073,7 +1805,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x750x320'
     },
     {
-        model: M_UMT2_7,
+        model: ModuleExample,
         type: 'wall',
         price: 3010,
         name: 'M_UMT2_7',
@@ -2083,7 +1815,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '920x800x320'
     },
     {
-        model: M_UMY_1,
+        model: ModuleExample,
         type: 'wall',
         price: 3070,
         name: 'M_UMY_1',
@@ -2093,7 +1825,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x500x320'
     },
     {
-        model: M_UMY_2,
+        model: ModuleExample,
         type: 'wall',
         price: 3160,
         name: 'M_UMY_2',
@@ -2103,7 +1835,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x550x320'
     },
     {
-        model: M_UMY_3,
+        model: ModuleExample,
         type: 'wall',
         price: 3230,
         name: 'M_UMY_3',
@@ -2113,7 +1845,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x600x320'
     },
     {
-        model: M_UMY_4,
+        model: ModuleExample,
         type: 'wall',
         price: 3630,
         name: 'M_UMY_4',
@@ -2123,7 +1855,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x650x320'
     },
     {
-        model: M_UMY_5,
+        model: ModuleExample,
         type: 'wall',
         price: 3740,
         name: 'M_UMY_5',
@@ -2133,7 +1865,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x700x320'
     },
     {
-        model: M_UMY_6,
+        model: ModuleExample,
         type: 'wall',
         price: 3800,
         name: 'M_UMY_6',
@@ -2143,7 +1875,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x750x320'
     },
     {
-        model: M_UMY_7,
+        model: ModuleExample,
         type: 'wall',
         price: 3870,
         name: 'M_UMY_7',
@@ -2153,7 +1885,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '850x800x320'
     },
     {
-        model: M_UMU1_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1840,
         name: 'M_UMU1_1',
@@ -2163,7 +1895,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x500x320'
     },
     {
-        model: M_UMU1_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1900,
         name: 'M_UMU1_2',
@@ -2173,7 +1905,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x550x320'
     },
     {
-        model: M_UMU1_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1940,
         name: 'M_UMU1_3',
@@ -2183,7 +1915,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x600x320'
     },
     {
-        model: M_UMU1_4,
+        model: ModuleExample,
         type: 'wall',
         price: 1980,
         name: 'M_UMU1_4',
@@ -2193,7 +1925,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x650x320'
     },
     {
-        model: M_UMU1_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2020,
         name: 'M_UMU1_5',
@@ -2203,7 +1935,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x700x320'
     },
     {
-        model: M_UMU1_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2060,
         name: 'M_UMU1_6',
@@ -2213,7 +1945,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x750x320'
     },
     {
-        model: M_UMU1_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2140,
         name: 'M_UMU1_7',
@@ -2223,7 +1955,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x800x320'
     },
     {
-        model: M_UMU2_1,
+        model: ModuleExample,
         type: 'wall',
         price: 1490,
         name: 'M_UMU2_1',
@@ -2233,7 +1965,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x200x320'
     },
     {
-        model: M_UMU2_2,
+        model: ModuleExample,
         type: 'wall',
         price: 1520,
         name: 'M_UMU2_2',
@@ -2243,7 +1975,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x250x320'
     },
     {
-        model: M_UMU2_3,
+        model: ModuleExample,
         type: 'wall',
         price: 1570,
         name: 'M_UMU2_3',
@@ -2253,7 +1985,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x300x320'
     },
     {
-        model: M_UMU2_4,
+        model: ModuleExample,
         type: 'wall',
         price: 1640,
         name: 'M_UMU2_4',
@@ -2263,7 +1995,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x350x320'
     },
     {
-        model: M_UMU2_5,
+        model: ModuleExample,
         type: 'wall',
         price: 1680,
         name: 'M_UMU2_5',
@@ -2273,7 +2005,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x400x320'
     },
     {
-        model: M_UMU2_6,
+        model: ModuleExample,
         type: 'wall',
         price: 1720,
         name: 'M_UMU2_6',
@@ -2283,7 +2015,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x450x320'
     },
     {
-        model: M_UMU2_7,
+        model: ModuleExample,
         type: 'wall',
         price: 1800,
         name: 'M_UMU2_7',
@@ -2293,7 +2025,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x500x320'
     },
     {
-        model: M_UMU2_8,
+        model: ModuleExample,
         type: 'wall',
         price: 1830,
         name: 'M_UMU2_8',
@@ -2303,7 +2035,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x550x320'
     },
     {
-        model: M_UMU2_9,
+        model: ModuleExample,
         type: 'wall',
         price: 1900,
         name: 'M_UMU2_9',
@@ -2313,7 +2045,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x600x320'
     },
     {
-        model: M_UMU2_10,
+        model: ModuleExample,
         type: 'wall',
         price: 1940,
         name: 'M_UMU2_10',
@@ -2323,7 +2055,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x650x320'
     },
     {
-        model: M_UMU2_11,
+        model: ModuleExample,
         type: 'wall',
         price: 1980,
         name: 'M_UMU2_11',
@@ -2333,7 +2065,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x700x320'
     },
     {
-        model: M_UMU2_12,
+        model: ModuleExample,
         type: 'wall',
         price: 2020,
         name: 'M_UMU2_12',
@@ -2343,7 +2075,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x750x320'
     },
     {
-        model: M_UMU2_13,
+        model: ModuleExample,
         type: 'wall',
         price: 2080,
         name: 'M_UMU2_13',
@@ -2353,7 +2085,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x800x320'
     },
     {
-        model: M_UMU3_1,
+        model: ModuleExample,
         type: 'wall',
         price: 2400,
         name: 'M_UMU3_1',
@@ -2363,7 +2095,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x500x555'
     },
     {
-        model: M_UMU3_2,
+        model: ModuleExample,
         type: 'wall',
         price: 2470,
         name: 'M_UMU3_2',
@@ -2373,7 +2105,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x550x555'
     },
     {
-        model: M_UMU3_3,
+        model: ModuleExample,
         type: 'wall',
         price: 2560,
         name: 'M_UMU3_3',
@@ -2383,7 +2115,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x600x555'
     },
     {
-        model: M_UMU3_4,
+        model: ModuleExample,
         type: 'wall',
         price: 2630,
         name: 'M_UMU3_4',
@@ -2393,7 +2125,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x650x555'
     },
     {
-        model: M_UMU3_5,
+        model: ModuleExample,
         type: 'wall',
         price: 2700,
         name: 'M_UMU3_5',
@@ -2403,7 +2135,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x700x555'
     },
     {
-        model: M_UMU3_6,
+        model: ModuleExample,
         type: 'wall',
         price: 2800,
         name: 'M_UMU3_6',
@@ -2413,7 +2145,7 @@ const wall_data: ModuleDef[] = [
         displaySize: '350x750x555'
     },
     {
-        model: M_UMU3_7,
+        model: ModuleExample,
         type: 'wall',
         price: 2870,
         name: 'M_UMU3_7',
@@ -2425,7 +2157,7 @@ const wall_data: ModuleDef[] = [
 ]
 const tech_data: ModuleDef[] = [
     // {
-    //     model: FridgeWithDisplay,
+    //     model: ModuleExample,
     //     type: 'floor',
     //     price: 14500,
     //     name: 'FridgeWithDisplay',
@@ -2433,87 +2165,79 @@ const tech_data: ModuleDef[] = [
     //     image: '/UML/UML/M_UML_1_F_1.obj.png'
     // },
     {
-        model: Stove,
+        model: ModuleExample,
         type: 'floor',
         price: 14500,
         name: 'Stove',
         tags: [CATEGORY_TECH, INCONFIGURABLE],
-        image: '/UML/M_UML_1_F_1.obj.png',
-        displayName: '',
+        image: '/previews/TECH/Stove.png',
+        displayName: 'Плита',
         displaySize: ''
     },
     {
-        model: Refrigirator,
+        model: ModuleExample,
         type: 'floor',
         price: 14500,
         name: 'Refrigirator',
         tags: [CATEGORY_TECH, INCONFIGURABLE],
-        image: '/UML/M_UML_1_F_1.obj.png',
-        displayName: '',
+        image: '/previews/TECH/Refrigirator.png',
+        displayName: 'Холодильник',
         displaySize: ''
     },
     {
-        model: KitchenHoodLarge,
+        model: ModuleExample,
         type: 'wall',
         price: 14500,
         name: 'KitchenHoodLarge',
         tags: [CATEGORY_TECH, INCONFIGURABLE],
-        image: '/UML/M_UML_1_F_1.obj.png',
-        displayName: '',
+        image: '/previews/TECH/kitchen_hood_large.png',
+        displayName: 'Вытяжка',
         displaySize: ''
     },
-    // {
-    //     model: CoffeMachine,
-    //     type: 'floor',
-    //     price: 14500,
-    //     name: 'CoffeeMachine',
-    //     tags: [CATEGORY_TECH, INCONFIGURABLE],
-    //     image: '/UML/UML/M_UML_1_F_1.obj.png'
-    // },
     {
-        model: Microwave,
+        model: ModuleExample,
         type: 'floor',
         price: 14500,
         name: 'Microwave',
         tags: [CATEGORY_TECH, INCONFIGURABLE, ROTATATABLE],
-        image: '/UML/M_UML_1_F_1.obj.png',
-        displayName: '',
+        image: '/previews/TECH/microwave.png',
+        displayName: 'Микроволновка',
         displaySize: ''
     },
+    // {
+    //     model: ModuleExample,
+    //     type: 'floor',
+    //     price: 14500,
+    //     name: 'Blender',
+    //     tags: [CATEGORY_TECH, INCONFIGURABLE],
+    //     image: '/UML/M_UML_1_F_1.obj.png',
+    //     displayName: '',
+    //     displaySize: ''
+    // },
     {
-        model: Blender,
-        type: 'floor',
-        price: 14500,
-        name: 'Blender',
-        tags: [CATEGORY_TECH, INCONFIGURABLE],
-        image: '/UML/M_UML_1_F_1.obj.png',
-        displayName: '',
-        displaySize: ''
-    },
-    {
-        model: M_DSY_1_F_1_NN,
+        model: ModuleExample,
         type: 'floor',
         price: 3460,
-        name: 'M_DSY_1_F_1_NN',
+        name: 'M_DSY_1',
         tags: [HAS_TABLETOP, CATEGORY_TECH, INCONFIGURABLE],
-        image: '/DSY/M_DSY_1_F_1_NN.obj.png',
+        image: '/previews/DSY/M_DSY_1.png',
         displayName: 'Шкаф под духовку 45см',
         displaySize: '450'
     },
     {
-        model: M_DSY_1_F_2_NN,
+        model: ModuleExample,
         type: 'floor',
         price: 3750,
-        name: 'M_DSY_1_F_2_NN',
+        name: 'M_DSY_2',
         tags: [HAS_TABLETOP, CATEGORY_TECH, INCONFIGURABLE],
-        image: '/DSY/M_DSY_1_F_2_NN.obj.png',
+        image: '/previews/DSY/M_DSY_2.png',
         displayName: 'Шкаф под духовку 60см',
         displaySize: '600'
     },
 ]
 const room_data: ModuleDef[] = [
     {
-        model: Window,
+        model: ModuleExample,
         type: 'wall',
         price: 14500,
         name: 'Window',
@@ -2523,7 +2247,7 @@ const room_data: ModuleDef[] = [
         displaySize: ''
     },
     {
-        model: Door,
+        model: ModuleExample,
         type: 'floor',
         price: 14500,
         name: 'Door',
@@ -2533,7 +2257,7 @@ const room_data: ModuleDef[] = [
         displaySize: ''
     },
     // {
-    //     model: Column,
+    //     model: ModuleExample,
     //     type: 'floor',
     //     price: 12000,
     //     name: 'Колонна',

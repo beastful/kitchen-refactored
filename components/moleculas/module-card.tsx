@@ -3,6 +3,7 @@
 import { ModuleDef } from '@/types'
 import { store } from '@/store'
 import React, { useCallback, useEffect, useRef } from 'react'
+import { CATEGORY_TECH } from '@/constants'
 
 export function ModuleCard({ module }: { module: ModuleDef }) {
   const { price, name, image, displayName } = module
@@ -27,6 +28,10 @@ export function ModuleCard({ module }: { module: ModuleDef }) {
     return () => window.removeEventListener('pointerup', handleGlobalPointerUp)
   }, [])
 
+    const m_name = name.split("_");
+    const m_folder = `${m_name?.[1]}`
+    const isTech = module.tags.includes(CATEGORY_TECH)
+
   return (
     <div
       onPointerDown={handlePointerDown}
@@ -35,7 +40,7 @@ export function ModuleCard({ module }: { module: ModuleDef }) {
       <img
         draggable={false}
         className="w-full object-cover drop-shadow-lg brightness-110 pointer-events-none"
-        src={`/icons/${image}`}
+        src={isTech != true ? `previews/${m_folder}/${name}.png` : module.image}
         alt={displayName || name}
       />
       <div className="flex flex-col gap-2.5 px-4 pb-4">

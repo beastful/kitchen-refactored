@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { useSnapshot } from 'valtio';
 import { Vector3 } from 'three';
 import { SnapCursor } from "@/snapping-tools/snap-cursor";
@@ -12,11 +12,22 @@ import { FacadeConfig } from "@/3d/furniture/assembler"
 import { ModuleMenu } from "@/3d/furniture/actions";
 import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
-import { Gltf, Html } from '@react-three/drei';
+import { Center, Gltf, Html } from '@react-three/drei';
 import { useSnapContext } from '@/snapping-tools/snap-provider';
 import { CATEGORY_TECH, EXPLICT_CASE_WINDOW } from '@/constants';
 import { getLock, useLock } from '@/lib/use-lock';
 import { CursorRoom } from '@/snapping-tools/cursor-room';
+
+function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, halfExtents: [number, number, number], entity: ModuleEntity }) {
+    const largest_z = 0.73;
+    const z = halfExtents[2] * 2;
+    const type = entity.type
+    const pos_z = type == "floor" ? ((largest_z - z) * 10) - 0.5 : 0
+
+    return <group position={[0, 0, pos_z]}>
+        {children}
+    </group>
+}
 
 export default function Room() {
     const snap = useSnapshot(store);
@@ -34,7 +45,7 @@ export default function Room() {
                 return;
             }
 
-             if (visibilityRef.current) {
+            if (visibilityRef.current) {
                 console.log('Cannot place:', result.reason);
                 return;
             }
@@ -67,14 +78,15 @@ export default function Room() {
         const mods = snap.modules;
         for (let i = 0; i < mods.length; i++) {
             if (mods[i].type == 'wall') {
-                const pos = mods[i].position.clone();
                 const ld = getLock(mods[i] as ModuleEntity, snap as Store);
                 store.modules[i].lock = ld.lock
             }
         }
     }, [snap.wallHeight]);
 
-    const CursorModel = snap.currentRawModule?.model ?? null;
+    const c_name = snap.currentRawModule?.name.split("_");
+    const c_folder = `${c_name?.[0]}_${c_name?.[1]}`
+
     return (
         <>
             <CursorRoom
@@ -85,9 +97,9 @@ export default function Room() {
                 height={snap.room.h}
                 depth={snap.room.d}
                 show={!!store.currentRawModule}>
-                {CursorModel && (
+                {snap.currentRawModule?.name && (
                     <SnapCursor lockY={lockY} lock={lock} userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
-                        <CursorModel />
+                        <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
                     </SnapCursor>
                 )}
             </CursorRoom>
@@ -95,6 +107,8 @@ export default function Room() {
 
             {snap.modules.map(entity => {
                 const EntityModel = entity.model;
+                const e_name = entity.name.split("_");
+                const e_folder = `${e_name[0]}_${e_name[1]}`
 
                 return (
                     <group key={`placed-${entity.id}`} >
@@ -114,7 +128,11 @@ export default function Room() {
                         >
                             {EntityModel && <ModuleMenu entity={entity as ModuleEntity}>
                                 <Tabletop entity={entity as ModuleEntity}>
-                                    <FacadeConfig src={`/${entity.name}.glb`} entity={entity as ModuleEntity} />
+                                    <ZCorrection entity={entity as ModuleEntity} halfExtents={[...entity.halfExtents]}>
+                                        <Center>
+                                            <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
+                                        </Center>
+                                    </ZCorrection>
                                 </Tabletop>
                             </ModuleMenu>}
                         </SnapPlacedObject>

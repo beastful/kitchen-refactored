@@ -104,7 +104,20 @@ export function toModuleEntity(def: ModuleDef, position: Vector3, normal?: Vecto
     };
 }
 
+export function toModuleDef(entity: ModuleEntity): ModuleDef {
+    return {
+        model: entity.model,
+        type: entity.type as ModuleType,
+        price: entity.price,
+        name: entity.name,
+        tags: entity.tags as ModuleTag[],
+        image: entity.image,
+        displayName: entity.displayName,
+        displaySize: ""
+    };
+}
+
 export interface AssemblerProps {
-  src: string;
-  entity: ModuleEntity;
+    src: string;
+    entity: ModuleEntity;
 }

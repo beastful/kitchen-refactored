@@ -14,7 +14,7 @@ export function RoomWalls() {
     const ruler_top_factor = 2
     const ruler_bottom_factor = 0.6
     const [colorMap] = useTexture([
-        'laminate_floor_02_diff_1k.jpg'
+        'assets/laminate_floor_02_diff_1k.jpg'
     ])
     //   const matcapTexture = useTexture('matcaps/mc3.png');
     const textureScale = 1.6;

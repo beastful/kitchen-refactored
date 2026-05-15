@@ -1,9 +1,9 @@
 import { store } from "@/store";
-import { ModuleEntity } from "@/types";
-import { Html } from "@react-three/drei";
+import { ModuleEntity, toModuleDef } from "@/types";
+import { Html, Outlines } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
-import { Rotate3D, Settings } from "lucide-react";
-import { useCallback, useEffect, useRef, ReactNode } from "react";
+import { Delete, Move, Rotate3D, Settings, Trash2Icon } from "lucide-react";
+import { useCallback, useEffect, useRef, ReactNode, useState } from "react";
 import { useSnapshot } from "valtio";
 
 interface ModuleMenuProps {
@@ -17,6 +17,7 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
     const { gl } = useThree();
     const menuRef = useRef<HTMLDivElement>(null);
     const isTogglingRef = useRef(false);
+    const [isDraggable, setIsDraggable] = useState(true)
 
     const handleRotate = useCallback((id: string) => {
         const module = store.modules.find(m => m.id === id);
@@ -45,25 +46,52 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
     return (
         <group onClick={handleGroupClick}>
             {isOpen && (
-                <Html>
-                    <div
-                        ref={menuRef}
-                        className="bg-white flex rounded-md translate-x-[-50%] translate-y-[-180px] shadow-xl"
-                    >
+                <>
+                    <Html>
                         <div
-                            onClick={() => handleRotate(entity.id)}
-                            className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer"
+                            ref={menuRef}
+                            className="bg-white flex rounded-md translate-x-[-50%] translate-y-[-100px] shadow-xl"
                         >
-                            <Rotate3D />
+                            <div
+                                onClick={() => handleRotate(entity.id)}
+                                className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer"
+                            >
+                                <Rotate3D />
+                            </div>
+                            <div onClick={() => {
+                                store.configurableEntity = entity.id;
+                            }} className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer">
+                                <Settings />
+                            </div>
+                            <div onClick={() => {
+                                store.configurableEntity = null;
+                            }} className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer">
+                                <Move />
+                            </div>
+                            <div onClick={() => {
+                                store.modules = [...snap.modules.filter(e => e.id != entity.id)] as ModuleEntity[];
+                            }} className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer">
+                                <Trash2Icon />
+                            </div>
                         </div>
-                        <div onClick={() => {
-                            store.configurableEntity = entity.id;
-                        }} className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer">
-                            <Settings />
-                        </div>
-                    </div>
-                </Html>
+                    </Html>
+                    {!snap.configurableEntity && (
+                        <mesh>
+                            <meshStandardMaterial alphaTest={0.3} transparent opacity={0.9} color={"orange"} />
+                            <boxGeometry args={[...entity.halfExtents.map(n => n * 2 * 10 + 0.8)] as []} />
+                        </mesh>
+                    )}
+
+                </>
             )}
+            {isDraggable && <Html>
+                <div onPointerDown={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    store.modules = [...snap.modules.filter(e => e.id != entity.id)] as ModuleEntity[];
+                    store.currentRawModule = toModuleDef(entity)
+                }} className="w-20 h-20 bg-white rounded opacity-50 translate-[-50%]"></div>
+            </Html>}
             {children}
         </group>
     );
