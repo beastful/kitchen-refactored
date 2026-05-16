@@ -4,7 +4,7 @@ import { useEffect, useRef, memo } from "react";
 import { store } from "@/store";
 import { EXPLICT_CASE_FOLD, EXPLICT_CASE_STRAIGHT, EXPLICT_CASE_TOP } from "@/constants";
 import { subscribe } from "valtio";
-import { Color, Mesh, MeshMatcapMaterial } from "three";
+import { Color, Mesh, MeshMatcapMaterial, MeshStandardMaterial } from "three";
 import { useTexture } from "@react-three/drei";
 import { ModuleEntity } from "@/types";
 
@@ -24,7 +24,6 @@ function FacadeComponent({ entity, model }: FacadeProps) {
         originalRotY.current = model.rotation.y;
     }, [model]);
 
-    const matcapTexture = useTexture('matcaps/mc1.png');
 
     const lastColor = useRef<Color | undefined>(undefined);
     const lastFacade = useRef<string | undefined>(undefined);
@@ -36,9 +35,8 @@ function FacadeComponent({ entity, model }: FacadeProps) {
         lastColor.current = entity.color;
         lastFacade.current = entity.facade;
 
-        const material = new MeshMatcapMaterial({
+        const material = new MeshStandardMaterial({
             color: new Color(entity.color),
-            matcap: matcapTexture,
             transparent: true,
             alphaTest: 1,
             opacity: 0.4,
@@ -52,7 +50,7 @@ function FacadeComponent({ entity, model }: FacadeProps) {
         }
 
         model.material = material;
-    }, [entity.color, entity.facade, matcapTexture, model]);
+    }, [entity.color, entity.facade, model]);
 
     /* ── REPLACEMENT FOR useFrame ── */
     useEffect(() => {

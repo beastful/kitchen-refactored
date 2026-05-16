@@ -150,16 +150,31 @@ export function hydrateStoreFromLocalStorage() {
 }
 
 // Как и раньше — восстанавливаем состояние при импорте модуля
-// hydrateStoreFromLocalStorage();
+hydrateStoreFromLocalStorage();
 
 // ------------------------------------------------------------------
 // 7. Persist on every mutation (как было изначально)
 // ------------------------------------------------------------------
 
-// subscribe(store, () => {
-//     try {
-//         localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState(store)));
-//     } catch (e) {
-//         console.error('[Store] Failed to persist to localStorage:', e);
-//     }
-// });
+subscribe(store, () => {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState(store)));
+    } catch (e) {
+        console.error('[Store] Failed to persist to localStorage:', e);
+    }
+});
+
+
+export function getJson(): string {
+    return JSON.stringify(serializeState(store));
+}
+
+export function setJson(json: string): void {
+    try {
+        const parsed = JSON.parse(json);
+        Object.assign(store, deserializeState(parsed));
+    } catch (e) {
+        console.error('[Store] Failed to set state from JSON:', e);
+        throw new Error('Invalid state JSON');
+    }
+}

@@ -3,7 +3,11 @@
 import React, { useState, useCallback } from 'react'
 import {
     Settings, Ruler, DoorOpen, Save, Printer, Calculator,
-    Columns3Cog, LogIn, Code2, Search
+    Columns3Cog, LogIn, Code2, Search,
+    Croissant,
+    CrossIcon,
+    ClosedCaption,
+    X
 } from 'lucide-react'
 import { useSnapshot } from 'valtio'
 import { store } from '@/store'
@@ -20,6 +24,9 @@ import { Hint } from '@/components/atoms/hint'
 import GroupEdit from '@/components/organisms/group-editor'
 import Scene from '@/3d/eviroment/scene'
 import { TabletopOption, WallHeight } from "@/types"
+import { GetStates } from '@/lib/get-states'
+import { useSaveToBack } from '@/lib/use-save-to-back'
+import { getJson, setJson } from '@/store';
 
 const ColorPicker = ({ colors, selected, onSelect }: {
     colors: readonly string[]
@@ -139,10 +146,53 @@ export default function Configurator() {
     const handleWallHeightSelect = useCallback((height: WallHeight) => {
         store.wallHeight = height
     }, [])
+    const [showSave, setShowSave] = useState(false);
+    const [write, saving, saveSuccess] = useSaveToBack();
 
     return (
         <>
+            {showSave && (
+                <div className='fixed top-[50%] right-[50%] translate-x-[-50%] translate-y-[-50%] z-[100]'>
+                    <div className='flex pb-2'>
+                        <div className='w-full'></div>
+                        <div
+                            onClick={() => setShowSave(false)}
+                            className='rounded-full min-w-10 w-10 h-10 bg-white flex items-center justify-center cursor-pointer'
+                        >
+                            <X />
+                        </div>
+                    </div>
 
+                    <GetStates
+                        onProjectGet={(data, id) => {
+                            setJson(JSON.stringify(data));
+                            setShowSave(false);
+                        }}
+                    />
+
+                    <div className='mt-4'>
+                        {/* ← подсказка над кнопкой */}
+                        {saveSuccess && <p className='text-xs text-gray-500 text-center mb-2 bg-white p-2 rounded'>
+                            Перезайдите в это окно,<br /> чтобы отобразился новый проект
+                        </p>}
+
+                        <button
+                            onClick={() => write(getJson())}
+                            disabled={saving}
+                            className={`w-full py-2.5 px-4 rounded-lg font-medium transition cursor-pointer
+                            ${saving ? 'opacity-60 cursor-wait' : ''}
+                            ${saveSuccess ? 'bg-green-600 hover:bg-green-700' : 'bg-[#F06900] hover:bg-[#d85e00]'}
+                            text-white shadow-md`}
+                        >
+                            {saving
+                                ? 'Сохранение…'
+                                : saveSuccess
+                                    ? 'Сохранено'
+                                    : 'Сохранить текущий проект'}
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className="flex h-screen w-full bg-indigo-100">
 
                 <div className="w-full relative">
@@ -163,7 +213,7 @@ export default function Configurator() {
                     <div className='h-screen'>
                         <Scene />
                     </div>
-                   
+
                     <footer className="flex items-end gap-4 w-full absolute bottom-0 left-0 p-5 z-10 pr-15">
                         <ToolButton
                             active={snap.openAngle !== 0}
@@ -193,7 +243,9 @@ export default function Configurator() {
                         />
                         <ToolButton
                             active={false}
-                            onClick={() => { }}
+                            onClick={() => {
+                                setShowSave(show => !show)
+                            }}
                             icon={<Save size={20} />}
                         />
                         <ToolButton
@@ -212,7 +264,7 @@ export default function Configurator() {
 
                 <Sidebar defaultPage="floor">
                     <SidebarPage title="Напольные" page="floor">
-                       
+
                         <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
                             <div className='text-2xl font-semibold'>Напольные модули</div>
                             <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
@@ -222,7 +274,7 @@ export default function Configurator() {
                                 <input className='p-3 w-full' placeholder='Ваш запрос' />
                             </div>
                             <div className='grid grid-cols-3 gap-[15px]'>
-                              
+
                                 {data.filter(module => module.tags.includes(CATEGORY_FLOOR)).map((module) => <ModuleCard key={JSON.stringify(module)} module={module} />)}
                             </div>
                         </div>
@@ -295,7 +347,7 @@ export default function Configurator() {
                                     onSelect={handleWallHeightSelect}
                                 />
                             </section>
-                             <div className='grid grid-cols-3 gap-[15px]'>
+                            <div className='grid grid-cols-3 gap-[15px]'>
                                 {data.filter(module => module.tags.includes(CATEGORY_ROOM)).map((module) => <ModuleCard key={JSON.stringify(module)} module={module} />)}
                             </div>
                         </div>
