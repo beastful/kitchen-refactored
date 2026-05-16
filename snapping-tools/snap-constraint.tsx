@@ -19,9 +19,9 @@ export function SnapConstraint({
 
     const throttledSetPointer = useCallback(
         throttle((e: any) => {
-            snapContext.setPointerEvent(e);
-            snapContext.setCursorVisible(true);
-        }, 16),
+            snapContext.pointerEventRef.current = e;
+            snapContext.cursorVisibleRef.current = true;
+        }, 10),
         [snapContext]
     );
 
@@ -53,13 +53,13 @@ export function SnapConstraint({
             onPointerEnter={(e) => {
                 e.stopPropagation();
                 if (useCursor) {
-                    snapContext.setCursorVisible(true)
+                    snapContext.cursorVisibleRef.current = false;
                 }
             }}
             onPointerOut={(e) => {
                 e.stopPropagation();
                 if (useCursor) {
-                    snapContext.setCursorVisible(false)
+                    snapContext.cursorVisibleRef.current = false;
                 }
             }}
             onPointerMove={(e) => {

@@ -14,7 +14,7 @@ export function useSnapCursorTransform() {
         worldNormal: new Vector3(0, 1, 0),
     });
     useFrame(() => {
-        const pointerEvent = snapContext.pointerEvent;
+        const pointerEvent = snapContext.pointerEventRef.current;
         let worldNormal: Vector3, yaw: number, cursorPos: Vector3;
         if (pointerEvent?.object.matrixWorld && pointerEvent.normal) {
             const localNormal = pointerEvent.normal;

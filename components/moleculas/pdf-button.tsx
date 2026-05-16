@@ -17,15 +17,16 @@ const hinges = [
 ];
 
 export function PDFExportButton() {
-  const snap = useSnapshot(store);
+  const snap_modules = useSnapshot(store.modules);
+  const snap_tabletop = useSnapshot(store.tabletop);
   const exportRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [progressStep, setProgressStep] = useState('');
 
-  const modules = snap.modules.filter((m: ModuleEntity) => !m.tags.includes(CATEGORY_ROOM));
+  const modules = snap_modules.filter((m: ModuleEntity) => !m.tags.includes(CATEGORY_ROOM));
   const modulesTotal = modules.reduce((sum, m) => sum + m.price, 0);
   const tabletopArea = modules.reduce((area, m) => area + (m.size.z * m.size.x), 0);
-  const tabletopPrice = Math.ceil(tabletopArea * snap.tabletop[2]);
+  const tabletopPrice = Math.ceil(tabletopArea * snap_tabletop[2]);
   const grandTotal = modulesTotal + tabletopPrice;
 
   const handleExportPDF = async () => {
@@ -214,9 +215,9 @@ export function PDFExportButton() {
         <div style={{ backgroundColor: '#f8fafc', borderRadius: '16px', padding: '20px', marginBottom: '24px' }}>
           <div style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>Столешница</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#475569' }}>Тип:</span><span>{snap.tabletop[1]}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#475569' }}>Тип:</span><span>{snap_tabletop[1]}</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#475569' }}>Площадь:</span><span>{tabletopArea.toFixed(2)} м²</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#475569' }}>Цена за м²:</span><span>{snap.tabletop[2].toLocaleString('ru-RU')} ₽</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#475569' }}>Цена за м²:</span><span>{snap_tabletop[2].toLocaleString('ru-RU')} ₽</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, paddingTop: '8px', borderTop: '1px solid #cbd5e1', gridColumn: 'span 2' }}>
               <span>Стоимость столешницы:</span><span>{tabletopPrice.toLocaleString('ru-RU')} ₽</span>
             </div>

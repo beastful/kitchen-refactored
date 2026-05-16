@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CursorClickIcon } from "./animated-icons/cursor-click";
 import { StoredPointerEvent } from "./types";
 import { Vector3 } from "three";
+import { usePointerMove } from "./hooks/use-pointer-move";
 
 interface CursorRoomProps {
     children: ReactNode,
@@ -29,9 +30,18 @@ function isVisible(point: Vector3 | undefined, width: number, height: number, de
 }
 
 export function CursorRoom({ children, width: depth, height, depth: width, show, visibilityChange }: CursorRoomProps) {
-    const { pointerEvent, cursorVisible } = useSnapContext()
-    const point = pointerEvent?.point;
+    const { pointerEventRef, cursorVisibleRef } = useSnapContext()
+    const point = pointerEventRef.current?.point;
     const isHovering = useRef(true)
+    const pointer = usePointerMove(() => {
+        return {
+            pointerEvent: pointerEventRef.current,
+            cursorVisible: cursorVisibleRef.current
+        }
+    }, {
+        pointerEvent: pointerEventRef.current,
+        cursorVisible: cursorVisibleRef.current
+    })
 
     const gl = useThree((state) => state.gl)
 
@@ -47,9 +57,9 @@ export function CursorRoom({ children, width: depth, height, depth: width, show,
     }, [gl])
 
     useEffect(() => {
-        visibilityChange(isVisible(point, width, height, depth, cursorVisible, show))
+        visibilityChange(isVisible(point, width, height, depth, pointer.cursorVisible as boolean, show))
     }, [point]);
-    const visible = useMemo(() => isVisible(point, width, height, depth, cursorVisible, show), [point]);
+    const visible = useMemo(() => isVisible(point, width, height, depth, pointer.cursorVisible as boolean, show), [point]);
 
     return <>
         <Html

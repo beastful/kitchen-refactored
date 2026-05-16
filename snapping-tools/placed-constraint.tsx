@@ -5,6 +5,8 @@ import { SnapPlane, SnapPlacedObjectProps } from './types';
 import { useSnapshot } from 'valtio';
 import { store } from '@/store';
 import { Html } from '@react-three/drei';
+import { usePointerMove } from './hooks/use-pointer-move';
+import { useFrame } from '@react-three/fiber';
 
 const _result = new Vector3();
 const _planePoint = new Vector3();

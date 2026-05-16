@@ -97,7 +97,7 @@ export function ModuleConfig() {
                                             }`}
                                     >
                                         <img
-                                            src={`./facade/${type}.png`}
+                                            src={`./facades/${type}.png`}
                                             alt={`Фасад ${type}`}
                                             className="w-full h-full object-cover"
                                         />

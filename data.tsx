@@ -2165,7 +2165,7 @@ const tech_data: ModuleDef[] = [
     //     image: '/UML/UML/M_UML_1_F_1.obj.png'
     // },
     {
-        model: ModuleExample,
+        model: '/modules/TECH/Stove.glb',
         type: 'floor',
         price: 14500,
         name: 'Stove',
@@ -2175,7 +2175,7 @@ const tech_data: ModuleDef[] = [
         displaySize: ''
     },
     {
-        model: ModuleExample,
+        model: '/modules/TECH/Refrigirator.glb',
         type: 'floor',
         price: 14500,
         name: 'Refrigirator',
@@ -2185,7 +2185,7 @@ const tech_data: ModuleDef[] = [
         displaySize: ''
     },
     {
-        model: ModuleExample,
+        model:  '/modules/TECH/KitchenHoodLarge.glb',
         type: 'wall',
         price: 14500,
         name: 'KitchenHoodLarge',
@@ -2195,7 +2195,7 @@ const tech_data: ModuleDef[] = [
         displaySize: ''
     },
     {
-        model: ModuleExample,
+        model:  '/modules/TECH/Microwave.glb',
         type: 'floor',
         price: 14500,
         name: 'Microwave',
@@ -2237,22 +2237,22 @@ const tech_data: ModuleDef[] = [
 ]
 const room_data: ModuleDef[] = [
     {
-        model: ModuleExample,
+        model: '/modules/ROOM/Window.glb',
         type: 'wall',
         price: 14500,
         name: 'Window',
         tags: [CATEGORY_ROOM, EXPLICT_CASE_TUNNEL, EXPLICT_CASE_WINDOW, INCONFIGURABLE],
-        image: '/UML/M_UML_1_F_1.obj.png',
+        image: '/previews/ROOM/Window.png',
         displayName: '',
         displaySize: ''
     },
     {
-        model: ModuleExample,
+        model: '/modules/ROOM/Door.glb',
         type: 'floor',
         price: 14500,
         name: 'Door',
         tags: [EXPLICT_CASE_DOUBLE, CATEGORY_ROOM, EXPLICT_CASE_TUNNEL, INCONFIGURABLE],
-        image: '/UML/M_UML_1_F_1.obj.png',
+        image: '/previews/ROOM/Door.png',
         displayName: '',
         displaySize: ''
     },

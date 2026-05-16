@@ -17,6 +17,6 @@ export function Shell({ entity, model }: ShellProps) {
             color: new Color('white'),
             matcap: matcapTexture
         })
-    }, [model, entity])
+    }, [model])
     return null
 }

@@ -4,10 +4,12 @@ import { Canvas } from '@react-three/fiber'
 import { ConstantForwardOrbitControls } from '@/3d/camera/dolly-orbit-controlls'
 import Room from '@/3d/eviroment/room'
 import { Suspense } from 'react'
+import { Stats } from '@react-three/drei';
 
 export default function Scene() {
     return (
         <Canvas camera={{ position: [-6, 6, 6], fov: 45, near: 0.1, far: 1000 }}>
+            <Stats />
             <Suspense fallback={null}>
                 <Room />
             </Suspense>

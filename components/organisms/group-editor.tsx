@@ -66,7 +66,7 @@ export function GroupEdit() {
                                                 className="relative rounded-xl overflow-hidden bg-gray-50 p-3 transition-all hover:shadow-md"
                                             >
                                                 <img
-                                                    src={`./facade/${facade}.png`}
+                                                    src={`./facades/${facade}.png`}
                                                     alt={`Фасад ${facade}`}
                                                     className="w-full h-auto object-contain"
                                                 />

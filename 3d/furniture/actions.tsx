@@ -1,3 +1,4 @@
+import { ROTATATABLE } from "@/constants";
 import { store } from "@/store";
 import { ModuleEntity, toModuleDef } from "@/types";
 import { Html, Outlines } from "@react-three/drei";
@@ -17,7 +18,8 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
     const { gl } = useThree();
     const menuRef = useRef<HTMLDivElement>(null);
     const isTogglingRef = useRef(false);
-    const [isDraggable, setIsDraggable] = useState(true)
+    const [isDraggable, setIsDraggable] = useState(false)
+    const rotatable = entity.tags.includes(ROTATATABLE);
 
     const handleRotate = useCallback((id: string) => {
         const module = store.modules.find(m => m.id === id);
@@ -52,12 +54,14 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
                             ref={menuRef}
                             className="bg-white flex rounded-md translate-x-[-50%] translate-y-[-100px] shadow-xl"
                         >
-                            <div
-                                onClick={() => handleRotate(entity.id)}
-                                className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer"
-                            >
-                                <Rotate3D />
-                            </div>
+                            {rotatable && (
+                                <div
+                                    onClick={() => handleRotate(entity.id)}
+                                    className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer"
+                                >
+                                    <Rotate3D />
+                                </div>
+                            )}
                             <div onClick={() => {
                                 store.configurableEntity = entity.id;
                             }} className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer">
@@ -65,6 +69,8 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
                             </div>
                             <div onClick={() => {
                                 store.configurableEntity = null;
+                                store.openMenuId = null;
+                                setIsDraggable(true);
                             }} className="w-12 min-w-12 h-12 flex items-center justify-center cursor-pointer">
                                 <Move />
                             </div>
@@ -90,7 +96,10 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
                     e.preventDefault()
                     store.modules = [...snap.modules.filter(e => e.id != entity.id)] as ModuleEntity[];
                     store.currentRawModule = toModuleDef(entity)
-                }} className="w-20 h-20 bg-white rounded opacity-50 translate-[-50%]"></div>
+                }} className="bg-white rounded-md opacity-60 translate-[-50%] cursor-grab border-2 border-dashed px-3 py-6 flex items-center justify-center flex-col gap-5">
+                     <Move />
+                     <div className="text-xs text-center">Удерживайте и тащите</div>
+                </div>
             </Html>}
             {children}
         </group>

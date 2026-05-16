@@ -1,9 +1,9 @@
+"use client";
+
 import { store } from "@/store";
-import { useFrame } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, memo } from "react";
 import { Color, MeshStandardMaterial, Mesh } from "three";
-import { lerp } from "three/src/math/MathUtils.js";
-import { useSnapshot } from "valtio";
+import { subscribe } from "valtio";
 import { ModuleEntity } from "@/types";
 
 interface ShelfProps {
@@ -11,21 +11,42 @@ interface ShelfProps {
     model: Mesh;
 }
 
-export function Shelf({ entity, model }: ShelfProps) {
-    const snap = useSnapshot(store);
+function ShelfComponent({ entity, model }: ShelfProps) {
     const originalZ = useRef(model.position.z);
 
     useEffect(() => {
         model.material = new MeshStandardMaterial({
             color: new Color('white'),
-        })
-    }, [model, entity])
+        });
+    }, [model]);
 
-    useFrame((_, delta) => {
-        let targetZ = originalZ.current + snap.openAngle * 3;
-        model.position.z = lerp(model.position.z, targetZ, 0.2);
+    /* ── REPLACEMENT FOR useFrame ── */
+    useEffect(() => {
+        const applyTransform = () => {
+            model.position.z = originalZ.current + store.openAngle * 3;
+        };
 
-    });
+        // Apply initial value
+        applyTransform();
 
-    return null
+        let lastOpenAngle = store.openAngle;
+        const unsubscribe = subscribe(store, () => {
+            if (store.openAngle !== lastOpenAngle) {
+                lastOpenAngle = store.openAngle;
+                applyTransform();
+            }
+        });
+
+        return () => {
+            unsubscribe();
+            // Restore original position on unmount
+            model.position.z = originalZ.current;
+        };
+    }, [model]);
+
+    return null;
 }
+
+export const Shelf = memo(ShelfComponent, (prevProps, nextProps) => {
+    return prevProps.model === nextProps.model;
+});

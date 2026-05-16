@@ -11,8 +11,8 @@ import {
 const SnapContext = createContext<SnapContextValue | null>(null);
 
 export function SnapProvider({ children, debug = false }: SnapProviderProps) {
-  const [pointerEvent, setPointerEvent] = useState<StoredPointerEvent>(null);
-  const [cursorVisible, setCursorVisible] = useState(false);
+  const pointerEventRef = useRef<StoredPointerEvent>(null);
+  const cursorVisibleRef = useRef(false)
   const constraintsMap = useRef<Map<string, StoredConstraint>>(new Map());
 
   const cursorStateRef = useRef<CursorLiveState>({
@@ -50,10 +50,8 @@ export function SnapProvider({ children, debug = false }: SnapProviderProps) {
 
   const value: SnapContextValue = {
     debug,
-    pointerEvent,
-    cursorVisible,
-    setPointerEvent,
-    setCursorVisible,
+    cursorVisibleRef,
+    pointerEventRef,
     registerConstraint,
     queryConstraints,
     cursorStateRef,

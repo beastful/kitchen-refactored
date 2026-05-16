@@ -34,7 +34,7 @@ export type ModuleTag = CategoryTag | FeatureTag | CaseTag;
 export type ModuleType = 'wall' | 'floor' | 'tall' | 'base' | 'corner' | 'tech' | 'room';
 
 export interface ModuleDef {
-    model: React.FC<any> | null;
+    model: React.FC<any> | null | string;
     type: ModuleType;
     price: number;
     name: string;

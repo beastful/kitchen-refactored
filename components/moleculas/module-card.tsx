@@ -3,7 +3,7 @@
 import { ModuleDef } from '@/types'
 import { store } from '@/store'
 import React, { useCallback, useEffect, useRef } from 'react'
-import { CATEGORY_TECH } from '@/constants'
+import { CATEGORY_ROOM, CATEGORY_TECH } from '@/constants'
 
 export function ModuleCard({ module }: { module: ModuleDef }) {
   const { price, name, image, displayName } = module
@@ -28,9 +28,9 @@ export function ModuleCard({ module }: { module: ModuleDef }) {
     return () => window.removeEventListener('pointerup', handleGlobalPointerUp)
   }, [])
 
-    const m_name = name.split("_");
-    const m_folder = `${m_name?.[1]}`
-    const isTech = module.tags.includes(CATEGORY_TECH)
+  const m_name = name.split("_");
+  const m_folder = `${m_name?.[1]}`
+  const isTech = module.tags.includes(CATEGORY_TECH) || module.tags.includes(CATEGORY_ROOM)
 
   return (
     <div

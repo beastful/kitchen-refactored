@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, Suspense, useEffect, useRef, useState } from 'react';
 import { useSnapshot } from 'valtio';
 import { Vector3 } from 'three';
 import { SnapCursor } from "@/snapping-tools/snap-cursor";
@@ -14,19 +14,25 @@ import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
 import { Center, Gltf, Html } from '@react-three/drei';
 import { useSnapContext } from '@/snapping-tools/snap-provider';
-import { CATEGORY_TECH, EXPLICT_CASE_WINDOW } from '@/constants';
+import { CATEGORY_ROOM, CATEGORY_TECH, EXPLICT_CASE_WINDOW } from '@/constants';
 import { getLock, useLock } from '@/lib/use-lock';
 import { CursorRoom } from '@/snapping-tools/cursor-room';
+import { SnapPlane } from '@/snapping-tools/types';
 
 function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, halfExtents: [number, number, number], entity: ModuleEntity }) {
     const largest_z = 0.73;
     const z = halfExtents[2] * 2;
-    const type = entity.type
-    const pos_z = type == "floor" ? ((largest_z - z) * 10) - 0.5 : 0
+    const type = entity.type;
+    const dontMove = entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) || type == "wall";
+    const pos_z = dontMove == true ? 0 : ((largest_z - z) * 10) - 0.5;
 
     return <group position={[0, 0, pos_z]}>
         {children}
     </group>
+}
+
+function ProcessedModule({ children, confugurable, facades, tabletop, }) {
+
 }
 
 export default function Room() {
@@ -72,7 +78,7 @@ export default function Room() {
 
         window.addEventListener('pointerup', handlePointerUp, true);
         return () => window.removeEventListener('pointerup', handlePointerUp, true);
-    }, [getPlacementData]);
+    }, [lock, snap.wallHeight]);
 
     useEffect(() => {
         const mods = snap.modules;
@@ -82,10 +88,10 @@ export default function Room() {
                 store.modules[i].lock = ld.lock
             }
         }
-    }, [snap.wallHeight]);
+    }, [snap.wallHeight, lock]);
 
     const c_name = snap.currentRawModule?.name.split("_");
-    const c_folder = `${c_name?.[0]}_${c_name?.[1]}`
+    const c_folder = `${c_name?.[0]}_${c_name?.[1]}`;
 
     return (
         <>
@@ -99,7 +105,12 @@ export default function Room() {
                 show={!!store.currentRawModule}>
                 {snap.currentRawModule?.name && (
                     <SnapCursor lockY={lockY} lock={lock} userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
-                        <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
+                        {typeof snap.currentRawModule?.model != "string" && (
+                            <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
+                        )}
+                        {typeof snap.currentRawModule?.model == "string" && (
+                            <Gltf src={snap.currentRawModule.model} />
+                        )}
                     </SnapCursor>
                 )}
             </CursorRoom>
@@ -119,22 +130,42 @@ export default function Room() {
                             lock={entity.lock}
                             id={`placed-${entity.id}`}
                             rotation={[0, entity.openAngle, 0]}
-                            halfExtents={[...entity.halfExtents]}
-                            snapPlanes={entity.snapPlanes.map(plane => ({
-                                point: [...plane.point],
-                                normal: [...plane.normal]
-                            }))}
+                            halfExtents={entity.halfExtents as [number, number, number]}
+                            snapPlanes={entity.snapPlanes as SnapPlane[]}
                             useDistance={true}
                         >
-                            {EntityModel && <ModuleMenu entity={entity as ModuleEntity}>
+
+                            {EntityModel && <Suspense fallback={null}> <ModuleMenu entity={entity as ModuleEntity}>
+
                                 <Tabletop entity={entity as ModuleEntity}>
-                                    <ZCorrection entity={entity as ModuleEntity} halfExtents={[...entity.halfExtents]}>
+                                    <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
                                         <Center>
-                                            <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
+                                            {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
+                                                 <>
+                                                    {typeof entity.model != "string" && (
+                                                        <Gltf src={`modules/${e_folder}/${entity.name}.glb`} />
+                                                    )}
+
+                                                    {typeof entity.model == "string" && (
+                                                        <Gltf src={entity.model} />
+                                                    )}
+                                                </>
+                                            ) : (
+                                                 <>
+                                                    {typeof entity.model != "string" && (
+                                                        <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
+                                                    )}
+
+                                                    {typeof entity.model == "string" && (
+                                                        <FacadeConfig src={entity.model} entity={entity as ModuleEntity} />
+                                                    )}
+                                                </>
+                                            )}
                                         </Center>
                                     </ZCorrection>
                                 </Tabletop>
-                            </ModuleMenu>}
+                            </ModuleMenu>
+                            </Suspense>}
                         </SnapPlacedObject>
                     </group>
                 );

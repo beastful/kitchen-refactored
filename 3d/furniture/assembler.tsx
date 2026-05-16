@@ -77,10 +77,10 @@ export function FacadeConfig({ src, entity }: AssemblerProps) {
 
   return (
     <>
-      {facades.map(model => <Facade key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
-      {shelves.map(model => <Shelf key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
-      {handles.map(model => <Handle key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
-      {modules.map(model => <Shell key={entity.id + "_" + model.uuid} entity={entity} model={model as Mesh} />)}
+      {facades.map(model => <Facade key={model.uuid} entity={entity} model={model as Mesh} />)}
+      {shelves.map(model => <Shelf key={model.uuid} entity={entity} model={model as Mesh} />)}
+      {handles.map(model => <Handle key={model.uuid} entity={entity} model={model as Mesh} />)}
+      {modules.map(model => <Shell key={model.uuid} entity={entity} model={model as Mesh} />)}
       <primitive object={model} />
     </>
   );
