@@ -9,7 +9,7 @@ import { Stats } from '@react-three/drei';
 export default function Scene() {
     return (
         <Canvas camera={{ position: [-6, 6, 6], fov: 45, near: 0.1, far: 1000 }}>
-            <Stats />
+        
             <Suspense fallback={null}>
                 <Room />
             </Suspense>

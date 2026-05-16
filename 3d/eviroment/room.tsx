@@ -31,10 +31,6 @@ function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, h
     </group>
 }
 
-function ProcessedModule({ children, confugurable, facades, tabletop, }) {
-
-}
-
 export default function Room() {
     const snap = useSnapshot(store);
     const getPlacementData = usePlacementData();
