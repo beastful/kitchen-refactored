@@ -231,16 +231,16 @@ export default function Configurator() {
                             icon={<Columns3Cog size={20} />}
                         />
                         <div className="flex-1" />
-                        <ToolButton
+                        {/* <ToolButton
                             active={debug}
                             onClick={handleToggleDebug}
                             icon={<Code2 size={20} />}
-                        />
-                        <ToolButton
+                        /> */}
+                        {/* <ToolButton
                             active={false}
                             onClick={() => { }}
                             icon={<LogIn size={20} />}
-                        />
+                        /> */}
                         <ToolButton
                             active={false}
                             onClick={() => {
