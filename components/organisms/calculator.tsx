@@ -36,6 +36,7 @@ export function CalculatorComponent() {
     const formatCurrency = (value: number) =>
         new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
 
+
     return (
         <div className="fixed inset-0 z-50 pointer-events-none">
             <AnimatePresence>
@@ -82,12 +83,16 @@ export function CalculatorComponent() {
                                         <div className="space-y-3">
                                             <h3 className="font-semibold text-gray-700 text-sm uppercase tracking-wide">Модули</h3>
                                             <div className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
-                                                {modules.map((module) => (
-                                                    <div key={module.id} className="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors">
+                                                {modules.map((module) => {
+
+                                                    const m_name = module.name.split("_");
+                                                    const m_folder = `${m_name?.[1]}`;
+
+                                                    return <div key={module.id} className="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors">
                                                         <div className="flex items-center gap-4">
                                                             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                                                                 <img
-                                                                    src={`/icons/${module.image}`}
+                                                                    src={`/previews/${m_folder}/${module.name}.png`}
                                                                     alt={module.name}
                                                                     className="w-10 h-10 object-contain"
                                                                 />
@@ -111,7 +116,7 @@ export function CalculatorComponent() {
                                                             {formatCurrency(module.price)}
                                                         </div>
                                                     </div>
-                                                ))}
+                                                })}
                                             </div>
                                         </div>
 

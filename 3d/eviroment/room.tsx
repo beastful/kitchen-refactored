@@ -14,7 +14,7 @@ import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
 import { Center, Gltf, Html } from '@react-three/drei';
 import { useSnapContext } from '@/snapping-tools/snap-provider';
-import { CATEGORY_ROOM, CATEGORY_TECH, EXPLICT_CASE_WINDOW } from '@/constants';
+import { CATEGORY_ROOM, CATEGORY_TECH, EXPLICT_CASE_TUNNEL, EXPLICT_CASE_WINDOW } from '@/constants';
 import { getLock, useLock } from '@/lib/use-lock';
 import { CursorRoom } from '@/snapping-tools/cursor-room';
 import { SnapPlane } from '@/snapping-tools/types';
@@ -25,8 +25,9 @@ function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, h
     const type = entity.type;
     const dontMove = entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) || type == "wall";
     const pos_z = dontMove == true ? 0 : ((largest_z - z) * 10) - 0.5;
+    const isWindowOrDoor = entity.tags.includes(EXPLICT_CASE_TUNNEL) || entity.name == "Door";
 
-    return <group position={[0, 0, pos_z]}>
+    return <group position={[0, 0, isWindowOrDoor == true ? -1 : pos_z]}>
         {children}
     </group>
 }
@@ -102,10 +103,14 @@ export default function Room() {
                 {snap.currentRawModule?.name && (
                     <SnapCursor lockY={lockY} lock={lock} userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
                         {typeof snap.currentRawModule?.model != "string" && (
-                            <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
+                            <Center>
+                                <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
+                            </Center>
                         )}
                         {typeof snap.currentRawModule?.model == "string" && (
-                            <Gltf src={snap.currentRawModule.model} />
+                            <Center>
+                                <Gltf src={snap.currentRawModule.model} />
+                            </Center>
                         )}
                     </SnapCursor>
                 )}
@@ -137,7 +142,7 @@ export default function Room() {
                                     <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
                                         <Center>
                                             {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
-                                                 <>
+                                                <>
                                                     {typeof entity.model != "string" && (
                                                         <Gltf src={`modules/${e_folder}/${entity.name}.glb`} />
                                                     )}
@@ -147,7 +152,7 @@ export default function Room() {
                                                     )}
                                                 </>
                                             ) : (
-                                                 <>
+                                                <>
                                                     {typeof entity.model != "string" && (
                                                         <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
                                                     )}
