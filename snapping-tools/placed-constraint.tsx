@@ -56,7 +56,7 @@ function recalculate(
     }
 
     group.position.copy(_result);
-    group.position.y = lock.y;
+    if(lockY) group.position.y = lock.y;
   }
 }
 

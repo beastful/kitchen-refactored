@@ -16,11 +16,12 @@ export function useLock() {
         lockZ: false,
         lock: new Vector3(0, 0, 0)
     }
-
+    
     const entityType = snap.currentRawModule.type
     const isTech = snap.currentRawModule.tags.includes(CATEGORY_TECH)
 
-    if (snap.currentModule?.name == "Microwave") {
+    if (snap.currentRawModule?.name == "Microwave") {
+       
         return {
             lockX: false,
             lockY: false,
@@ -61,6 +62,18 @@ export function getLock(mod: ModuleEntity, snap: Store) {
     } else {
         wallY = -(snap.room.h / 2 - mod.halfExtents[1]) + snap.wallHeight + 0.9;
     }
+
+    if (snap.currentRawModule?.name == "Microwave") {
+        
+        return {
+            lockX: false,
+            lockY: false,
+            lockZ: false,
+            lock: new Vector3(0, 0, 0)
+        }
+    }
+
+    
 
     return {
         lockX: false,

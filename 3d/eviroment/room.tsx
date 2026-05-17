@@ -79,7 +79,7 @@ export default function Room() {
     useEffect(() => {
         const mods = snap.modules;
         for (let i = 0; i < mods.length; i++) {
-            if (mods[i].type == 'wall') {
+            if (mods[i].type == 'wall' && mods[i].name != "Window") {
                 const ld = getLock(mods[i] as ModuleEntity, snap as Store);
                 store.modules[i].lock = ld.lock
             }
