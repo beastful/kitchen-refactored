@@ -29,7 +29,7 @@ export function RoomWalls() {
             colorMap.repeat.set(repeatX, repeatY);
             colorMap.needsUpdate = true;
         }
-    }, [colorMap, snap.room.d, snap.room.w, textureScale]);
+    }, []);
     // if (!matcapTexture) return null;
 
 

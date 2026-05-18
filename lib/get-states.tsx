@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Loader2, Calendar, FileText, Download, Clock, History, Star } from 'lucide-react';
+import {
+  Loader2,
+  Calendar,
+  FileText,
+  Download,
+  Clock,
+  History,
+  Star,
+  Plus,
+} from 'lucide-react';
 
 interface StateItem {
   id: string;
@@ -11,6 +20,8 @@ interface StateItem {
 interface GetStatesProps {
   /** Called when a project is fetched. Receives the PARSED state_data object and the id. */
   onProjectGet?: (state: any, id: string) => void;
+  /** Called when user clicks "Начать новый проект". You decide what to do. */
+  onNewProject?: () => void;
 }
 
 const STORAGE_KEY = 'db save collection';
@@ -21,7 +32,7 @@ const isLocalhost = () => {
   return host === 'localhost' || host === '127.0.0.1';
 };
 
-export function GetStates({ onProjectGet }: GetStatesProps) {
+export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
   const [list, setList] = useState<StateItem[]>([]);
   const [loadingList, setLoadingList] = useState(true);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -228,7 +239,6 @@ export function GetStates({ onProjectGet }: GetStatesProps) {
 
   return (
     <div className='w-80 max-h-[28rem] overflow-y-auto bg-white rounded-xl shadow-xl border border-gray-100'>
-      
       {/* Header */}
       <div className='sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-3 z-10'>
         <h3 className='font-semibold text-gray-800 flex items-center gap-2'>
@@ -237,13 +247,23 @@ export function GetStates({ onProjectGet }: GetStatesProps) {
         </h3>
       </div>
 
+      {/* ── Кнопка «Начать новый проект» ──────────────────────── */}
+      <div className='p-4 border-b border-gray-100'>
+        <button
+          onClick={() => onNewProject?.()}
+          className='w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border-2 border-dashed border-[#F06900] text-[#F06900] font-medium hover:bg-orange-50 transition cursor-pointer'
+        >
+          <Plus className='w-4 h-4' />
+          Начать новый проект
+        </button>
+      </div>
+
       {sortedList.length === 0 ? (
         <div className='p-6 text-center text-gray-400 text-sm'>
           Нет сохраненных проектов
         </div>
       ) : (
         <div className='divide-y divide-gray-50'>
-          
           {/* ── Последний сохраненный проект ───────────────── */}
           {latest && (
             <div className='p-4 bg-orange-50/50'>
@@ -251,7 +271,7 @@ export function GetStates({ onProjectGet }: GetStatesProps) {
                 <Star className='w-3.5 h-3.5' />
                 Последний сохраненный проект
               </div>
-              
+
               <div className='bg-white rounded-lg p-3 shadow-sm border border-orange-100'>
                 <div className='flex items-start justify-between gap-3'>
                   <div className='flex-1 min-w-0'>
@@ -261,7 +281,7 @@ export function GetStates({ onProjectGet }: GetStatesProps) {
                         {latest.name}
                       </span>
                     </div>
-                    
+
                     <div className='flex items-center gap-1.5 text-xs text-gray-500 mb-1'>
                       <Calendar className='w-3 h-3' />
                       <span>Создан: {formatDate(latest.date_create)}</span>
@@ -270,7 +290,10 @@ export function GetStates({ onProjectGet }: GetStatesProps) {
                     {latest.date_update && (
                       <div className='flex items-center gap-1.5 text-xs text-gray-400'>
                         <Clock className='w-3 h-3' />
-                        <span>В последний раз редактировано: {formatRelative(latest.date_update)}</span>
+                        <span>
+                          В последний раз редактировано:{' '}
+                          {formatRelative(latest.date_update)}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -302,7 +325,10 @@ export function GetStates({ onProjectGet }: GetStatesProps) {
           )}
 
           {history.map((item) => (
-            <div key={item.id} className='px-4 py-3 hover:bg-orange-50/40 transition'>
+            <div
+              key={item.id}
+              className='px-4 py-3 hover:bg-orange-50/40 transition'
+            >
               <div className='flex items-start justify-between gap-3'>
                 <div className='flex-1 min-w-0'>
                   <div className='flex items-center gap-2 mb-1'>
@@ -311,7 +337,7 @@ export function GetStates({ onProjectGet }: GetStatesProps) {
                       {item.name}
                     </span>
                   </div>
-                  
+
                   <div className='flex items-center gap-1.5 text-xs text-gray-400'>
                     <Calendar className='w-3 h-3' />
                     <span>{formatDate(item.date_create)}</span>

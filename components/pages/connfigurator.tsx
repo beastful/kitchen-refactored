@@ -168,6 +168,13 @@ export default function Configurator() {
                             setJson(JSON.stringify(data));
                             setShowSave(false);
                         }}
+                        onNewProject={() => {
+                            store.modules = [];
+                            store.page = 'starter';
+                            store.currentRawModule = null;
+                            store.currentModule = null;
+                            setShowSave(false);
+                        }}
                     />
 
                     <div className='mt-4'>
