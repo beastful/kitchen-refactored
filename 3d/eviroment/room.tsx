@@ -92,29 +92,31 @@ export default function Room() {
 
     return (
         <>
-            <CursorRoom
-                visibilityChange={(v) => {
-                    visibilityRef.current = v;
-                }}
-                width={snap.room.w}
-                height={snap.room.h}
-                depth={snap.room.d}
-                show={!!store.currentRawModule}>
-                {snap.currentRawModule?.name && (
-                    <SnapCursor lockY={lockY} lock={lock} userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
-                        {typeof snap.currentRawModule?.model != "string" && (
-                            <Center>
-                                <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
-                            </Center>
-                        )}
-                        {typeof snap.currentRawModule?.model == "string" && (
-                            <Center>
-                                <Gltf src={snap.currentRawModule.model} />
-                            </Center>
-                        )}
-                    </SnapCursor>
-                )}
-            </CursorRoom>
+            <Suspense>
+                <CursorRoom
+                    visibilityChange={(v) => {
+                        visibilityRef.current = v;
+                    }}
+                    width={snap.room.w}
+                    height={snap.room.h}
+                    depth={snap.room.d}
+                    show={!!store.currentRawModule}>
+                    {snap.currentRawModule?.name && (
+                        <SnapCursor lockY={lockY} lock={lock} userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
+                            {typeof snap.currentRawModule?.model != "string" && (
+                                <Center>
+                                    <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
+                                </Center>
+                            )}
+                            {typeof snap.currentRawModule?.model == "string" && (
+                                <Center>
+                                    <Gltf src={snap.currentRawModule.model} />
+                                </Center>
+                            )}
+                        </SnapCursor>
+                    )}
+                </CursorRoom>
+            </Suspense>
             <RoomWalls />
 
             {snap.modules.map(entity => {
@@ -135,37 +137,36 @@ export default function Room() {
                             snapPlanes={entity.snapPlanes as SnapPlane[]}
                             useDistance={true}
                         >
+                            {EntityModel && <Suspense fallback={null}>
+                                <ModuleMenu entity={entity as ModuleEntity}>
+                                    <Tabletop entity={entity as ModuleEntity}>
+                                        <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
+                                            <Center>
+                                                {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
+                                                    <>
+                                                        {typeof entity.model != "string" && (
+                                                            <Gltf src={`modules/${e_folder}/${entity.name}.glb`} />
+                                                        )}
 
-                            {EntityModel && <Suspense fallback={null}> <ModuleMenu entity={entity as ModuleEntity}>
+                                                        {typeof entity.model == "string" && (
+                                                            <Gltf src={entity.model} />
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {typeof entity.model != "string" && (
+                                                            <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
+                                                        )}
 
-                                <Tabletop entity={entity as ModuleEntity}>
-                                    <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
-                                        <Center>
-                                            {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
-                                                <>
-                                                    {typeof entity.model != "string" && (
-                                                        <Gltf src={`modules/${e_folder}/${entity.name}.glb`} />
-                                                    )}
-
-                                                    {typeof entity.model == "string" && (
-                                                        <Gltf src={entity.model} />
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    {typeof entity.model != "string" && (
-                                                        <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
-                                                    )}
-
-                                                    {typeof entity.model == "string" && (
-                                                        <FacadeConfig src={entity.model} entity={entity as ModuleEntity} />
-                                                    )}
-                                                </>
-                                            )}
-                                        </Center>
-                                    </ZCorrection>
-                                </Tabletop>
-                            </ModuleMenu>
+                                                        {typeof entity.model == "string" && (
+                                                            <FacadeConfig src={entity.model} entity={entity as ModuleEntity} />
+                                                        )}
+                                                    </>
+                                                )}
+                                            </Center>
+                                        </ZCorrection>
+                                    </Tabletop>
+                                </ModuleMenu>
                             </Suspense>}
                         </SnapPlacedObject>
                     </group>
