@@ -337,7 +337,7 @@ const floor_data: ModuleDef[] = [
         type: 'floor',
         price: 1720,
         name: 'M_BTL_1',
-        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION],
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
         image: '/BTL/M_BTL_1_F_1_NN.obj.png',
         displayName: 'Шкаф под бутылочницу 15см',
         displaySize: '150'
@@ -347,7 +347,7 @@ const floor_data: ModuleDef[] = [
         type: 'floor',
         price: 1920,
         name: 'M_BTL_2',
-        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION],
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
         image: '/BTL/M_BTL_1_F_2_NN.obj.png',
         displayName: 'Шкаф под бутылочницу 20см',
         displaySize: '200'
@@ -357,7 +357,7 @@ const floor_data: ModuleDef[] = [
         type: 'floor',
         price: 1980,
         name: 'M_BTL_3',
-        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION],
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
         image: '/BTL/M_BTL_1_F_3_NN.obj.png',
         displayName: 'Шкаф под бутылочницу 25см',
         displaySize: '250'
