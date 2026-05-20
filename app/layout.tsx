@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  userScalable: true, // allows zoom if needed; set to false if you want to disable
+  userScalable: false, // allows zoom if needed; set to false if you want to disable
   viewportFit: "cover", // helpful for notched screens (iPhone X+)
 };
 
