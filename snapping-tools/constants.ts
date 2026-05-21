@@ -1,4 +1,4 @@
-export const SNAP_RADIUS = 0.5;
+export const SNAP_RADIUS = 0.2;
 export const THROTTLE = 1;
 
 export const MAGNET_SMOOTH = 20;

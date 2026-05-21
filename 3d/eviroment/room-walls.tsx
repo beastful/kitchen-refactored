@@ -11,7 +11,7 @@ export function RoomWalls() {
     const snap = useSnapshot(store)
     const depth = 0.06;
     const ruler_wal_gap = 0.005
-    const ruler_top_factor = 2
+    const ruler_top_factor = 1.7
     const ruler_bottom_factor = 0.6
     const [colorMap] = useTexture([
         'assets/laminate_floor_02_diff_1k.jpg'

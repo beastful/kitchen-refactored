@@ -42,7 +42,7 @@ export function GroupEdit() {
 
                                 {/* Color */}
                                 <div className="mb-8">
-                                    <label className="block text-sm font-medium text-gray-600 mb-3">Цвет корпуса</label>
+                                    <label className="block text-sm font-medium text-gray-600 mb-3">Цвет фасада</label>
                                     <div className="grid grid-cols-5 gap-3">
                                         {COLORS.map(color => (
                                             <button
@@ -140,7 +140,7 @@ export function GroupEdit() {
 
                                 {/* Color */}
                                 <div className="mb-8">
-                                    <label className="block text-sm font-medium text-gray-600 mb-3">Цвет корпуса</label>
+                                    <label className="block text-sm font-medium text-gray-600 mb-3">Цвет фасада</label>
                                     <div className="grid grid-cols-5 gap-3">
                                         {COLORS.map(color => (
                                             <button
@@ -164,7 +164,7 @@ export function GroupEdit() {
                                                 className="relative rounded-xl overflow-hidden bg-gray-50 p-3 transition-all hover:shadow-md"
                                             >
                                                 <img
-                                                    src={`./facade/${facade}.png`}
+                                                    src={`./facades/${facade}.png`}
                                                     alt={`Фасад ${facade}`}
                                                     className="w-full h-auto object-contain"
                                                 />
