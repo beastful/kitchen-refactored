@@ -2252,7 +2252,7 @@ const room_data: ModuleDef[] = [
         price: 14500,
         name: 'Door',
         tags: [EXPLICT_CASE_DOUBLE, CATEGORY_ROOM, EXPLICT_CASE_TUNNEL, INCONFIGURABLE],
-        image: '/previews/ROOM/Door.png',
+        image: '/previews/ROOM/Door2.png',
         displayName: '',
         displaySize: ''
     },
