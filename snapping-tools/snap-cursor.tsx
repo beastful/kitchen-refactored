@@ -95,7 +95,10 @@ export function SnapCursor({ children, lockY = true, lock, ...groupProps }: Snap
     previewRef.current?.position.copy(snapPosition);
     previewRef.current?.rotation.set(0, rotationYaw, 0);
 
-    const snapPlanes = isSnapped ? buildSnapPlanes(intersections) : [];
+    // UPDATED: pass cursorPos and cursorHalf so planes match the actual winners
+    const snapPlanes = isSnapped
+      ? buildSnapPlanes(cursorPos, intersections, cursorHalf, rotationYaw)
+      : [];
 
     updateCursorState({
       position: cursorPos,

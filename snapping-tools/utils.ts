@@ -1,45 +1,44 @@
-import { Mesh, Vector3 } from "three";
-import { Box3, Object3D, Matrix4 } from 'three';
-import { MutableRefObject } from 'react';
+import { Vector3, Box3, Object3D, Matrix4 } from "three";
+import { MutableRefObject } from "react";
 import { Intersection, SnapPlane } from "./types";
 
 export function getYawFromNormal(normal: Vector3): number {
-    const flatX = normal.x;
-    const flatZ = normal.z;
-    if (Math.abs(flatX) < 1e-6 && Math.abs(flatZ) < 1e-6) {
-        return 0;
-    }
-    const angle = Math.atan2(flatX, flatZ);
-    return angle;
+  const flatX = normal.x;
+  const flatZ = normal.z;
+  if (Math.abs(flatX) < 1e-6 && Math.abs(flatZ) < 1e-6) {
+    return 0;
+  }
+  const angle = Math.atan2(flatX, flatZ);
+  return angle;
 }
 
 const boxA = new Box3();
 const boxB = new Box3();
 
 export function checkIntersection(
-    refA: MutableRefObject<Object3D | null>,
-    refB: MutableRefObject<Object3D | null>
+  refA: MutableRefObject<Object3D | null>,
+  refB: MutableRefObject<Object3D | null>
 ): [boolean, Vector3, Vector3, Vector3, Vector3] {
-    const objA = refA.current;
-    const objB = refB.current;
-    if (!objA || !objB) return [false, new Vector3(), new Vector3(), new Vector3(), new Vector3()];
+  const objA = refA.current;
+  const objB = refB.current;
+  if (!objA || !objB) return [false, new Vector3(), new Vector3(), new Vector3(), new Vector3()];
 
-    boxA.setFromObject(objA);
-    boxB.setFromObject(objB);
+  boxA.setFromObject(objA);
+  boxB.setFromObject(objB);
 
-    const centerA = new Vector3();
-    const centerB = new Vector3();
+  const centerA = new Vector3();
+  const centerB = new Vector3();
 
-    const sizeA = new Vector3();
-    const sizeB = new Vector3();
+  const sizeA = new Vector3();
+  const sizeB = new Vector3();
 
-    boxA.getCenter(centerA);
-    boxB.getCenter(centerB);
+  boxA.getCenter(centerA);
+  boxB.getCenter(centerB);
 
-    boxA.getSize(sizeA);
-    boxB.getSize(sizeB);
+  boxA.getSize(sizeA);
+  boxB.getSize(sizeB);
 
-    return [boxA.intersectsBox(boxB), centerA, centerB, sizeA, sizeB];
+  return [boxA.intersectsBox(boxB), centerA, centerB, sizeA, sizeB];
 }
 
 const _boxA = new Box3();
@@ -49,107 +48,107 @@ const _size = new Vector3();
 const _matrix = new Matrix4();
 
 export function checkIntersectionFast(
-    refA: MutableRefObject<Object3D | null>,
-    refB: MutableRefObject<Object3D | null>
+  refA: MutableRefObject<Object3D | null>,
+  refB: MutableRefObject<Object3D | null>
 ): [boolean, Vector3, Vector3, Vector3, Vector3] {
-    const objA = refA.current;
-    const objB = refB.current;
+  const objA = refA.current;
+  const objB = refB.current;
 
-    if (!objA || !objB) {
-        return [false, _center.clone(), _center.clone(), _size.clone(), _size.clone()];
-    }
+  if (!objA || !objB) {
+    return [false, _center.clone(), _center.clone(), _size.clone(), _size.clone()];
+  }
 
-    const geoA = (objA as any).geometry;
-    const geoB = (objB as any).geometry;
+  const geoA = (objA as any).geometry;
+  const geoB = (objB as any).geometry;
 
-    if (!geoA?.boundingBox || !geoB?.boundingBox) {
-        return checkIntersection(refA, refB);
-    }
+  if (!geoA?.boundingBox || !geoB?.boundingBox) {
+    return checkIntersection(refA, refB);
+  }
 
-    _boxA.copy(geoA.boundingBox);
-    _boxB.copy(geoB.boundingBox);
+  _boxA.copy(geoA.boundingBox);
+  _boxB.copy(geoB.boundingBox);
 
-    objA.updateWorldMatrix(true, false);
-    objB.updateWorldMatrix(true, false);
+  objA.updateWorldMatrix(true, false);
+  objB.updateWorldMatrix(true, false);
 
-    _boxA.applyMatrix4(objA.matrixWorld);
-    _boxB.applyMatrix4(objB.matrixWorld);
+  _boxA.applyMatrix4(objA.matrixWorld);
+  _boxB.applyMatrix4(objB.matrixWorld);
 
-    _boxA.getCenter(_center);
-    const centerA = _center.clone();
+  _boxA.getCenter(_center);
+  const centerA = _center.clone();
 
-    _boxB.getCenter(_center);
-    const centerB = _center.clone();
+  _boxB.getCenter(_center);
+  const centerB = _center.clone();
 
-    _boxA.getSize(_size);
-    const sizeA = _size.clone();
+  _boxA.getSize(_size);
+  const sizeA = _size.clone();
 
-    _boxB.getSize(_size);
-    const sizeB = _size.clone();
+  _boxB.getSize(_size);
+  const sizeB = _size.clone();
 
-    return [_boxA.intersectsBox(_boxB), centerA, centerB, sizeA, sizeB];
+  return [_boxA.intersectsBox(_boxB), centerA, centerB, sizeA, sizeB];
 }
 
-export function getBoxFromArgs(mesh: Mesh, outBox: Box3): void {
-    const args = (mesh.geometry as any).parameters as { width: number; height: number; depth: number };
-    const halfW = args.width / 2;
-    const halfH = args.height / 2;
-    const halfD = args.depth / 2;
+export function getBoxFromArgs(mesh: any, outBox: Box3): void {
+  const args = (mesh.geometry as any).parameters as { width: number; height: number; depth: number };
+  const halfW = args.width / 2;
+  const halfH = args.height / 2;
+  const halfD = args.depth / 2;
 
-    outBox.min.set(-halfW, -halfH, -halfD);
-    outBox.max.set(halfW, halfH, halfD);
-    outBox.applyMatrix4(mesh.matrixWorld);
+  outBox.min.set(-halfW, -halfH, -halfD);
+  outBox.max.set(halfW, halfH, halfD);
+  outBox.applyMatrix4(mesh.matrixWorld);
 }
 
 export function getDominantIntersectionNormal(
-    refA: MutableRefObject<Object3D | null>,
-    refB: MutableRefObject<Object3D | null>
+  refA: MutableRefObject<Object3D | null>,
+  refB: MutableRefObject<Object3D | null>
 ): Vector3 | null {
-    const objA = refA.current;
-    const objB = refB.current;
-    if (!objA || !objB) return null;
+  const objA = refA.current;
+  const objB = refB.current;
+  if (!objA || !objB) return null;
 
-    const boxA = new Box3().setFromObject(objA);
-    const boxB = new Box3().setFromObject(objB);
+  const boxA = new Box3().setFromObject(objA);
+  const boxB = new Box3().setFromObject(objB);
 
-    if (!boxA.intersectsBox(boxB)) return null;
+  if (!boxA.intersectsBox(boxB)) return null;
 
-    const [minA, maxA] = [boxA.min, boxA.max];
-    const [minB, maxB] = [boxB.min, boxB.max];
+  const [minA, maxA] = [boxA.min, boxA.max];
+  const [minB, maxB] = [boxB.min, boxB.max];
 
-    let bestDepth = Infinity;
-    let bestWorldNormal: Vector3 | null = null;
+  let bestDepth = Infinity;
+  let bestWorldNormal: Vector3 | null = null;
 
-    const axes: [number, Vector3][] = [
-        [0, new Vector3(1, 0, 0)],
-        [1, new Vector3(0, 1, 0)],
-        [2, new Vector3(0, 0, 1)]
-    ];
+  const axes: [number, Vector3][] = [
+    [0, new Vector3(1, 0, 0)],
+    [1, new Vector3(0, 1, 0)],
+    [2, new Vector3(0, 0, 1)]
+  ];
 
-    for (const [idx, axisDir] of axes) {
-        const aMin = minA.getComponent(idx);
-        const aMax = maxA.getComponent(idx);
-        const bMin = minB.getComponent(idx);
-        const bMax = maxB.getComponent(idx);
+  for (const [idx, axisDir] of axes) {
+    const aMin = minA.getComponent(idx);
+    const aMax = maxA.getComponent(idx);
+    const bMin = minB.getComponent(idx);
+    const bMax = maxB.getComponent(idx);
 
-        const depthPos = aMax - bMin;
-        if (depthPos > 0 && depthPos < bestDepth) {
-            bestDepth = depthPos;
-            bestWorldNormal = axisDir.clone();
-        }
-
-        const depthNeg = bMax - aMin;
-        if (depthNeg > 0 && depthNeg < bestDepth) {
-            bestDepth = depthNeg;
-            bestWorldNormal = axisDir.clone().negate();
-        }
+    const depthPos = aMax - bMin;
+    if (depthPos > 0 && depthPos < bestDepth) {
+      bestDepth = depthPos;
+      bestWorldNormal = axisDir.clone();
     }
 
-    if (!bestWorldNormal) return null;
+    const depthNeg = bMax - aMin;
+    if (depthNeg > 0 && depthNeg < bestDepth) {
+      bestDepth = depthNeg;
+      bestWorldNormal = axisDir.clone().negate();
+    }
+  }
 
-    const localNormal = bestWorldNormal.clone().transformDirection(objA.matrixWorld.clone().invert()).normalize();
+  if (!bestWorldNormal) return null;
 
-    return localNormal;
+  const localNormal = bestWorldNormal.clone().transformDirection(objA.matrixWorld.clone().invert()).normalize();
+
+  return localNormal;
 }
 
 export function distanceSqToAABB(point: Vector3, box: Box3): number {
@@ -159,6 +158,22 @@ export function distanceSqToAABB(point: Vector3, box: Box3): number {
   return dx * dx + dy * dy + dz * dz;
 }
 
+type Axis = 'x' | 'y' | 'z';
+
+function getDominantAxis(normal: Vector3): Axis {
+  const absX = Math.abs(normal.x);
+  const absY = Math.abs(normal.y);
+  const absZ = Math.abs(normal.z);
+  return absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
+}
+
+/**
+ * Computes a snapped position where EACH AXIS is resolved independently.
+ * For every axis (x/y/z), we look at all colliders whose dominant normal
+ * points along that axis, and pick the one whose surface is NEAREST to
+ * the current cursor coordinate. This fixes the "wall steals lock" bug
+ * in narrow spaces.
+ */
 export function computeSnappedPosition(
   cursorPos: Vector3,
   intersections: Intersection[],
@@ -167,42 +182,125 @@ export function computeSnappedPosition(
   out: Vector3,
 ): Vector3 {
   out.copy(cursorPos);
-  const locked = { x: false, y: false, z: false };
+
+  if (intersections.length === 0) {
+    return out;
+  }
 
   const cos = Math.cos(yaw);
   const sin = Math.sin(yaw);
   const worldHalfX = Math.abs(cursorHalfExtents.x * cos) + Math.abs(cursorHalfExtents.z * sin);
   const worldHalfZ = Math.abs(cursorHalfExtents.x * sin) + Math.abs(cursorHalfExtents.z * cos);
 
-  for (const [center, targetSize, normal] of intersections) {
-    const absX = Math.abs(normal.x);
-    const absY = Math.abs(normal.y);
-    const absZ = Math.abs(normal.z);
-    const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
-    if (locked[axis]) continue;
-    locked[axis] = true;
+  // Group intersections by dominant axis
+  const byAxis: Record<Axis, Intersection[]> = { x: [], y: [], z: [] };
 
-    const dir = Math.sign(normal[axis]);
-    const surface = center[axis] + targetSize[axis] * 0.5 * dir;
-    const half = axis === 'y' ? cursorHalfExtents.y : (axis === 'x' ? worldHalfX : worldHalfZ);
-    out[axis] = surface + half * dir;
+  for (const inter of intersections) {
+    const axis = getDominantAxis(inter[2]);
+    byAxis[axis].push(inter);
+  }
+
+  // Resolve each axis independently: nearest surface wins
+  for (const axis of (['x', 'y', 'z'] as Axis[])) {
+    const group = byAxis[axis];
+    if (group.length === 0) continue;
+
+    let winner: Intersection | null = null;
+    let winnerDist = Infinity;
+
+    for (const inter of group) {
+      const [center, targetSize, normal] = inter;
+      const dir = Math.sign(normal[axis]) || 1;
+      const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
+      const half = axis === 'y'
+        ? cursorHalfExtents.y
+        : (axis === 'x' ? worldHalfX : worldHalfZ);
+      const snappedCoord = surface + half * dir;
+      const dist = Math.abs(cursorPos[axis] - snappedCoord);
+
+      if (dist < winnerDist) {
+        winnerDist = dist;
+        winner = inter;
+      }
+    }
+
+    if (winner) {
+      const [center, targetSize, normal] = winner;
+      const dir = Math.sign(normal[axis]) || 1;
+      const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
+      const half = axis === 'y'
+        ? cursorHalfExtents.y
+        : (axis === 'x' ? worldHalfX : worldHalfZ);
+      out[axis] = surface + half * dir;
+    }
   }
 
   return out;
 }
 
-export function buildSnapPlanes(intersections: Intersection[]): SnapPlane[] {
-  return intersections.map(([center, targetSize, normal]) => {
-    const absX = Math.abs(normal.x);
-    const absY = Math.abs(normal.y);
-    const absZ = Math.abs(normal.z);
-    const axis = absX > absY && absX > absZ ? 'x' : absY > absZ ? 'y' : 'z';
-    const dir = Math.sign(normal[axis]);
-    const surface = center[axis] + targetSize[axis] * 0.5 * dir;
+/**
+ * Builds snap planes ONLY for the winning colliders per axis.
+ * This keeps debug visualization (violet planes / gizmos) accurate
+ * so you don't see planes for walls that were ignored.
+ */
+export function buildSnapPlanes(
+  cursorPos: Vector3,
+  intersections: Intersection[],
+  cursorHalfExtents: Vector3,
+  yaw: number,
+): SnapPlane[] {
+  if (intersections.length === 0) return [];
+
+  const cos = Math.cos(yaw);
+  const sin = Math.sin(yaw);
+  const worldHalfX = Math.abs(cursorHalfExtents.x * cos) + Math.abs(cursorHalfExtents.z * sin);
+  const worldHalfZ = Math.abs(cursorHalfExtents.x * sin) + Math.abs(cursorHalfExtents.z * cos);
+
+  const byAxis: Record<Axis, Intersection[]> = { x: [], y: [], z: [] };
+
+  for (const inter of intersections) {
+    byAxis[getDominantAxis(inter[2])].push(inter);
+  }
+
+  const winners: Intersection[] = [];
+
+  for (const axis of (['x', 'y', 'z'] as Axis[])) {
+    const group = byAxis[axis];
+    if (group.length === 0) continue;
+
+    let winner: Intersection | null = null;
+    let winnerDist = Infinity;
+
+    for (const inter of group) {
+      const [center, targetSize, normal] = inter;
+      const dir = Math.sign(normal[axis]) || 1;
+      const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
+      const half = axis === 'y'
+        ? cursorHalfExtents.y
+        : (axis === 'x' ? worldHalfX : worldHalfZ);
+      const snappedCoord = surface + half * dir;
+      const dist = Math.abs(cursorPos[axis] - snappedCoord);
+
+      if (dist < winnerDist) {
+        winnerDist = dist;
+        winner = inter;
+      }
+    }
+
+    if (winner) winners.push(winner);
+  }
+
+  return winners.map(([center, targetSize, normal]) => {
+    const axis = getDominantAxis(normal);
+    const dir = Math.sign(normal[axis]) || 1;
+    const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
 
     const point: [number, number, number] = [center.x, center.y, center.z];
     point[axis === 'x' ? 0 : axis === 'y' ? 1 : 2] = surface;
 
-    return { point, normal: [normal.x, normal.y, normal.z] as [number, number, number] };
+    return {
+      point,
+      normal: [normal.x, normal.y, normal.z] as [number, number, number],
+    };
   });
 }
