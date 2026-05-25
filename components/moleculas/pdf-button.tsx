@@ -23,7 +23,7 @@ export function PDFExportButton() {
   const [isExporting, setIsExporting] = useState(false);
   const [progressStep, setProgressStep] = useState('');
 
-  const modules = snap_modules.filter((m: ModuleEntity) => !m.tags.includes(CATEGORY_ROOM));
+  const modules = snap_modules.filter((m: any) => !m.tags.includes(CATEGORY_ROOM));
   const modulesTotal = modules.reduce((sum, m) => sum + m.price, 0);
   const tabletopArea = modules.reduce((area, m) => area + (m.size.z * m.size.x), 0);
   const tabletopPrice = Math.ceil(tabletopArea * snap_tabletop[2]);

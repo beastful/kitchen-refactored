@@ -9,7 +9,7 @@ import { Stats } from '@react-three/drei';
 function R3FScene() {
     return (
         <Canvas dpr={[1, 2]} // Limits resolution on high-end screen
-            gl={{ antialias: true, powerPreference: "low-power" }} camera={{ position: [-6, 6, 6], fov: 45, near: 0.1, far: 1000 }}>
+            gl={{ antialias: true }} camera={{ position: [-6, 6, 6], fov: 45, near: 0.1, far: 1000 }}>
             <Room />
             <ambientLight intensity={0.6} color="#fff8f0" />
             <directionalLight position={[5, 8, 5]} intensity={1.2} color="#ffffff" castShadow shadow-mapSize={[1024, 1024]} />

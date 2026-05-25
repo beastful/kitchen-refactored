@@ -59,7 +59,7 @@ export interface ModuleEntity {
     hingeReplacement: number;
     price: number;
     size: Vector3;
-    model: React.FC<any> | null;
+    model: React.FC<any> | null | string;
     position: Vector3;
     normal: Vector3;
     lock: Vector3;

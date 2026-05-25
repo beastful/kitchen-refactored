@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useCallback, useMemo, memo } from 'react'
+import React, { useState, useCallback, useMemo, memo, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import {
     Settings, Ruler, DoorOpen, Save, Printer, Calculator,
     Columns3Cog, Search, X
@@ -18,13 +19,15 @@ import { MobileScreen } from '@/components/organisms/mobile-screen'
 import { HintScreen } from '@/components/organisms/hint-screen'
 import { Hint } from '@/components/atoms/hint'
 import GroupEdit from '@/components/organisms/group-editor'
-import Scene from '@/3d/eviroment/scene'
 import { TabletopOption, WallHeight } from "@/types"
 import { GetStates } from '@/lib/get-states'
 import { useSaveToBack } from '@/lib/use-save-to-back'
 import { getJson, setJson } from '@/store'
 
-// ---------- Memoized presentational components (same as before) ----------
+// Dynamically import Scene with SSR disabled
+const Scene = dynamic(() => import('@/3d/eviroment/scene'), { ssr: false })
+
+// ---------- Memoized presentational components ----------
 const ColorPicker = memo(({ colors, selected, onSelect }: {
     colors: readonly string[]
     selected: string
@@ -104,10 +107,7 @@ const ToolButton = memo(({ active, onClick, icon }: {
 ))
 ToolButton.displayName = 'ToolButton'
 
-// ---------- Memoized Scene ----------
-const MemoizedScene = memo(Scene)
-
-// ---------- Toolbar now receives a callback to open the save modal ----------
+// ---------- Toolbar ----------
 function Toolbar({ onOpenSaveModal }: { onOpenSaveModal: () => void }) {
     const openAngle = useSnapshot(store).openAngle
     const ruler = useSnapshot(store).ruler
@@ -136,36 +136,36 @@ function Toolbar({ onOpenSaveModal }: { onOpenSaveModal: () => void }) {
             <ToolButton active={groupEdit} onClick={handleOpenGroupEdit} icon={<Columns3Cog size={20} />} />
             <div className="flex-1" />
             <ToolButton active={false} onClick={onOpenSaveModal} icon={<Save size={20} />} />
-            <ToolButton active={false} onClick={() => {}} icon={<Printer size={20} />} />
+            <ToolButton active={false} onClick={() => { }} icon={<Printer size={20} />} />
             <ToolButton active={false} onClick={handleOpenCalculator} icon={<Calculator size={20} />} />
             <PDFExportButton />
         </footer>
     )
 }
 
-// ---------- SidebarContent (unchanged, search by displayName) ----------
+// ---------- SidebarContent (unchanged) ----------
 function SidebarContent() {
     const [floorSearch, setFloorSearch] = useState('')
     const [wallSearch, setWallSearch] = useState('')
     const [techSearch, setTechSearch] = useState('')
 
     const floorModules = useMemo(() => {
-        return data.filter(m => 
-            m.tags.includes(CATEGORY_FLOOR) && 
+        return data.filter(m =>
+            m.tags.includes(CATEGORY_FLOOR) &&
             (floorSearch === '' || m.displayName?.toLowerCase().includes(floorSearch.toLowerCase()))
         )
     }, [floorSearch])
-    
+
     const wallModules = useMemo(() => {
-        return data.filter(m => 
-            m.tags.includes(CATEGORY_WALL) && 
+        return data.filter(m =>
+            m.tags.includes(CATEGORY_WALL) &&
             (wallSearch === '' || m.displayName?.toLowerCase().includes(wallSearch.toLowerCase()))
         )
     }, [wallSearch])
-    
+
     const techModules = useMemo(() => {
-        return data.filter(m => 
-            m.tags.includes(CATEGORY_TECH) && 
+        return data.filter(m =>
+            m.tags.includes(CATEGORY_TECH) &&
             (techSearch === '' || m.displayName?.toLowerCase().includes(techSearch.toLowerCase()))
         )
     }, [techSearch])
@@ -197,15 +197,15 @@ function SidebarContent() {
                     <div className='text-2xl font-semibold'>Напольные модули</div>
                     <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
                         <div className='opacity-30'><Search /></div>
-                        <input 
-                            className='p-3 w-full' 
-                            placeholder='Ваш запрос' 
+                        <input
+                            className='p-3 w-full'
+                            placeholder='Ваш запрос'
                             value={floorSearch}
                             onChange={(e) => setFloorSearch(e.target.value)}
                         />
                     </div>
                     <div className='grid grid-cols-3 gap-[15px]'>
-                        {floorModules.map(module => <ModuleCard key={module.id} module={module} />)}
+                        {floorModules.map(module => <ModuleCard key={module.name} module={module} />)}
                     </div>
                 </div>
             </SidebarPage>
@@ -215,15 +215,15 @@ function SidebarContent() {
                     <div className='text-2xl font-semibold'>Настенные модули</div>
                     <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
                         <div className='opacity-30'><Search /></div>
-                        <input 
-                            className='p-3 w-full' 
-                            placeholder='Ваш запрос' 
+                        <input
+                            className='p-3 w-full'
+                            placeholder='Ваш запрос'
                             value={wallSearch}
                             onChange={(e) => setWallSearch(e.target.value)}
                         />
                     </div>
                     <div className='grid grid-cols-3 gap-[15px]'>
-                        {wallModules.map(module => <ModuleCard key={module.id} module={module} />)}
+                        {wallModules.map(module => <ModuleCard key={module.name} module={module} />)}
                     </div>
                 </div>
             </SidebarPage>
@@ -233,15 +233,15 @@ function SidebarContent() {
                     <div className='text-2xl font-semibold'>Техника</div>
                     <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
                         <div className='opacity-30'><Search /></div>
-                        <input 
-                            className='p-3 w-full' 
-                            placeholder='Ваш запрос' 
+                        <input
+                            className='p-3 w-full'
+                            placeholder='Ваш запрос'
                             value={techSearch}
                             onChange={(e) => setTechSearch(e.target.value)}
                         />
                     </div>
                     <div className='grid grid-cols-3 gap-[15px]'>
-                        {techModules.map(module => <ModuleCard key={module.id} module={module} />)}
+                        {techModules.map(module => <ModuleCard key={module.name} module={module} />)}
                     </div>
                 </div>
             </SidebarPage>
@@ -268,7 +268,7 @@ function SidebarContent() {
                         <WallHeightSelector heights={WALL_HEIGHTS} selected={wallHeight} onSelect={handleWallHeightSelect} />
                     </section>
                     <div className='grid grid-cols-3 gap-[15px]'>
-                        {roomModules.map(module => <ModuleCard key={module.id} module={module} />)}
+                        {roomModules.map(module => <ModuleCard key={module.name} module={module} />)}
                     </div>
                 </div>
             </SidebarPage>
@@ -276,7 +276,7 @@ function SidebarContent() {
     )
 }
 
-// ---------- SaveModal now accepts showSave and onClose ----------
+// ---------- SaveModal (unchanged) ----------
 function SaveModal({ showSave, onClose }: { showSave: boolean; onClose: () => void }) {
     const [write, saving, saveSuccess] = useSaveToBack()
 
@@ -322,6 +322,7 @@ function SaveModal({ showSave, onClose }: { showSave: boolean; onClose: () => vo
     )
 }
 
+// ---------- Header (unchanged) ----------
 function Header() {
     const handleToggleHints = useCallback(() => {
         store.hints = !store.hints
@@ -341,6 +342,12 @@ function Header() {
 // ---------- Main Configurator ----------
 export default function Configurator() {
     const [showSaveModal, setShowSaveModal] = useState(false)
+    const [isMounted, setIsMounted] = useState(false)
+
+    // Ensure client-only components only render after mount
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
 
     const handleOpenSaveModal = useCallback(() => setShowSaveModal(true), [])
     const handleCloseSaveModal = useCallback(() => setShowSaveModal(false), [])
@@ -352,16 +359,20 @@ export default function Configurator() {
                 <div className="w-full relative">
                     <Header />
                     <div className='h-screen'>
-                        <MemoizedScene />
+                        <Scene />
                     </div>
                     <Toolbar onOpenSaveModal={handleOpenSaveModal} />
                 </div>
                 <SidebarContent />
-                <HintScreen />
-                <CalculatorComponent />
-                <ModuleConfig />
-                <MobileScreen />
-                <GroupEdit />
+                {isMounted && (
+                    <>
+                        <HintScreen />
+                        <CalculatorComponent />
+                        <ModuleConfig />
+                        <MobileScreen />
+                        <GroupEdit />
+                    </>
+                )}
             </div>
         </>
     )

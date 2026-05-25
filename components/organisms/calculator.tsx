@@ -15,7 +15,7 @@ export function CalculatorComponent() {
 
     // Get all modules from store, excluding room entities
     const modules = useMemo(() => {
-        return snap.modules.filter((mod: ModuleEntity) =>
+        return snap.modules.filter((mod: any) =>
             !mod.tags.includes(CATEGORY_ROOM)
         );
     }, [snap.modules]);
