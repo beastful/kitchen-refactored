@@ -58,7 +58,7 @@ function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
         maxDistance={10}
         maxPolarAngle={Math.PI / 2}
       />
-      <Stats />
+     
     </>
   )
 }
