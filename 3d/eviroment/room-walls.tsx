@@ -1,11 +1,11 @@
 import { SnapConstraint } from "@/snapping-tools/snap-constraint"
 import { store } from "@/store"
-import { useTexture } from "@react-three/drei";
+import { Text, useTexture } from "@react-three/drei";
 import { Suspense, useEffect, useRef } from "react";
 import { useSnapshot } from "valtio"
 import * as THREE from 'three';
 import { RaycastRuler } from "./raycast-ruler";
-
+import LocalMeasurements from "./local-ruler";
 
 export function RoomWalls() {
     const snap = useSnapshot(store)
@@ -62,7 +62,73 @@ export function RoomWalls() {
                 from={new THREE.Vector3(-snap.room.d / 2, -snap.room.h / 2 + ruler_bottom_factor, -snap.room.w / 2 + ruler_wal_gap)}
                 to={new THREE.Vector3(snap.room.d / 2, -snap.room.h / 2 + ruler_bottom_factor, -snap.room.w / 2 + ruler_wal_gap)}
                 textAngle={Math.PI} />
+            <group>
+                {/* Size display — fine-tune vars */}
+                {(() => {
+                    // --- CONFIG: adjust these to tweak the look ---
+                    const sdThick = 0.02;            // bar thickness (X)
+                    const sdDepth = 0.01;            // bar depth    (Z)
+                    const sdBaseH = 0.860 + snap.tabletop[0];           // bottom segment height (plinth / leg)
+                    const sdModuleH = snap.wallHeight; // middle segment height (module / wall)
+                    const sdTopH = 0.76;            // top segment height    (crown / upper)
+                    const sdGap = 0.02;            // gap between segments
+                    const sdX = -snap.room.d * 0.5 + depth * 0.5;
+                    const sdZ = -snap.room.w * 0.5;
+                    const floorY = -snap.room.h / 2;
+                    // --- positions calculated from the floor up ---
+
+                    const yBase = floorY + sdBaseH / 2;
+                    const yModule = floorY + sdBaseH + sdGap + sdModuleH / 2;
+                    const yTop = floorY + sdBaseH + sdGap + sdModuleH + sdGap + sdTopH / 2;
+                    return (
+                        <group>
+                            <group position={[sdX, yTop, sdZ]}>
+                                <Text
+                                    position={[0.1, 0, 0.01]}
+                                    fontSize={0.06}
+                                    color={"#000"}
+                                    anchorX="center"
+                                    anchorY="middle"
+                                    rotation={[0, 0, Math.PI / 2]}
+                                >
+                                    {`0.72m`}
+                                </Text>
+                                <mesh><boxGeometry args={[sdThick, sdTopH, sdDepth]} /><meshMatcapMaterial color={"#000"} /></mesh>
+                            </group>
+                            <group position={[sdX, yModule, sdZ]}>
+                                <Text
+                                    position={[0.1, 0, 0.01]}
+                                    fontSize={0.06}
+                                    color={"#000"}
+                                    anchorX="center"
+                                    anchorY="middle"
+                                    rotation={[0, 0, Math.PI / 2]}
+                                >
+                                    {String(snap.wallHeight) + "m"}
+                                </Text>
+                                <mesh><boxGeometry args={[sdThick, sdModuleH, sdDepth]} /><meshMatcapMaterial color={"#000"} /></mesh>
+                            </group>
+                            <group position={[sdX, yBase, sdZ]}>
+                                <Text
+                                    position={[0.1, 0, 0.01]}
+                                    fontSize={0.06}
+                                    color={"#000"}
+                                    anchorX="center"
+                                    anchorY="middle"
+                                    rotation={[0, 0, Math.PI / 2]}
+                                >
+                                    {Number(82.2) + Number(snap.tabletop[0]) + "m"}
+                                </Text>
+                                <mesh><boxGeometry args={[sdThick, sdBaseH, sdDepth]} /><meshMatcapMaterial color={"#000"} /></mesh>
+                            </group>
+                        </group>
+                    );
+                })()}
+            </group>
         </>}
+        {/* {"Size display"} */}
+
+
         <SnapConstraint userData={{ layer: 'modules' }} name="wall-z" useCursor useDistance position={[0, 0, snap.room.w * 0.5 + depth * 0.5]}>
             <mesh name="wall" receiveShadow castShadow>
                 <boxGeometry args={[snap.room.d, snap.room.h, depth]} />
@@ -82,14 +148,14 @@ export function RoomWalls() {
             </mesh>
         </SnapConstraint>
 
-         <SnapConstraint userData={{ layer: 'modules' }} name="wall-m" useCursor useDistance position={[-snap.room.d * 0.5 + depth * 0.5 - depth, 0, -snap.room.w * 0.5 - depth * 0.5 + 0.1]}>
+        <SnapConstraint userData={{ layer: 'modules' }} name="wall-m" useCursor useDistance position={[-snap.room.d * 0.5 + depth * 0.5 - depth, 0, -snap.room.w * 0.5 - depth * 0.5 + 0.1]}>
             <mesh visible={false} name="wall" receiveShadow castShadow>
                 <boxGeometry args={[depth, snap.room.h, 0.2]} />
                 <meshMatcapMaterial color={snap.roomColor} />
             </mesh>
         </SnapConstraint>
 
-         <SnapConstraint userData={{ layer: 'modules' }} name="wall-m" useCursor useDistance position={[-snap.room.d * 0.5 + depth * 0.5 - depth, 0, snap.room.w * 0.5 - depth * 0.5 - 0.1]}>
+        <SnapConstraint userData={{ layer: 'modules' }} name="wall-m" useCursor useDistance position={[-snap.room.d * 0.5 + depth * 0.5 - depth, 0, snap.room.w * 0.5 - depth * 0.5 - 0.1]}>
             <mesh visible={false} name="wall" receiveShadow castShadow>
                 <boxGeometry args={[depth, snap.room.h, 0.2]} />
                 <meshMatcapMaterial color={snap.roomColor} />

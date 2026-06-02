@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "components/legacy/facade-config.jsx"  ],
+, "components/legacy/facade-config.jsx", "3d/eviroment/memory-audit.jsx"  ],
   "exclude": ["node_modules"]
 }

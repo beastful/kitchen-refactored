@@ -1,46 +1,47 @@
 "use client";
 
-import { store } from "@/store";
-import { useEffect, useRef, memo } from "react";
-import { Color, MeshStandardMaterial, Mesh } from "three";
-import { subscribe } from "valtio";
+import { useEffect, memo } from "react";
+import { Mesh, MeshStandardMaterial } from "three";
 import { ModuleEntity } from "@/types";
+import { animationRegistry } from "@/3d/eviroment/animation-system";
+
+const shelfMaterialCache = new Map<string, MeshStandardMaterial>();
+
+function getShelfMaterial(): MeshStandardMaterial {
+    const key = "white";
+    if (!shelfMaterialCache.has(key)) {
+        const mat = new MeshStandardMaterial({ color: "white" });
+        shelfMaterialCache.set(key, mat);
+    }
+    return shelfMaterialCache.get(key)!;
+}
 
 interface ShelfProps {
     entity: ModuleEntity;
     model: Mesh;
 }
 
-function ShelfComponent({ entity, model }: ShelfProps) {
-    const originalZ = useRef(model.position.z);
-
+function ShelfComponent({ model }: ShelfProps) {
+    /* ── Material ── */
     useEffect(() => {
-        model.material = new MeshStandardMaterial({
-            color: new Color('white'),
-        });
+        const originalMaterial = model.material;
+        model.material = getShelfMaterial();
+        return () => {
+            model.material = originalMaterial;
+        };
     }, [model]);
 
-    /* ── REPLACEMENT FOR useFrame ── */
+    /* ── Register for centralized animation (no subscribe) ── */
     useEffect(() => {
-        const applyTransform = () => {
-            model.position.z = originalZ.current + store.openAngle * 3;
-        };
-
-        // Apply initial value
-        applyTransform();
-
-        let lastOpenAngle = store.openAngle;
-        const unsubscribe = subscribe(store, () => {
-            if (store.openAngle !== lastOpenAngle) {
-                lastOpenAngle = store.openAngle;
-                applyTransform();
-            }
+        const originalZ = model.position.z;
+        animationRegistry.shelves.set(model.uuid, {
+            mesh: model,
+            originalZ,
         });
 
         return () => {
-            unsubscribe();
-            // Restore original position on unmount
-            model.position.z = originalZ.current;
+            animationRegistry.shelves.delete(model.uuid);
+            model.position.z = originalZ;
         };
     }, [model]);
 

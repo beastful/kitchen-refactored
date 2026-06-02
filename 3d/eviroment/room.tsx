@@ -1,23 +1,25 @@
 "use client"
 
-import { ReactNode, Suspense, useEffect, useRef, useState } from 'react';
+import { ReactNode, Suspense, useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { useSnapshot } from 'valtio';
+import { subscribe } from 'valtio';
 import { Vector3 } from 'three';
 import { SnapCursor } from "@/snapping-tools/snap-cursor";
 import { SnapPlacedObject } from "@/snapping-tools/placed-constraint";
 import { usePlacementData } from "@/snapping-tools/hooks/use-placement-data";
-import { Store, store } from '@/store';
+import { store } from '@/store';
 import { ModuleEntity, toModuleEntity } from '@/types';
 import { FacadeConfig } from "@/3d/furniture/assembler"
 import { ModuleMenu } from "@/3d/furniture/actions";
 import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
-import { Center, Gltf, Html } from '@react-three/drei';
-import { useSnapContext } from '@/snapping-tools/snap-provider';
-import { CATEGORY_ROOM, CATEGORY_TECH, EXPLICT_CASE_TUNNEL, EXPLICT_CASE_WINDOW } from '@/constants';
+import { Center, Gltf } from '@react-three/drei';
+import { CATEGORY_ROOM, CATEGORY_TECH, EXPLICT_CASE_TUNNEL } from '@/constants';
 import { getLock, useLock } from '@/lib/use-lock';
 import { CursorRoom } from '@/snapping-tools/cursor-room';
 import { SnapPlane } from '@/snapping-tools/types';
+import { AnimationSystem } from './animation-system';
+import { MemoryAudit } from './memory-audit';
 
 function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, halfExtents: [number, number, number], entity: ModuleEntity }) {
     const largest_z = 0.73;
@@ -32,24 +34,189 @@ function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, h
     </group>
 }
 
-export default function Room() {
-    const snap = useSnapshot(store);
-    const getPlacementData = usePlacementData();
-    const { lockY, lock } = useLock()
-    const visibilityRef = useRef<boolean>(true);
+// ── Stable module IDs + hydration-safe version key ──
+// Detects both array mutation (push/pop) and array replacement (localStorage hydration)
+function useModuleIds() {
+    const [ids, setIds] = useState(() => store.modules.map(m => m.id));
+    const [version, setVersion] = useState(0);
+    const prevRef = useRef({ ids: store.modules.map(m => m.id), array: store.modules });
 
+    useEffect(() => {
+        return subscribe(store, () => {
+            const currentArray = store.modules;
+            const newIds = currentArray.map(m => m.id);
+            const prev = prevRef.current;
+
+            // Array was replaced (e.g. localStorage hydration) → remount everything
+            if (currentArray !== prev.array) {
+                setVersion(v => v + 1);
+                setIds(newIds);
+                prevRef.current = { ids: newIds, array: currentArray };
+                return;
+            }
+
+            // Array mutated (push/pop) → update IDs, React handles add/remove
+            if (newIds.length !== prev.ids.length || newIds.some((id, i) => id !== prev.ids[i])) {
+                setIds(newIds);
+                prevRef.current = { ids: newIds, array: currentArray };
+            }
+        });
+    }, []);
+
+    return { ids, version };
+}
+
+// ── Isolated cursor: subscribes to store but only updates React state on real changes ──
+const CursorSystem = memo(function CursorSystem({
+    lockY,
+    lock,
+    visibilityRef,
+}: {
+    lockY: any;
+    lock: any;
+    visibilityRef: React.MutableRefObject<boolean>;
+}) {
+    const [cursor, setCursor] = useState(() => ({
+        name: store.currentRawModule?.name ?? null as string | null,
+        model: store.currentRawModule?.model,
+        room: { w: store.room.w, h: store.room.h, d: store.room.d }
+    }));
+
+    useEffect(() => {
+        return subscribe(store, () => {
+            const raw = store.currentRawModule;
+            const next = {
+                name: raw?.name ?? null,
+                model: raw?.model,
+                room: { w: store.room.w, h: store.room.h, d: store.room.d }
+            };
+
+            setCursor(prev => {
+                if (prev.name === next.name && prev.model === next.model &&
+                    prev.room.w === next.room.w && prev.room.h === next.room.h && prev.room.d === next.room.d) {
+                    return prev; // bail out — no React re-render
+                }
+                return next;
+            });
+        });
+    }, []);
+
+    const handleVisibility = useCallback((v: boolean) => {
+        visibilityRef.current = v;
+    }, [visibilityRef]);
+
+    if (!cursor.name) return null;
+
+    const c_name = cursor.name.split("_");
+    const c_folder = `${c_name?.[0]}_${c_name?.[1]}`;
+
+    return (
+        <CursorRoom
+            visibilityChange={handleVisibility}
+            width={cursor.room.w}
+            height={cursor.room.h}
+            depth={cursor.room.d}
+            show={true}
+        >
+            <SnapCursor lockY={lockY} lock={lock} userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
+                {typeof cursor.model != "string" && cursor.model && (
+                    <Center>
+                        <Gltf src={`modules/${c_folder}/${cursor.name}.glb`} />
+                    </Center>
+                )}
+                {typeof cursor.model == "string" && (
+                    <Center>
+                        <Gltf src={cursor.model} />
+                    </Center>
+                )}
+            </SnapCursor>
+        </CursorRoom>
+    );
+});
+
+// ── Per-module shell: reactive via useSnapshot on the module proxy ──
+// version is passed so useMemo recalculates the proxy after hydration
+const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; version: number }) {
+    const moduleProxy = useMemo(() => store.modules.find(m => m.id === id), [id, version]);
+    if (!moduleProxy) return null;
+
+    const entity = useSnapshot(moduleProxy);
+    const e_name = entity.name.split("_");
+    const e_folder = `${e_name[0]}_${e_name[1]}`;
+
+    return (
+        <group>
+            <SnapPlacedObject
+                position={entity.position.toArray()}
+                scale={0.1}
+                lockY={entity.lockY}
+                lock={entity.lock}
+                id={`placed-${entity.id}`}
+                rotation={[0, entity.openAngle, 0]}
+                halfExtents={entity.halfExtents as [number, number, number]}
+                snapPlanes={entity.snapPlanes as SnapPlane[]}
+                useDistance={true}
+            >
+                <Suspense fallback={null}>
+                    <ModuleMenu entity={entity as ModuleEntity}>
+                        <Tabletop entity={entity as ModuleEntity}>
+                            <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
+                                <Center>
+                                    {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
+                                        <>
+                                            {typeof entity.model != "string" && (
+                                                <Gltf src={`modules/${e_folder}/${entity.name}.glb`} />
+                                            )}
+                                            {typeof entity.model == "string" && (
+                                                <Gltf src={entity.model} />
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {typeof entity.model != "string" && (
+                                                <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
+                                            )}
+                                            {typeof entity.model == "string" && (
+                                                <FacadeConfig src={entity.model} entity={entity as ModuleEntity} />
+                                            )}
+                                        </>
+                                    )}
+                                </Center>
+                            </ZCorrection>
+                        </Tabletop>
+                    </ModuleMenu>
+                </Suspense>
+            </SnapPlacedObject>
+        </group>
+    );
+});
+
+export default function Room() {
+    const getPlacementData = usePlacementData();
+    const { lockY, lock } = useLock();
+    const visibilityRef = useRef<boolean>(true);
+    const { ids, version } = useModuleIds();
+
+    // Mutable refs for stable event listener
+    const getPlacementDataRef = useRef(getPlacementData);
+    const lockYRef = useRef(lockY);
+    const lockRef = useRef(lock);
+    getPlacementDataRef.current = getPlacementData;
+    lockYRef.current = lockY;
+    lockRef.current = lock;
+
+    // ── Placement: stable listener, reads mutable refs directly ──
     useEffect(() => {
         const handlePointerUp = () => {
             if (!store.currentRawModule) return;
-            const result = getPlacementData();
+            const result = getPlacementDataRef.current();
 
             if (!result.possible) {
                 console.log('Cannot place:', result.reason);
                 return;
             }
-
             if (visibilityRef.current) {
-                console.log('Cannot place:', result.reason);
+                console.log('Cannot place: visibility blocked');
                 return;
             }
 
@@ -64,8 +231,8 @@ export default function Room() {
                 normal: [...plane.normal] as [number, number, number]
             }));
 
-            entity.lockY = lockY;
-            entity.lock = lock;
+            entity.lockY = lockYRef.current;
+            entity.lock = lockRef.current;
             entity.snapPlanes = snapPlanes;
             entity.halfExtents = placement.halfExtents;
             entity.id = crypto.randomUUID();
@@ -75,103 +242,46 @@ export default function Room() {
 
         window.addEventListener('pointerup', handlePointerUp, true);
         return () => window.removeEventListener('pointerup', handlePointerUp, true);
-    }, [lock, snap.wallHeight]);
+    }, []); // ← empty: no stale closures
 
+    // ── Wall locking: recalculates on wallHeight change (via subscription) and lock change (via effect) ──
     useEffect(() => {
-        const mods = snap.modules;
-        for (let i = 0; i < mods.length; i++) {
-            if (mods[i].type == 'wall' && mods[i].name != "Window") {
-                const ld = getLock(mods[i] as ModuleEntity, snap as Store);
-                store.modules[i].lock = ld.lock
+        const recalc = () => {
+            const modules = store.modules;
+            for (let i = 0; i < modules.length; i++) {
+                const mod = modules[i];
+                if (mod.type === 'wall' && mod.name !== "Window") {
+                    const ld = getLock(mod as ModuleEntity, store);
+                    if (mod.lock !== ld.lock) {
+                        mod.lock = ld.lock;
+                    }
+                }
             }
-        }
-    }, [snap.wallHeight, lock]);
+        };
 
-    const c_name = snap.currentRawModule?.name.split("_");
-    const c_folder = `${c_name?.[0]}_${c_name?.[1]}`;
+        recalc(); // initial + when lock changes
+
+        let lastWallHeight = store.wallHeight;
+        return subscribe(store, () => {
+            if (store.wallHeight !== lastWallHeight) {
+                lastWallHeight = store.wallHeight;
+                recalc();
+            }
+        });
+    }, [lock]);
 
     return (
         <>
+            <AnimationSystem />
             <Suspense>
-                <CursorRoom
-                    visibilityChange={(v) => {
-                        visibilityRef.current = v;
-                    }}
-                    width={snap.room.w}
-                    height={snap.room.h}
-                    depth={snap.room.d}
-                    show={!!store.currentRawModule}>
-                    {snap.currentRawModule?.name && (
-                        <SnapCursor lockY={lockY} lock={lock} userData={{ layer: 'modules' }} name="cursor" scale={0.1}>
-                            {typeof snap.currentRawModule?.model != "string" && (
-                                <Center>
-                                    <Gltf src={`modules/${c_folder}/${snap.currentRawModule?.name}.glb`} />
-                                </Center>
-                            )}
-                            {typeof snap.currentRawModule?.model == "string" && (
-                                <Center>
-                                    <Gltf src={snap.currentRawModule.model} />
-                                </Center>
-                            )}
-                        </SnapCursor>
-                    )}
-                </CursorRoom>
+                {/* <MemoryAudit /> */}
+                <CursorSystem lockY={lockY} lock={lock} visibilityRef={visibilityRef} />
             </Suspense>
             <RoomWalls />
 
-            {snap.modules.map(entity => {
-                const EntityModel = entity.model;
-                const e_name = entity.name.split("_");
-                const e_folder = `${e_name[0]}_${e_name[1]}`
-
-                return (
-                    <group key={`placed-${entity.id}`} >
-                        <SnapPlacedObject
-                            position={entity.position.toArray()}
-                            scale={0.1}
-                            lockY={entity.lockY}
-                            lock={entity.lock}
-                            id={`placed-${entity.id}`}
-                            rotation={[0, entity.openAngle, 0]}
-                            halfExtents={entity.halfExtents as [number, number, number]}
-                            snapPlanes={entity.snapPlanes as SnapPlane[]}
-                            useDistance={true}
-                        >
-                            {EntityModel && <Suspense fallback={null}>
-                                <ModuleMenu entity={entity as ModuleEntity}>
-                                    <Tabletop entity={entity as ModuleEntity}>
-                                        <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
-                                            <Center>
-                                                {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
-                                                    <>
-                                                        {typeof entity.model != "string" && (
-                                                            <Gltf src={`modules/${e_folder}/${entity.name}.glb`} />
-                                                        )}
-
-                                                        {typeof entity.model == "string" && (
-                                                            <Gltf src={entity.model} />
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        {typeof entity.model != "string" && (
-                                                            <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
-                                                        )}
-
-                                                        {typeof entity.model == "string" && (
-                                                            <FacadeConfig src={entity.model} entity={entity as ModuleEntity} />
-                                                        )}
-                                                    </>
-                                                )}
-                                            </Center>
-                                        </ZCorrection>
-                                    </Tabletop>
-                                </ModuleMenu>
-                            </Suspense>}
-                        </SnapPlacedObject>
-                    </group>
-                );
-            })}
+            {ids.map(id => (
+                <ModuleShell key={`placed-${id}-${version}`} id={id} version={version} />
+            ))}
         </>
     );
 }

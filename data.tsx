@@ -367,7 +367,7 @@ const floor_data: ModuleDef[] = [
         type: 'floor',
         price: 2040,
         name: 'M_BTL_4',
-        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION],
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
         image: '/BTL/M_BTL_1_F_4_NN.obj.png',
         displayName: 'Шкаф под бутылочницу 30см',
         displaySize: '300'

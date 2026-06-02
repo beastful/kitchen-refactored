@@ -145,135 +145,201 @@ function Toolbar({ onOpenSaveModal }: { onOpenSaveModal: () => void }) {
 
 // ---------- SidebarContent (unchanged) ----------
 function SidebarContent() {
-    const [floorSearch, setFloorSearch] = useState('')
-    const [wallSearch, setWallSearch] = useState('')
-    const [techSearch, setTechSearch] = useState('')
+  const [floorSearch, setFloorSearch] = useState('')
+  const [wallSearch, setWallSearch] = useState('')
+  const [techSearch, setTechSearch] = useState('')
 
-    const floorModules = useMemo(() => {
-        return data.filter(m =>
-            m.tags.includes(CATEGORY_FLOOR) &&
-            (floorSearch === '' || m.displayName?.toLowerCase().includes(floorSearch.toLowerCase()))
-        )
-    }, [floorSearch])
+  // Size filter states (null = no filter)
+  const [floorSizeFilter, setFloorSizeFilter] = useState<string | null>(null)
+  const [wallSizeFilter, setWallSizeFilter] = useState<string | null>(null)
+  const [techSizeFilter, setTechSizeFilter] = useState<string | null>(null)
 
-    const wallModules = useMemo(() => {
-        return data.filter(m =>
-            m.tags.includes(CATEGORY_WALL) &&
-            (wallSearch === '' || m.displayName?.toLowerCase().includes(wallSearch.toLowerCase()))
-        )
-    }, [wallSearch])
+  // Available size chips
+  const sizeChips = ['30', '40', '50', '60', '70', '80']
 
-    const techModules = useMemo(() => {
-        return data.filter(m =>
-            m.tags.includes(CATEGORY_TECH) &&
-            (techSearch === '' || m.displayName?.toLowerCase().includes(techSearch.toLowerCase()))
-        )
-    }, [techSearch])
+  // Helper: extract all numeric dimensions from a module name
+  const extractSizesFromName = (name: string): number[] => {
+    // Match pattern like "35х70х70см" or "35x70x70см" or just "35х70х70"
+    const match = name.match(/(\d+)[хx](\d+)[хx](\d+)(?:см)?/i)
+    if (match) {
+      return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)]
+    }
+    // Also try to catch any standalone numbers if format varies
+    const numbers = name.match(/\d+/g)
+    if (numbers) return numbers.map(n => parseInt(n, 10))
+    return []
+  }
 
-    const roomModules = useMemo(() => data.filter(m => m.tags.includes(CATEGORY_ROOM)), [])
+  // Combined filter function
+  const filterModules = (modules: typeof data, search: string, sizeFilter: string | null) => {
+    return modules.filter(m => {
+      // Text filter
+      const matchesText = search === '' || m.displayName?.toLowerCase().includes(search.toLowerCase())
+      if (!matchesText) return false
 
-    const tabletop = useSnapshot(store).tabletop as TabletopOption
-    const tabletopColor = useSnapshot(store).tabletopColor
-    const roomColor = useSnapshot(store).roomColor
-    const wallHeight = useSnapshot(store).wallHeight
+      // Size filter
+      if (sizeFilter === null) return true
+      const sizes = extractSizesFromName(m.displayName || m.name)
+      return sizes.some(size => size.toString() === sizeFilter)
+    })
+  }
 
-    const handleTabletopSelect = useCallback((option: TabletopOption) => {
-        store.tabletop = option
-    }, [])
-    const handleTabletopColorSelect = useCallback((color: string) => {
-        store.tabletopColor = color
-    }, [])
-    const handleRoomColorSelect = useCallback((color: string) => {
-        store.roomColor = color
-    }, [])
-    const handleWallHeightSelect = useCallback((height: WallHeight) => {
-        store.wallHeight = height
-    }, [])
+  const floorModules = useMemo(() => {
+    const floorData = data.filter(m => m.tags.includes(CATEGORY_FLOOR))
+    return filterModules(floorData, floorSearch, floorSizeFilter)
+  }, [floorSearch, floorSizeFilter])
 
-    return (
-        <Sidebar defaultPage="floor">
-            <SidebarPage title="Напольные" page="floor">
-                <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
-                    <div className='text-2xl font-semibold'>Напольные модули</div>
-                    <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
-                        <div className='opacity-30'><Search /></div>
-                        <input
-                            className='p-3 w-full'
-                            placeholder='Ваш запрос'
-                            value={floorSearch}
-                            onChange={(e) => setFloorSearch(e.target.value)}
-                        />
-                    </div>
-                    <div className='grid grid-cols-3 gap-[15px]'>
-                        {floorModules.map(module => <ModuleCard key={module.name} module={module} />)}
-                    </div>
-                </div>
-            </SidebarPage>
+  const wallModules = useMemo(() => {
+    const wallData = data.filter(m => m.tags.includes(CATEGORY_WALL))
+    return filterModules(wallData, wallSearch, wallSizeFilter)
+  }, [wallSearch, wallSizeFilter])
 
-            <SidebarPage title="Настенные" page="wall">
-                <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
-                    <div className='text-2xl font-semibold'>Настенные модули</div>
-                    <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
-                        <div className='opacity-30'><Search /></div>
-                        <input
-                            className='p-3 w-full'
-                            placeholder='Ваш запрос'
-                            value={wallSearch}
-                            onChange={(e) => setWallSearch(e.target.value)}
-                        />
-                    </div>
-                    <div className='grid grid-cols-3 gap-[15px]'>
-                        {wallModules.map(module => <ModuleCard key={module.name} module={module} />)}
-                    </div>
-                </div>
-            </SidebarPage>
+  const techModules = useMemo(() => {
+    const techData = data.filter(m => m.tags.includes(CATEGORY_TECH))
+    return filterModules(techData, techSearch, techSizeFilter)
+  }, [techSearch, techSizeFilter])
 
-            <SidebarPage title="Техника" page="tech">
-                <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
-                    <div className='text-2xl font-semibold'>Техника</div>
-                    <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
-                        <div className='opacity-30'><Search /></div>
-                        <input
-                            className='p-3 w-full'
-                            placeholder='Ваш запрос'
-                            value={techSearch}
-                            onChange={(e) => setTechSearch(e.target.value)}
-                        />
-                    </div>
-                    <div className='grid grid-cols-3 gap-[15px]'>
-                        {techModules.map(module => <ModuleCard key={module.name} module={module} />)}
-                    </div>
-                </div>
-            </SidebarPage>
+  const roomModules = useMemo(() => data.filter(m => m.tags.includes(CATEGORY_ROOM)), [])
 
-            <SidebarPage title="Столешница" page="table">
-                <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
-                    <h2 className="text-2xl font-semibold">Столешница</h2>
-                    <TabletopSelector options={TABLETOP_OPTIONS} selected={tabletop} onSelect={handleTabletopSelect} />
-                    <section>
-                        <h3 className="text-lg font-semibold mb-4">Цвет столешницы</h3>
-                        <ColorPicker colors={COLORS} selected={tabletopColor} onSelect={handleTabletopColorSelect} />
-                    </section>
-                </div>
-            </SidebarPage>
+  const tabletop = useSnapshot(store).tabletop as TabletopOption
+  const tabletopColor = useSnapshot(store).tabletopColor
+  const roomColor = useSnapshot(store).roomColor
+  const wallHeight = useSnapshot(store).wallHeight
 
-            <SidebarPage title="Помещение" page="room">
-                <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
-                    <section>
-                        <h3 className="text-lg font-semibold mb-4">Цвет стен</h3>
-                        <ColorPicker colors={COLORS} selected={roomColor} onSelect={handleRoomColorSelect} />
-                    </section>
-                    <section>
-                        <h3 className="text-lg font-semibold mb-4">Высота фартука</h3>
-                        <WallHeightSelector heights={WALL_HEIGHTS} selected={wallHeight} onSelect={handleWallHeightSelect} />
-                    </section>
-                    <div className='grid grid-cols-3 gap-[15px]'>
-                        {roomModules.map(module => <ModuleCard key={module.name} module={module} />)}
-                    </div>
-                </div>
-            </SidebarPage>
-        </Sidebar>
-    )
+  const handleTabletopSelect = useCallback((option: TabletopOption) => {
+    store.tabletop = option
+  }, [])
+  const handleTabletopColorSelect = useCallback((color: string) => {
+    store.tabletopColor = color
+  }, [])
+  const handleRoomColorSelect = useCallback((color: string) => {
+    store.roomColor = color
+  }, [])
+  const handleWallHeightSelect = useCallback((height: WallHeight) => {
+    store.wallHeight = height
+  }, [])
+
+  // Render chip row component
+  const renderChipRow = (currentFilter: string | null, setFilter: (v: string | null) => void) => (
+    <div className="flex flex-wrap gap-2 mt-2">
+      <button
+        onClick={() => setFilter(null)}
+        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+          currentFilter === null
+            ? 'bg-[#F06900] text-white'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+        }`}
+      >
+        Все
+      </button>
+      {sizeChips.map(size => (
+        <button
+          key={size}
+          onClick={() => setFilter(size)}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            currentFilter === size
+              ? 'bg-[#F06900] text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {size} см
+        </button>
+      ))}
+    </div>
+  )
+
+  return (
+    <Sidebar defaultPage="floor">
+      {/* Напольные */}
+      <SidebarPage title="Напольные" page="floor">
+        <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
+          <div className='text-2xl font-semibold'>Напольные модули</div>
+          <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
+            <div className='opacity-30'><Search /></div>
+            <input
+              className='p-3 w-full'
+              placeholder='Ваш запрос'
+              value={floorSearch}
+              onChange={(e) => setFloorSearch(e.target.value)}
+            />
+          </div>
+          {renderChipRow(floorSizeFilter, setFloorSizeFilter)}
+          <div className='grid grid-cols-3 gap-[15px]'>
+            {floorModules.map(module => <ModuleCard key={module.name} module={module} />)}
+          </div>
+        </div>
+      </SidebarPage>
+
+      {/* Настенные */}
+      <SidebarPage title="Настенные" page="wall">
+        <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
+          <div className='text-2xl font-semibold'>Настенные модули</div>
+          <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
+            <div className='opacity-30'><Search /></div>
+            <input
+              className='p-3 w-full'
+              placeholder='Ваш запрос'
+              value={wallSearch}
+              onChange={(e) => setWallSearch(e.target.value)}
+            />
+          </div>
+          {renderChipRow(wallSizeFilter, setWallSizeFilter)}
+          <div className='grid grid-cols-3 gap-[15px]'>
+            {wallModules.map(module => <ModuleCard key={module.name} module={module} />)}
+          </div>
+        </div>
+      </SidebarPage>
+
+      {/* Техника */}
+      <SidebarPage title="Техника" page="tech">
+        <div className='flex flex-col gap-[30px] w-full bg-white px-6 py-8 h-full overflow-x-auto'>
+          <div className='text-2xl font-semibold'>Техника</div>
+          <div className='flex rounded-[10px] bg-gray-100 items-center pl-4'>
+            <div className='opacity-30'><Search /></div>
+            <input
+              className='p-3 w-full'
+              placeholder='Ваш запрос'
+              value={techSearch}
+              onChange={(e) => setTechSearch(e.target.value)}
+            />
+          </div>
+          {renderChipRow(techSizeFilter, setTechSizeFilter)}
+          <div className='grid grid-cols-3 gap-[15px]'>
+            {techModules.map(module => <ModuleCard key={module.name} module={module} />)}
+          </div>
+        </div>
+      </SidebarPage>
+
+      {/* Столешница (unchanged) */}
+      <SidebarPage title="Столешница" page="table">
+        <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
+          <h2 className="text-2xl font-semibold">Столешница</h2>
+          <TabletopSelector options={TABLETOP_OPTIONS} selected={tabletop} onSelect={handleTabletopSelect} />
+          <section>
+            <h3 className="text-lg font-semibold mb-4">Цвет столешницы</h3>
+            <ColorPicker colors={COLORS} selected={tabletopColor} onSelect={handleTabletopColorSelect} />
+          </section>
+        </div>
+      </SidebarPage>
+
+      {/* Помещение (unchanged) */}
+      <SidebarPage title="Помещение" page="room">
+        <div className="flex flex-col gap-8 w-full bg-white px-6 py-8 h-full overflow-y-auto">
+          <section>
+            <h3 className="text-lg font-semibold mb-4">Цвет стен</h3>
+            <ColorPicker colors={COLORS} selected={roomColor} onSelect={handleRoomColorSelect} />
+          </section>
+          <section>
+            <h3 className="text-lg font-semibold mb-4">Высота фартука</h3>
+            <WallHeightSelector heights={WALL_HEIGHTS} selected={wallHeight} onSelect={handleWallHeightSelect} />
+          </section>
+          <div className='grid grid-cols-3 gap-[15px]'>
+            {roomModules.map(module => <ModuleCard key={module.name} module={module} />)}
+          </div>
+        </div>
+      </SidebarPage>
+    </Sidebar>
+  )
 }
 
 // ---------- SaveModal (unchanged) ----------

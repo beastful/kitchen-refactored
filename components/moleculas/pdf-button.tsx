@@ -10,10 +10,11 @@ import jsPDF from 'jspdf';
 import { CATEGORY_ROOM } from '@/constants';
 import { Loader, Printer, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 
-const hinges = [
-  { name: 'Нет' },
-  { name: 'Да' },
-  { name: 'Да' },
+// Hinge replacement options with prices (in RUB)
+const hingeOptions = [
+  { name: 'Нет', price: 0 },
+  { name: 'Да', price: 350 },
+  { name: 'Да', price: 650 },
 ];
 
 export function PDFExportButton() {
@@ -24,10 +25,21 @@ export function PDFExportButton() {
   const [progressStep, setProgressStep] = useState('');
 
   const modules = snap_modules.filter((m: any) => !m.tags.includes(CATEGORY_ROOM));
-  const modulesTotal = modules.reduce((sum, m) => sum + m.price, 0);
+  
+  // Base module prices (without hinges)
+  const modulesBaseTotal = modules.reduce((sum, m) => sum + m.price, 0);
+  
+  // Hinge total cost
+  const hingeTotal = modules.reduce((sum, m) => {
+    const idx = Math.min(Math.max(0, m.hingeReplacement ?? 0), hingeOptions.length - 1);
+    return sum + hingeOptions[idx].price;
+  }, 0);
+  
+  const modulesTotalWithHinges = modulesBaseTotal + hingeTotal;
+  
   const tabletopArea = modules.reduce((area, m) => area + (m.size.z * m.size.x), 0);
   const tabletopPrice = Math.ceil(tabletopArea * snap_tabletop[2]);
-  const grandTotal = modulesTotal + tabletopPrice;
+  const grandTotal = modulesTotalWithHinges + tabletopPrice;
 
   const handleExportPDF = async () => {
     if (!exportRef.current || isExporting) return;
@@ -113,7 +125,6 @@ export function PDFExportButton() {
         Экспорт спецификации PDF
       </button>
 
-      {/* Professional loading overlay */}
       {isExporting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-5 min-w-[360px] border border-gray-100">
@@ -144,14 +155,13 @@ export function PDFExportButton() {
         </div>
       )}
 
-      {/* Hidden export content – unchanged from your version, kept intact for brevity */}
       <div
         ref={exportRef}
         style={{
           position: 'fixed',
           top: '-9999px',
           left: '-9999px',
-          width: '795px',
+          width: '900px',       // slightly wider to fit 9 columns
           background: '#fff',
           padding: '40px',
           fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
@@ -166,7 +176,7 @@ export function PDFExportButton() {
           <h1 style={{ fontSize: '26px', fontWeight: 700, margin: 0 }}>Спецификация модулей</h1>
           <p style={{ fontSize: '14px', color: '#64748b', marginTop: '8px' }}>Детальный расчет стоимости конфигурации</p>
         </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '32px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', marginBottom: '32px' }}>
           <thead>
             <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #cbd5e1' }}>
               <th style={{ textAlign: 'left', padding: '12px 8px' }}>Название</th>
@@ -176,13 +186,17 @@ export function PDFExportButton() {
               <th style={{ textAlign: 'left', padding: '12px 8px' }}>Цвет ручки</th>
               <th style={{ textAlign: 'left', padding: '12px 8px' }}>Замена петель</th>
               <th style={{ textAlign: 'left', padding: '12px 8px' }}>Цвет корпуса</th>
-              <th style={{ textAlign: 'right', padding: '12px 8px' }}>Цена, ₽</th>
-             </tr>
+              <th style={{ textAlign: 'right', padding: '12px 8px' }}>Цена модуля, ₽</th>
+              <th style={{ textAlign: 'right', padding: '12px 8px' }}>Петли, ₽</th>
+            </tr>
           </thead>
           <tbody>
             {modules.map(module => {
               const handleColorHex = `#${new Color(module.handleColor).getHexString()}`;
               const bodyColorHex = `#${new Color(module.color).getHexString()}`;
+              const hingeIdx = Math.min(Math.max(0, module.hingeReplacement ?? 0), hingeOptions.length - 1);
+              const hingeName = hingeOptions[hingeIdx].name;
+              const hingePrice = hingeOptions[hingeIdx].price;
               return (
                 <tr key={module.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                   <td style={{ padding: '10px 8px' }}>{module.displayName || module.name}</td>
@@ -195,7 +209,7 @@ export function PDFExportButton() {
                       <span style={{ fontFamily: 'monospace' }}>{handleColorHex}</span>
                     </div>
                   </td>
-                  <td style={{ padding: '10px 8px' }}>{hinges[module.hingeReplacement]?.name || '—'}</td>
+                  <td style={{ padding: '10px 8px' }}>{hingeName}</td>
                   <td style={{ padding: '10px 8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ width: '14px', height: '14px', borderRadius: '4px', backgroundColor: bodyColorHex }} />
@@ -203,15 +217,27 @@ export function PDFExportButton() {
                     </div>
                   </td>
                   <td style={{ textAlign: 'right', padding: '10px 8px' }}>{module.price.toLocaleString('ru-RU')}</td>
+                  <td style={{ textAlign: 'right', padding: '10px 8px' }}>{hingePrice.toLocaleString('ru-RU')}</td>
                 </tr>
               );
             })}
             <tr style={{ borderTop: '2px solid #cbd5e1', backgroundColor: '#fefce8' }}>
-              <td colSpan={7} style={{ padding: '12px 8px', textAlign: 'right', fontWeight: 700 }}>Итого модули:</td>
-              <td style={{ textAlign: 'right', padding: '12px 8px', fontWeight: 700 }}>{modulesTotal.toLocaleString('ru-RU')} ₽</td>
+              <td colSpan={7} style={{ padding: '12px 8px', textAlign: 'right', fontWeight: 700 }}>Итого модули</td>
+              <td style={{ textAlign: 'right', padding: '12px 8px', fontWeight: 700 }}>{modulesBaseTotal.toLocaleString('ru-RU')} ₽</td>
+              <td></td>
+            </tr>
+            <tr style={{ backgroundColor: '#fefce8' }}>
+              <td colSpan={7} style={{ padding: '12px 8px', textAlign: 'right', fontWeight: 700 }}>Итого замена петель</td>
+              <td></td>
+              <td style={{ textAlign: 'right', padding: '12px 8px', fontWeight: 700 }}>{hingeTotal.toLocaleString('ru-RU')} ₽</td>
+            </tr>
+            <tr style={{ backgroundColor: '#fefce8', borderBottom: '1px solid #cbd5e1' }}>
+              <td colSpan={7} style={{ padding: '12px 8px', textAlign: 'right', fontWeight: 700 }}>Всего модули (с петлями)</td>
+              <td colSpan={2} style={{ textAlign: 'right', padding: '12px 8px', fontWeight: 700 }}>{modulesTotalWithHinges.toLocaleString('ru-RU')} ₽</td>
             </tr>
           </tbody>
         </table>
+
         <div style={{ backgroundColor: '#f8fafc', borderRadius: '16px', padding: '20px', marginBottom: '24px' }}>
           <div style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>Столешница</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px' }}>
@@ -223,9 +249,10 @@ export function PDFExportButton() {
             </div>
           </div>
         </div>
+
         <div style={{ textAlign: 'right', borderTop: '2px solid #e2e8f0', paddingTop: '20px' }}>
           <div style={{ fontSize: '20px', fontWeight: 800 }}>Общая стоимость: {grandTotal.toLocaleString('ru-RU')} ₽</div>
-          <div style={{ fontSize: '12px', color: '#64748b' }}>Включая модули и столешницу</div>
+          <div style={{ fontSize: '12px', color: '#64748b' }}>Включая модули (с петлями) и столешницу</div>
         </div>
         <div style={{ marginTop: '40px', fontSize: '10px', color: '#94a3b8', textAlign: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
           Документ сгенерирован автоматически • {new Date().toLocaleDateString('ru-RU')}

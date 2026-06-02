@@ -1,8 +1,20 @@
 import { useTexture } from "@react-three/drei";
-import { useEffect } from "react";
-import { Color, MeshMatcapMaterial } from "three";
-import { Mesh } from "three";
+import { useEffect, useRef } from "react";
+import { Color, Material, Mesh, MeshMatcapMaterial, Texture } from "three";
 import { ModuleEntity } from "@/types";
+
+const matcapMaterialCache = new Map<string, MeshMatcapMaterial>();
+
+function getMatcapMaterial(texture: Texture): MeshMatcapMaterial {
+    if (!matcapMaterialCache.has(texture.uuid)) {
+        const mat = new MeshMatcapMaterial({
+            color: new Color("white"),
+            matcap: texture,
+        });
+        matcapMaterialCache.set(texture.uuid, mat);
+    }
+    return matcapMaterialCache.get(texture.uuid)!;
+}
 
 interface ShellProps {
     entity: ModuleEntity;
@@ -10,13 +22,16 @@ interface ShellProps {
 }
 
 export function Shell({ entity, model }: ShellProps) {
-    const matcapTexture = useTexture('matcaps/mc1.png');
+    const matcapTexture = useTexture("matcaps/mc1.png");
 
     useEffect(() => {
-        model.material = new MeshMatcapMaterial({
-            color: new Color('white'),
-            matcap: matcapTexture
-        })
-    }, [model])
-    return null
+        const originalMaterial = model.material;
+        model.material = getMatcapMaterial(matcapTexture);
+
+        return () => {
+            model.material = originalMaterial;
+        };
+    }, [model, matcapTexture]);
+
+    return null;
 }

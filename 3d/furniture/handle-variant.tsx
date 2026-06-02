@@ -3,29 +3,34 @@ import { Model as Handle2 } from "@/handles/Handle2";
 import { Model as Handle3 } from "@/handles/Handle3";
 import { Model as Handle4 } from "@/handles/Handle4";
 import { Model as Handle5 } from "@/handles/Handle5";
-import { Color, Group, Mesh, MeshStandardMaterial } from "three";
+import { Color, Group, Material, Mesh, MeshStandardMaterial } from "three";
 import { CATEGORY_FLOOR, CATEGORY_WALL } from "@/constants";
-import { ThreeElements, useFrame } from '@react-three/fiber';
+import { ThreeElements, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, memo } from "react";
 import { ModuleEntity } from "@/types";
 
-type HandleVariantProps = ThreeElements['group'] & {
-    entity: ModuleEntity;
-    worldYRef: React.RefObject<number>;
+const handleMaterialCache = new Map<string, MeshStandardMaterial>();
+
+function getHandleMaterial(color: string | Color): MeshStandardMaterial {
+    const hex = typeof color === "string" ? color : `#${color.getHexString()}`;
+    if (!handleMaterialCache.has(hex)) {
+        const mat = new MeshStandardMaterial({ color: new Color(color) });
+        handleMaterialCache.set(hex, mat);
+    }
+    return handleMaterialCache.get(hex)!;
 }
+
+type HandleVariantProps = ThreeElements["group"] & {
+    entity: ModuleEntity;
+    worldYRef: React.RefObject<number | null>;
+};
 
 function HandleVariantComponent({ entity, worldYRef, ...props }: HandleVariantProps) {
     const variant = entity.handleVariant + 1;
     const groupRef = useRef<Group>(null);
     const handle4Ref = useRef<Group>(null);
+    const originalMaterialsRef = useRef<Map<Mesh, Material | Material[]>>(new Map());
 
-    // 1. Memoize material by color — create once, not once-per-mesh
-    const material = useMemo(
-        () => new MeshStandardMaterial({ color: new Color(entity.handleColor) }),
-        [entity.handleColor]
-    );
-
-    // 2. Static parts of the Handle4 offset (only wall case needs the dynamic worldY)
     const handle4BaseOffset = useMemo(() => {
         if (entity.tags.includes(CATEGORY_WALL)) {
             return entity.position.y - entity.halfExtents[1];
@@ -38,19 +43,31 @@ function HandleVariantComponent({ entity, worldYRef, ...props }: HandleVariantPr
 
     const isWall = entity.tags.includes(CATEGORY_WALL);
 
-    // 3. Apply material once when material or variant changes
+    /* ── Apply cached material once per color ── */
     useEffect(() => {
         const group = groupRef.current;
         if (!group) return;
 
+        const material = getHandleMaterial(entity.handleColor);
+
         group.traverse((child) => {
             if (child instanceof Mesh) {
+                if (!originalMaterialsRef.current.has(child)) {
+                    originalMaterialsRef.current.set(child, child.material);
+                }
                 child.material = material;
             }
         });
-    }, [material, variant]);
 
-    // 4. Imperatively update Handle4 position every frame (no React re-render)
+        return () => {
+            originalMaterialsRef.current.forEach((originalMat, mesh) => {
+                mesh.material = originalMat;
+            });
+            originalMaterialsRef.current.clear();
+        };
+    }, [entity.handleColor, variant]);
+
+    /* ── Imperative Handle4 offset ── */
     useFrame(() => {
         if (!handle4Ref.current) return;
         const z = isWall
