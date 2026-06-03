@@ -2,12 +2,13 @@
 
 import Configurator from '@/components/pages/connfigurator';
 import Introduction from '@/components/pages/introduction';
-import { hydrateStoreFromLocalStorage, store } from '@/store';
+import { hydrateStoreFromLocalStorage, store, setJson } from '@/store';
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio';
 import { AnimatePresence, motion } from "motion/react"
 import { SnapProvider } from '@/snapping-tools/snap-provider';
 import { useTexture } from '@react-three/drei';
+import { loadProductFromBitrix } from '@/lib/get-states';
 
 useTexture.preload('/matcap/mc1.png');
 useTexture.preload('/matcap/mc2.png');
@@ -17,14 +18,55 @@ function BiggerScreen() {
   return
 }
 
+function getQueryParam(param: string): string | null {
+    if (typeof window === 'undefined') return null;
+    const search = window.location.search;
+    if (!search) return null;
+    const params = new URLSearchParams(search);
+    return params.get(param);
+}
+
 function Home() {
-  
-  
-  const snap = useSnapshot(store)
 
+    const [sceneReady, setSceneReady] = useState(false);
+    const snap = useSnapshot(store);
 
+    useEffect(() => {
+        const productId = getQueryParam('product_id');
+        if (!productId) {
+            setSceneReady(true);
+            return;
+        }
 
-  return (
+        loadProductFromBitrix(productId, (stateData: any) => {
+            try {
+                if (stateData && typeof stateData === 'object') {
+                    setJson(JSON.stringify(stateData));
+                }
+                setSceneReady(true);
+            } catch (e) {
+                console.error('[Home] Failed to hydrate store from product:', e);
+                setSceneReady(true);
+            }
+        });
+
+        const fallbackTimer = setTimeout(() => {
+            console.warn('[Home] Product load timeout, opening empty scene');
+            setSceneReady(true);
+        }, 10000);
+
+        return () => clearTimeout(fallbackTimer);
+    }, []);
+
+    if (!sceneReady) {
+        return (
+            <div className="w-full h-[100vh] flex items-center justify-center bg-indigo-100">
+                <div className="text-gray-600">Загрузка конфигурации…</div>
+            </div>
+        );
+    }
+
+    return (
     <SnapProvider>
       <div className='w-full h-[100vh] overflow-hidden'>
 

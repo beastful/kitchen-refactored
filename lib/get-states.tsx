@@ -32,6 +32,48 @@ const isLocalhost = () => {
   return host === 'localhost' || host === '127.0.0.1';
 };
 
+export function loadProductFromBitrix(productId: string, onLoaded: (state: any, id: string) => void): void {
+    const requestId = String(Math.random());
+
+    const onMessage = (event: MessageEvent) => {
+        let data: any;
+        try {
+            data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        } catch {
+            return;
+        }
+
+        if (data.requestId === requestId) {
+            window.removeEventListener('message', onMessage);
+
+            const wrapper = data.state || data.data || data.result;
+            let payload = wrapper;
+
+            if (wrapper && typeof wrapper === 'object' && typeof wrapper.state_data === 'string') {
+                try {
+                    payload = JSON.parse(wrapper.state_data);
+                } catch {
+                    payload = wrapper.state_data;
+                }
+            }
+
+            if (payload) {
+                onLoaded(payload, String(productId));
+            }
+        }
+    };
+
+    window.addEventListener('message', onMessage);
+    window.parent.postMessage(
+        JSON.stringify({ requestId, action: 'load_product', data: { product_id: productId } }),
+        '*'
+    );
+
+    setTimeout(() => {
+        window.removeEventListener('message', onMessage);
+    }, 10000);
+}
+
 export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
   const [list, setList] = useState<StateItem[]>([]);
   const [loadingList, setLoadingList] = useState(true);
