@@ -98,12 +98,12 @@ export function FacadeConfig({ src, entity }: AssemblerProps) {
   }, [model, entity.size.x])
 
   return (
-    <>
+    <group scale={modelScale}>
       {facades.map(model => <Facade key={model.uuid} entity={entity} model={model as Mesh} />)}
       {shelves.map(model => <Shelf key={model.uuid} entity={entity} model={model as Mesh} />)}
       {handles.map(model => <Handle key={model.uuid} entity={entity} model={model as Mesh} />)}
       {modules.map(model => <Shell key={model.uuid} entity={entity} model={model as Mesh} />)}
       <primitive object={model} />
-    </>
+    </group>
   );
 }
