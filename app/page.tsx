@@ -29,6 +29,7 @@ function getQueryParam(param: string): string | null {
 function Home() {
 
     const [sceneReady, setSceneReady] = useState(false);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const snap = useSnapshot(store);
 
     useEffect(() => {
@@ -46,13 +47,16 @@ function Home() {
                 setSceneReady(true);
             } catch (e) {
                 console.error('[Home] Failed to hydrate store from product:', e);
-                setSceneReady(true);
+                setLoadError('Не удалось загрузить конфигурацию кухни');
+                // Fall back to empty scene after showing error briefly
+                setTimeout(() => setSceneReady(true), 3000);
             }
         });
 
         const fallbackTimer = setTimeout(() => {
             console.warn('[Home] Product load timeout, opening empty scene');
-            setSceneReady(true);
+            setLoadError('Загрузка заняла больше времени, чем ожидалось');
+            setTimeout(() => setSceneReady(true), 3000);
         }, 10000);
 
         return () => clearTimeout(fallbackTimer);
@@ -60,8 +64,29 @@ function Home() {
 
     if (!sceneReady) {
         return (
-            <div className="w-full h-[100vh] flex items-center justify-center bg-indigo-100">
-                <div className="text-gray-600">Загрузка конфигурации…</div>
+            <div className="w-full h-[100vh] flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #faf0ea 0%, #f5e6d8 100%)' }}>
+                <div className="flex flex-col items-center gap-6">
+                    {/* Логотип */}
+                    <img src="/logo.png" alt="Ясная Мебель" className="h-10 mb-2" />
+                    
+                    {/* Спиннер */}
+                    <div className="relative w-16 h-16">
+                        <div className="absolute inset-0 rounded-full border-4 border-[#f0d5c0]"></div>
+                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F06900] animate-spin"></div>
+                    </div>
+                    
+                    {loadError ? (
+                        <>
+                            <p className="text-[#8B4513] text-lg font-medium">{loadError}</p>
+                            <p className="text-[#a08070] text-sm">Откроется пустая сцена через несколько секунд</p>
+                        </>
+                    ) : (
+                        <>
+                            <p className="text-[#8B4513] text-lg font-medium">Загружаем конфигурацию кухни</p>
+                            <p className="text-[#a08070] text-sm">Пожалуйста, подождите…</p>
+                        </>
+                    )}
+                </div>
             </div>
         );
     }

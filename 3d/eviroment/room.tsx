@@ -11,6 +11,7 @@ import { store } from '@/store';
 import { ModuleEntity, toModuleEntity } from '@/types';
 import { FacadeConfig } from "@/3d/furniture/assembler"
 import { MeasuredModel } from "@/3d/furniture/measured-model"
+import { ModuleErrorBoundary, ModuleLoadingPlaceholder } from "@/3d/furniture/module-error-boundary"
 import { ModuleMenu } from "@/3d/furniture/actions";
 import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
@@ -162,29 +163,29 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
                 snapPlanes={entity.snapPlanes as SnapPlane[]}
                 useDistance={true}
             >
-                <Suspense fallback={null}>
+                <Suspense fallback={<ModuleLoadingPlaceholder />}>
                     <ModuleMenu entity={entity as ModuleEntity}>
                         <Tabletop entity={entity as ModuleEntity}>
                             <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
                                 <Center>
                                     {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
-                                        <>
+                                        <ModuleErrorBoundary moduleName={entity.displayName || entity.name}>
                                             {typeof entity.model != "string" && (
                                                 <MeasuredModel src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
                                             )}
                                             {typeof entity.model == "string" && (
                                                 <MeasuredModel src={entity.model} entity={entity as ModuleEntity} />
                                             )}
-                                        </>
+                                        </ModuleErrorBoundary>
                                     ) : (
-                                        <>
+                                        <ModuleErrorBoundary moduleName={entity.displayName || entity.name}>
                                             {typeof entity.model != "string" && (
                                                 <FacadeConfig src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
                                             )}
                                             {typeof entity.model == "string" && (
                                                 <FacadeConfig src={entity.model} entity={entity as ModuleEntity} />
                                             )}
-                                        </>
+                                        </ModuleErrorBoundary>
                                     )}
                                 </Center>
                             </ZCorrection>
