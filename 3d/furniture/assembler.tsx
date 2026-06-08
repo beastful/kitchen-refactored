@@ -75,27 +75,31 @@ export function FacadeConfig({ src, entity }: AssemblerProps) {
     setModules(tmpModules)
   }, [model])
 
-  // Measure actual model dimensions and compute corrective scale SYNCHRONOUSLY
-  // to avoid visual pop-in. GLTF models may differ from backend positioning expectations.
-  // e.g., M_SPL_9.glb is ~0.8m wide at scale(0.1) but backend positions at 0.6m intervals.
-  // We scale uniformly so model WIDTH (local X) matches entity.size.x.
+  // Measure actual model dimensions and compute corrective scale SYNCHRONOUSLY.
+  // GLTF models may differ from backend positioning expectations in ALL axes.
+  // We apply non-uniform scaling so each axis matches entity.size.
+  // This ensures modules sit exactly on the floor (Y matches) and fit their slot (X matches).
   const modelScale = useMemo(() => {
-    if (!model) return 1;
+    if (!model) return new Vector3(1, 1, 1);
     model.updateMatrixWorld(true);
     const box = new Box3().setFromObject(model);
     const modelSize = new Vector3();
     box.getSize(modelSize);
 
-    // Parent SnapPlacedObject has scale(0.1), so world width = modelSize.x * 0.1
-    const worldWidth = modelSize.x * 0.1;
-    const targetWidth = entity.size.x;
-    const needsScale = worldWidth > 0.001 && Math.abs(worldWidth - targetWidth) > 0.01;
-    const scale = needsScale ? targetWidth / worldWidth : 1;
+    // Parent SnapPlacedObject has scale(0.1)
+    const parentScale = 0.1;
     
-    console.log(`[DEBUG_FIX2] ${entity.name}: modelSize=${modelSize.x.toFixed(4)}×${modelSize.y.toFixed(4)}×${modelSize.z.toFixed(4)}, worldWidth=${worldWidth.toFixed(4)}, target=${targetWidth}, scale=${scale.toFixed(4)}`);
-    
-    return scale;
-  }, [model, entity.size.x])
+    const scaleFor = (axis: 'x' | 'y' | 'z'): number => {
+      const world = modelSize[axis] * parentScale;
+      const target = entity.size[axis];
+      if (world > 0.001 && Math.abs(world - target) > 0.005 && target > 0) {
+        return target / world;
+      }
+      return 1;
+    };
+
+    return new Vector3(scaleFor('x'), scaleFor('y'), scaleFor('z'));
+  }, [model, entity.size.x, entity.size.y, entity.size.z])
 
   return (
     <group scale={modelScale}>

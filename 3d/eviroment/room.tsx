@@ -10,6 +10,7 @@ import { usePlacementData } from "@/snapping-tools/hooks/use-placement-data";
 import { store } from '@/store';
 import { ModuleEntity, toModuleEntity } from '@/types';
 import { FacadeConfig } from "@/3d/furniture/assembler"
+import { MeasuredModel } from "@/3d/furniture/measured-model"
 import { ModuleMenu } from "@/3d/furniture/actions";
 import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
@@ -107,8 +108,10 @@ const CursorSystem = memo(function CursorSystem({
 
     if (!cursor.name) return null;
 
-    const c_name = cursor.name.split("_");
-    const c_folder = `${c_name?.[0]}_${c_name?.[1]}`;
+    const c_parts = cursor.name.split("_");
+    const c_folder = c_parts.length > 1
+        ? c_parts.slice(0, -1).join("_")
+        : c_parts[0];
 
     return (
         <CursorRoom
@@ -141,8 +144,10 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
     if (!moduleProxy) return null;
 
     const entity = useSnapshot(moduleProxy);
-    const e_name = entity.name.split("_");
-    const e_folder = `${e_name[0]}_${e_name[1]}`;
+    const e_parts = entity.name.split("_");
+    const e_folder = e_parts.length > 1
+        ? e_parts.slice(0, -1).join("_")
+        : e_parts[0];
 
     return (
         <group>
@@ -165,10 +170,10 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
                                     {entity.tags.includes(CATEGORY_TECH) || entity.tags.includes(CATEGORY_ROOM) == true ? (
                                         <>
                                             {typeof entity.model != "string" && (
-                                                <Gltf src={`modules/${e_folder}/${entity.name}.glb`} />
+                                                <MeasuredModel src={`modules/${e_folder}/${entity.name}.glb`} entity={entity as ModuleEntity} />
                                             )}
                                             {typeof entity.model == "string" && (
-                                                <Gltf src={entity.model} />
+                                                <MeasuredModel src={entity.model} entity={entity as ModuleEntity} />
                                             )}
                                         </>
                                     ) : (
