@@ -135,27 +135,15 @@ export function RoomWalls() {
                 <meshMatcapMaterial color={snap.roomColor} />
             </mesh>
         </SnapConstraint>
-
-        {/* Right wall — 1m stub from back corner */}
-        <SnapConstraint userData={{ layer: 'modules' }} name="wall-x" useCursor useDistance position={[snap.room.d * 0.5 + depth * 0.5, 0, snap.room.w * 0.5 - 0.5]}>
+        <SnapConstraint userData={{ layer: 'modules' }} name="wall-x" useCursor useDistance position={[snap.room.d * 0.5 + depth * 0.5, 0, 0]}>
             <mesh name="wall" receiveShadow castShadow>
-                <boxGeometry args={[depth, snap.room.h, 1]} />
+                <boxGeometry args={[depth, snap.room.h, snap.room.w + depth * 2]} />
                 <meshMatcapMaterial color={snap.roomColor} />
             </mesh>
         </SnapConstraint>
-
-        {/* Left wall — 1m stub from back corner */}
-        <SnapConstraint userData={{ layer: 'modules' }} name="wall-x" useCursor useDistance position={[-snap.room.d * 0.5 - depth * 0.5, 0, snap.room.w * 0.5 - 0.5]}>
+        <SnapConstraint userData={{ layer: 'modules' }} name="wall-x" useCursor useDistance position={[0, 0, -snap.room.w * 0.5 - depth * 0.5]}>
             <mesh name="wall" receiveShadow castShadow>
-                <boxGeometry args={[depth, snap.room.h, 1]} />
-                <meshMatcapMaterial color={snap.roomColor} />
-            </mesh>
-        </SnapConstraint>
-
-        {/* Front wall — 1m stub at right corner */}
-        <SnapConstraint userData={{ layer: 'modules' }} name="wall-z" useCursor useDistance position={[snap.room.d * 0.5 - 0.5, 0, -snap.room.w * 0.5 - depth * 0.5]}>
-            <mesh name="wall" receiveShadow castShadow>
-                <boxGeometry args={[1, snap.room.h, depth]} />
+                <boxGeometry args={[snap.room.d, snap.room.h, depth]} />
                 <meshMatcapMaterial color={snap.roomColor} />
             </mesh>
         </SnapConstraint>
