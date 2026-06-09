@@ -15,7 +15,7 @@ import { ModuleErrorBoundary, ModuleLoadingPlaceholder } from "@/3d/furniture/mo
 import { ModuleMenu } from "@/3d/furniture/actions";
 import { RoomWalls } from "@/3d/eviroment/room-walls";
 import { Tabletop } from "@/3d/furniture/tabletop";
-import { Center, Gltf } from '@react-three/drei';
+import { Center, Gltf, Html } from '@react-three/drei';
 import { CATEGORY_ROOM, CATEGORY_TECH, EXPLICT_CASE_TUNNEL } from '@/constants';
 import { getLock, useLock } from '@/lib/use-lock';
 import { CursorRoom } from '@/snapping-tools/cursor-room';
@@ -140,6 +140,8 @@ const CursorSystem = memo(function CursorSystem({
 
 // ── Per-module shell: reactive via useSnapshot on the module proxy ──
 // version is passed so useMemo recalculates the proxy after hydration
+const DBG = true;
+
 const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; version: number }) {
     const moduleProxy = useMemo(() => store.modules.find(m => m.id === id), [id, version]);
     if (!moduleProxy) return null;
@@ -150,8 +152,21 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
         ? e_parts.slice(0, -1).join("_")
         : e_parts[0];
 
+    // Debug: calculate expected top of module in scaled local space
+    const moduleTopLocal = entity.size.y * 5;
+    const topWorld = entity.position.y + entity.size.y / 2;
+    const bottomWorld = entity.position.y - entity.size.y / 2;
+
     return (
         <group>
+            {DBG && <Html position={[entity.position.x, entity.position.y + entity.size.y + 0.15, entity.position.z]}>
+                <div style={{ background: 'rgba(0,100,200,0.85)', color: '#fff', padding: '2px 6px', borderRadius: 3, fontSize: 11, whiteSpace: 'nowrap', fontFamily: 'monospace' }}>
+                    📐 {entity.displayName || entity.name}<br/>
+                    posY={entity.position.y.toFixed(3)} | size.y={entity.size.y}<br/>
+                    низ={bottomWorld.toFixed(3)} | верх={topWorld.toFixed(3)}<br/>
+                    halfExt=[{entity.halfExtents.map(h => h.toFixed(3)).join(', ')}]
+                </div>
+            </Html>}
             <SnapPlacedObject
                 position={entity.position.toArray()}
                 scale={0.1}
