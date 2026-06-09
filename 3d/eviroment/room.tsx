@@ -140,8 +140,6 @@ const CursorSystem = memo(function CursorSystem({
 
 // ── Per-module shell: reactive via useSnapshot on the module proxy ──
 // version is passed so useMemo recalculates the proxy after hydration
-const DBG = true;
-
 const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; version: number }) {
     const moduleProxy = useMemo(() => store.modules.find(m => m.id === id), [id, version]);
     if (!moduleProxy) return null;
@@ -151,16 +149,6 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
     const e_folder = e_parts.length > 1
         ? e_parts.slice(0, -1).join("_")
         : e_parts[0];
-
-    if (DBG) {
-        console.log(`[Module] ${entity.displayName || entity.name}`);
-        console.log(`  position.y = ${entity.position.y}`);
-        console.log(`  size.y = ${entity.size.y}`);
-        console.log(`  bottom (world) = ${entity.position.y - entity.size.y / 2}`);
-        console.log(`  top (world) = ${entity.position.y + entity.size.y / 2}`);
-        console.log(`  halfExtents = [${entity.halfExtents.map(h => h.toFixed(4)).join(', ')}]`);
-        console.log(`  type = ${entity.type}, tags = [${entity.tags.join(', ')}]`);
-    }
 
     return (
         <group>
