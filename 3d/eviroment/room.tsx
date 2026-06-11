@@ -22,6 +22,8 @@ import { CursorRoom } from '@/snapping-tools/cursor-room';
 import { SnapPlane } from '@/snapping-tools/types';
 import { AnimationSystem } from './animation-system';
 import { MemoryAudit } from './memory-audit';
+import { LocalRuler } from './local-ruler';
+import { useValtioKey } from './hooks/use-key';
 
 function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, halfExtents: [number, number, number], entity: ModuleEntity }) {
     const largest_z = 0.73;
@@ -141,6 +143,8 @@ const CursorSystem = memo(function CursorSystem({
 // ── Per-module shell: reactive via useSnapshot on the module proxy ──
 // version is passed so useMemo recalculates the proxy after hydration
 const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; version: number }) {
+    const ruler = useValtioKey('ruler');
+
     const moduleProxy = useMemo(() => store.modules.find(m => m.id === id), [id, version]);
     if (!moduleProxy) return null;
 
@@ -150,8 +154,10 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
         ? e_parts.slice(0, -1).join("_")
         : e_parts[0];
 
+
     return (
         <group>
+            {ruler && <LocalRuler entity={entity as ModuleEntity} />}
             <SnapPlacedObject
                 position={entity.position.toArray()}
                 scale={0.1}
