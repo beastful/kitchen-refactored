@@ -31,13 +31,14 @@ function ZCorrection({ children, halfExtents, entity }: { children: ReactNode, h
     const pos_z = dontMove == true ? 0 : ((largest_z - z) * 10) - 0.5;
     const isWindowOrDoor = entity.tags.includes(EXPLICT_CASE_TUNNEL) || entity.name == "Door";
 
-    return <group position={[0, 0, isWindowOrDoor == true ? -1 : pos_z]}>
-        {children}
-    </group>
+    return (
+        <group position={[0, 0, isWindowOrDoor == true ? -1 : pos_z]}>
+            {children}
+        </group>
+    );
 }
 
 // ── Stable module IDs + hydration-safe version key ──
-// Detects both array mutation (push/pop) and array replacement (localStorage hydration)
 function useModuleIds() {
     const [ids, setIds] = useState(() => store.modules.map(m => m.id));
     const [version, setVersion] = useState(0);
@@ -49,7 +50,6 @@ function useModuleIds() {
             const newIds = currentArray.map(m => m.id);
             const prev = prevRef.current;
 
-            // Array was replaced (e.g. localStorage hydration) → remount everything
             if (currentArray !== prev.array) {
                 setVersion(v => v + 1);
                 setIds(newIds);
@@ -57,7 +57,6 @@ function useModuleIds() {
                 return;
             }
 
-            // Array mutated (push/pop) → update IDs, React handles add/remove
             if (newIds.length !== prev.ids.length || newIds.some((id, i) => id !== prev.ids[i])) {
                 setIds(newIds);
                 prevRef.current = { ids: newIds, array: currentArray };
@@ -94,9 +93,14 @@ const CursorSystem = memo(function CursorSystem({
             };
 
             setCursor(prev => {
-                if (prev.name === next.name && prev.model === next.model &&
-                    prev.room.w === next.room.w && prev.room.h === next.room.h && prev.room.d === next.room.d) {
-                    return prev; // bail out — no React re-render
+                if (
+                    prev.name === next.name &&
+                    prev.model === next.model &&
+                    prev.room.w === next.room.w &&
+                    prev.room.h === next.room.h &&
+                    prev.room.d === next.room.d
+                ) {
+                    return prev;
                 }
                 return next;
             });
@@ -136,8 +140,7 @@ const CursorSystem = memo(function CursorSystem({
     );
 });
 
-// ── Per-module shell: reactive via useSnapshot on the module proxy ──
-// version is passed so useMemo recalculates the proxy after hydration
+// ── Per-module shell ──
 const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; version: number }) {
     const ruler = useValtioKey('ruler');
 
@@ -147,7 +150,6 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
     const entity = useSnapshot(moduleProxy);
     const e_name = entity.name.split("_");
     const e_folder = `${e_name[0]}_${e_name[1]}`;
-
 
     return (
         <group>
@@ -164,7 +166,6 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
                 useDistance={true}
             >
                 <Suspense fallback={null}>
-
                     <ModuleMenu entity={entity as ModuleEntity}>
                         <Tabletop entity={entity as ModuleEntity}>
                             <ZCorrection entity={entity as ModuleEntity} halfExtents={entity.halfExtents as [number, number, number]}>
@@ -204,24 +205,27 @@ export default function Room() {
     const visibilityRef = useRef<boolean>(true);
     const { ids, version } = useModuleIds();
 
-    // Mutable refs for stable event listener
     const getPlacementDataRef = useRef(getPlacementData);
     const lockYRef = useRef(lockY);
     const lockRef = useRef(lock);
+
     getPlacementDataRef.current = getPlacementData;
     lockYRef.current = lockY;
     lockRef.current = lock;
 
-    // ── Placement: stable listener, reads mutable refs directly ──
+    // ── Placement: single source via currentRawModule ──
     useEffect(() => {
         const handlePointerUp = () => {
-            if (!store.currentRawModule) return;
+            const source = store.currentRawModule;
+            if (!source) return;
+
             const result = getPlacementDataRef.current();
 
             if (!result.possible) {
                 console.log('Cannot place:', result.reason);
                 return;
             }
+
             if (visibilityRef.current) {
                 console.log('Cannot place: visibility blocked');
                 return;
@@ -231,27 +235,28 @@ export default function Room() {
             const position = new Vector3(...placement.position);
             const normal = new Vector3(0, 0, 1);
 
-            const entity = toModuleEntity(store.currentRawModule, position, normal);
+            const entity = toModuleEntity(source, position, normal);
             entity.openAngle = placement.rotation[1];
+
             const snapPlanes = placement.snapPlanes.map(plane => ({
                 point: [...plane.point] as [number, number, number],
                 normal: [...plane.normal] as [number, number, number]
             }));
 
             entity.lockY = lockYRef.current;
-            entity.lock = lockRef.current;
+            entity.lock = lockRef.current.clone();
             entity.snapPlanes = snapPlanes;
-            entity.halfExtents = placement.halfExtents;
-            entity.id = crypto.randomUUID();
+            entity.halfExtents = [...placement.halfExtents] as [number, number, number];
+
             store.modules.push(entity);
             store.currentRawModule = null;
         };
 
         window.addEventListener('pointerup', handlePointerUp, true);
         return () => window.removeEventListener('pointerup', handlePointerUp, true);
-    }, []); // ← empty: no stale closures
+    }, []);
 
-    // ── Wall locking: recalculates on wallHeight change (via subscription) and lock change (via effect) ──
+    // ── Wall locking ──
     useEffect(() => {
         const recalc = () => {
             const modules = store.modules;
@@ -266,7 +271,7 @@ export default function Room() {
             }
         };
 
-        recalc(); // initial + when lock changes
+        recalc();
 
         let lastWallHeight = store.wallHeight;
         return subscribe(store, () => {

@@ -103,6 +103,8 @@ export default function Scene() {
         camera={{ position: [-6, 6, 6], fov: 45, near: 0.1, far: 1000 }}
         dpr={[1, 2]} // Cap pixel ratio to reduce GPU pressure
         frameloop="always"
+        className="config-scene"
+        gl={{ preserveDrawingBuffer: true }}
         onCreated={({ gl }) => {
           // Optional: reduce GPU memory pressure on high-DPI screens
           gl.setPixelRatio(Math.min(window.devicePixelRatio, 2))
