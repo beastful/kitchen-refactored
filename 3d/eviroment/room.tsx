@@ -142,8 +142,8 @@ const CursorSystem = memo(function CursorSystem({
 
 // ── Per-module shell ──
 const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; version: number }) {
-    const ruler = useValtioKey('ruler');
-
+    
+const snap = useSnapshot(store)
     const moduleProxy = useMemo(() => store.modules.find(m => m.id === id), [id, version]);
     if (!moduleProxy) return null;
 
@@ -153,7 +153,7 @@ const ModuleShell = memo(function ModuleShell({ id, version }: { id: string; ver
 
     return (
         <group>
-            {ruler && <LocalRuler entity={entity as ModuleEntity} />}
+            {snap.ruler && <LocalRuler entity={entity as ModuleEntity} />}
             <SnapPlacedObject
                 position={entity.position.toArray()}
                 scale={0.1}

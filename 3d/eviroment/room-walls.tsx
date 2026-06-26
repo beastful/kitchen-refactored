@@ -160,7 +160,7 @@ export function RoomWalls() {
             )}
             textAngle={Math.PI}
           />
-
+{/* 
           <group>
             {(() => {
               const sdThick = 0.02
@@ -233,7 +233,7 @@ export function RoomWalls() {
                 </group>
               )
             })()}
-          </group>
+          </group> */}
         </>
       )}
 

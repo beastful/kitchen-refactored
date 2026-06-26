@@ -70,9 +70,13 @@ function HandleVariantComponent({ entity, worldYRef, ...props }: HandleVariantPr
     /* ── Imperative Handle4 offset ── */
     useFrame(() => {
         if (!handle4Ref.current) return;
+
+        // entity.name.includes("3YNSD")
+        
         const z = isWall
             ? -(handle4BaseOffset - (worldYRef.current ?? 0))
             : -handle4BaseOffset;
+
         handle4Ref.current.position.set(0, -0.018, z);
     });
 
