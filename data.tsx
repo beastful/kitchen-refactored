@@ -142,6 +142,16 @@ const floor_data: ModuleDef[] = [
         displayName: 'Шкаф с 3мя ящиками 80см 67',
         displaySize: '800'
     },
+    {
+        model: ModuleExample,
+        type: 'floor',
+        price: 7780,
+        name: 'M_3YNSD_67_7',
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+        image: '/3YNSD/M_3YNSD_11.png',
+        displayName: 'Шкаф с 3мя ящиками 80см 67 7',
+        displaySize: '800'
+    },
     // {
     //     model: ModuleExample,
     //     type: 'floor',
