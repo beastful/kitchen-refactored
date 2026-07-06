@@ -10,9 +10,17 @@ import { Text } from "@react-three/drei";
 import { useSnapshot } from "valtio";
 import { store } from "@/store";
 
+
+
 export function LocalRuler({ entity }: { entity: ModuleEntity }) {
+
+    
+
     const normal_y = Math.sin(entity.openAngle)
     const normal_x = Math.cos(entity.openAngle)
+
+    const ruler_side = normal_y == 0 ? -1 : 1
+
     const gap_from_wall = 0.005
     const gap_from_module = 0.05
     const shift_left = (entity.halfExtents[0] + gap_from_module) * normal_x - (entity.halfExtents[2] - gap_from_wall) * normal_y
@@ -26,21 +34,31 @@ export function LocalRuler({ entity }: { entity: ModuleEntity }) {
     const type = entity.type
     const snap = useSnapshot(store)
 
+    function getCalculatedLockY() {
+        if (entity.name == "Window" ||  entity.name == "Door") {
+            return entity.position.y 
+        }
+        return entity.lock.y
+    }
+
+    const calculatedLockY = getCalculatedLockY();
+
     return <>
-        <group position={[entity.position.x + shift_left, entity.lock.y, entity.position.z + shift_forward]}>
+        <group position={[entity.position.x + shift_left * ruler_side, calculatedLockY, entity.position.z + shift_forward]}>
             <mesh>
                 <meshBasicMaterial color={"black"} />
                 <boxGeometry args={[0.005, entity.halfExtents[1] * 2, 0.005]} />
             </mesh>
         </group>
         <group
-            position={[entity.position.x + shift_left_text, entity.lock.y, entity.position.z + shift_forward_text]}
+            position={[entity.position.x + shift_left_text * ruler_side, calculatedLockY + 0.2, entity.position.z + shift_forward_text]}
             rotation={[0, entity.openAngle, 0]}>
             <Text rotation={[0, 0, Math.PI / 2]} color={"black"} fontSize={0.06}>
                 {type == "floor" && (0.822 + snap.tabletop[0]) * 100 + " см"}
                 {type == "wall" && Number(entity.halfExtents[1] * 2).toFixed(2) + " см"}
             </Text>
         </group>
+        {/* <Text position={entity.position}>{JSON.stringify(entity.name)}</Text> */}
         {/* <Text position={entity.position}>{JSON.stringify(entity.position)}</Text> */}
     </>
 }
