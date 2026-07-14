@@ -16,7 +16,7 @@ export const hinges = [
 function ModuleExample() {
     return <mesh>
         <meshNormalMaterial />
-        <boxGeometry args={[0.2 * 10, 1 * 10, 0.5 * 10]}/>
+        <boxGeometry args={[0.2 * 10, 1 * 10, 0.5 * 10]} />
     </mesh>
 }
 
@@ -132,6 +132,66 @@ const floor_data: ModuleDef[] = [
         displayName: 'Шкаф с 3мя ящиками 80см',
         displaySize: '800'
     },
+    {
+        model: ModuleExample,
+        type: 'floor',
+        price: 7780,
+        name: 'M_3YNSD_67',
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+        image: '/3YNSD/M_3YNSD_11.png',
+        displayName: 'Шкаф с 3мя ящиками 80см 67',
+        displaySize: '800'
+    },
+    {
+        model: ModuleExample,
+        type: 'floor',
+        price: 7780,
+        name: 'M_3YNSD_67_7',
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+        image: '/3YNSD/M_3YNSD_11.png',
+        displayName: 'Шкаф с 3мя ящиками 80см 67 7',
+        displaySize: '800'
+    },
+    // {
+    //     model: ModuleExample,
+    //     type: 'floor',
+    //     price: 77800,
+    //     name: 'M_3YNSD_20',
+    //     tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+    //     image: '/3YNSD/M_3YNSD_11.png',
+    //     displayName: 'Шкаф с 3мя ящиками 80см',
+    //     displaySize: '800'
+    // },
+    // {
+    //     model: ModuleExample,
+    //     type: 'floor',
+    //     price: 77800,
+    //     name: 'M_3YNSD_21',
+    //     tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+    //     image: '/3YNSD/M_3YNSD_11.png',
+    //     displayName: 'Шкаф с 3мя ящиками 80см',
+    //     displaySize: '800'
+    // },
+    // {
+    //     model: ModuleExample,
+    //     type: 'floor',
+    //     price: 77800,
+    //     name: 'M_3YNSD_22',
+    //     tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+    //     image: '/3YNSD/M_3YNSD_11.png',
+    //     displayName: 'Шкаф с 3мя ящиками 80см',
+    //     displaySize: '800'
+    // },
+    // {
+    //     model: ModuleExample,
+    //     type: 'floor',
+    //     price: 77800,
+    //     name: 'M_3YNSD_23',
+    //     tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+    //     image: '/3YNSD/M_3YNSD_11.png',
+    //     displayName: 'Шкаф с 3мя ящиками 80см',
+    //     displaySize: '800'
+    // },
     {
         model: ModuleExample,
         type: 'floor',
@@ -2185,7 +2245,7 @@ const tech_data: ModuleDef[] = [
         displaySize: ''
     },
     {
-        model:  '/modules/TECH/KitchenHoodLarge.glb',
+        model: '/modules/TECH/KitchenHoodLarge.glb',
         type: 'wall',
         price: 14500,
         name: 'KitchenHoodLarge',
@@ -2195,7 +2255,7 @@ const tech_data: ModuleDef[] = [
         displaySize: ''
     },
     {
-        model:  '/modules/TECH/Microwave.glb',
+        model: '/modules/TECH/Microwave.glb',
         type: 'floor',
         price: 14500,
         name: 'Microwave',

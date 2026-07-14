@@ -4,7 +4,7 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { Stats } from '@react-three/drei'
 import React, { useState, useCallback, useRef, Suspense, useEffect } from 'react'
 import * as THREE from 'three'
-import { ConstantForwardOrbitControls } from '@/3d/camera/dolly-orbit-controlls'
+import { ConstantForwardOrbitControls } from '@/3d/camera/dolly-orbit-controlls' // adjust path
 import Room from '@/3d/eviroment/room'
 
 function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
@@ -14,14 +14,13 @@ function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
     const canvas = gl.domElement
 
     const handleLost = (event: any) => {
-      event.preventDefault() // Critical: allows the browser to restore
+      event.preventDefault()
       console.warn('WebGL context lost')
       onContextLost()
     }
 
     const handleRestored = () => {
       console.log('WebGL context restored')
-      // Resize trick to wake up the renderer (Chrome/WebKit)
       const size = gl.getSize(new THREE.Vector2())
       gl.setSize(size.width - 1, size.height - 1)
       requestAnimationFrame(() => gl.setSize(size.width, size.height))
@@ -49,7 +48,7 @@ function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
       />
       <directionalLight position={[-3, 4, -3]} intensity={0.4} color="#e8e4ff" />
       <pointLight position={[0, -1, 2]} intensity={0.3} color="#ffeedd" />
-      <hemisphereLight args={["#ddeeff", "#332211", 0.5]} />
+      <hemisphereLight args={['#ddeeff', '#332211', 0.5]} />
       <ConstantForwardOrbitControls
         stepSize={0.4}
         enableRotate
@@ -58,7 +57,6 @@ function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
         maxDistance={10}
         maxPolarAngle={Math.PI / 2}
       />
-     
     </>
   )
 }
@@ -71,15 +69,21 @@ export default function Scene() {
 
   const handleContextLost = useCallback(() => {
     setIsRecovering(true)
-    // Small delay to let the browser release the old context
     setTimeout(() => {
-      setCanvasKey((k) => k + 1) // Force full remount
+      setCanvasKey((k) => k + 1)
       setIsRecovering(false)
     }, 600)
   }, [])
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        touchAction: 'none', // <-- PREVENTS PAGE ZOOM
+      }}
+    >
       {isRecovering && (
         <div
           style={{
@@ -101,10 +105,11 @@ export default function Scene() {
       <Canvas
         key={canvasKey}
         camera={{ position: [-6, 6, 6], fov: 45, near: 0.1, far: 1000 }}
-        dpr={[1, 2]} // Cap pixel ratio to reduce GPU pressure
+        dpr={[1, 2]}
         frameloop="always"
+        className="config-scene"
+        gl={{ preserveDrawingBuffer: true }}
         onCreated={({ gl }) => {
-          // Optional: reduce GPU memory pressure on high-DPI screens
           gl.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         }}
       >

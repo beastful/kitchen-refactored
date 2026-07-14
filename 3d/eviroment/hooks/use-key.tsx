@@ -12,6 +12,6 @@ export function useValtioKey(key: string) {
 
         // Clean up subscription on unmount
         return unsubscribe;
-    }, []);
+    }, [key]);
     return state;
 }

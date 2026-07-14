@@ -1,0 +1,7 @@
+From https://github.com/beastful/kitchen-refactored
+ * branch            main       -> FETCH_HEAD
+Auto-merging 3d/eviroment/room.tsx
+CONFLICT (content): Merge conflict in 3d/eviroment/room.tsx
+Auto-merging 3d/furniture/tabletop.tsx
+CONFLICT (content): Merge conflict in 3d/furniture/tabletop.tsx
+Automatic merge failed; fix conflicts and then commit the result.
