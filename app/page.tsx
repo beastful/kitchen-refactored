@@ -8,7 +8,7 @@ import { useSnapshot } from 'valtio';
 import { AnimatePresence, motion } from "motion/react"
 import { SnapProvider } from '@/snapping-tools/snap-provider';
 import { useTexture } from '@react-three/drei';
-import { loadProductFromBitrix } from '@/lib/get-states';
+import { loadProductFromBitrix, loadSharedFromBitrix } from '@/lib/get-states';
 
 useTexture.preload('/matcap/mc1.png');
 useTexture.preload('/matcap/mc2.png');
@@ -34,32 +34,58 @@ function Home() {
 
     useEffect(() => {
         const productId = getQueryParam('product_id');
-        if (!productId) {
-            setSceneReady(true);
-            return;
+        const stateId = getQueryParam('state_id');
+
+        // Если есть state_id — загружаем проект по ссылке (публичный доступ)
+        if (stateId) {
+            loadSharedFromBitrix(stateId, (stateData: any) => {
+                try {
+                    if (stateData && typeof stateData === 'object') {
+                        setJson(JSON.stringify(stateData));
+                    }
+                    setSceneReady(true);
+                } catch (e) {
+                    console.error('[Home] Failed to hydrate store from shared scene:', e);
+                    setLoadError('Не удалось загрузить проект');
+                    setTimeout(() => setSceneReady(true), 3000);
+                }
+            });
+
+            const fallbackTimer = setTimeout(() => {
+                console.warn('[Home] Shared scene load timeout, opening empty scene');
+                setLoadError('Загрузка заняла больше времени, чем ожидалось');
+                setTimeout(() => setSceneReady(true), 3000);
+            }, 10000);
+
+            return () => clearTimeout(fallbackTimer);
         }
 
-        loadProductFromBitrix(productId, (stateData: any) => {
-            try {
-                if (stateData && typeof stateData === 'object') {
-                    setJson(JSON.stringify(stateData));
+        if (productId) {
+            loadProductFromBitrix(productId, (stateData: any) => {
+                try {
+                    if (stateData && typeof stateData === 'object') {
+                        setJson(JSON.stringify(stateData));
+                    }
+                    setSceneReady(true);
+                } catch (e) {
+                    console.error('[Home] Failed to hydrate store from product:', e);
+                    setLoadError('Не удалось загрузить конфигурацию кухни');
+                    // Fall back to empty scene after showing error briefly
+                    setTimeout(() => setSceneReady(true), 3000);
                 }
-                setSceneReady(true);
-            } catch (e) {
-                console.error('[Home] Failed to hydrate store from product:', e);
-                setLoadError('Не удалось загрузить конфигурацию кухни');
-                // Fall back to empty scene after showing error briefly
+            });
+
+            const fallbackTimer = setTimeout(() => {
+                console.warn('[Home] Product load timeout, opening empty scene');
+                setLoadError('Загрузка заняла больше времени, чем ожидалось');
                 setTimeout(() => setSceneReady(true), 3000);
-            }
-        });
+            }, 10000);
 
-        const fallbackTimer = setTimeout(() => {
-            console.warn('[Home] Product load timeout, opening empty scene');
-            setLoadError('Загрузка заняла больше времени, чем ожидалось');
-            setTimeout(() => setSceneReady(true), 3000);
-        }, 10000);
+            return () => clearTimeout(fallbackTimer);
+        }
 
-        return () => clearTimeout(fallbackTimer);
+        // Ничего нет — просто открываем пустой конструктор
+        setSceneReady(true);
     }, []);
 
     if (!sceneReady) {
