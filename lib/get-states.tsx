@@ -65,7 +65,7 @@ export function loadSharedFromBitrix(sceneId: string, onLoaded: (state: any, id:
 
     window.addEventListener('message', onMessage);
     window.parent.postMessage(
-        JSON.stringify({ requestId, action: 'load_shared', data: { id: sceneId } }),
+        JSON.stringify({ requestId, action: 'get', data: { id: sceneId } }),
         '*'
     );
 
