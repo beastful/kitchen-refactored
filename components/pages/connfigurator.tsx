@@ -562,8 +562,9 @@ function SaveModal({
   const [write, saving, saveSuccess, savedId] = useSaveToBack()
   const [linkCopied, setLinkCopied] = useState(false)
 
+  const parentOrigin = useSnapshot(store).parentOrigin || window.location.origin
   const shareUrl = savedId
-    ? window.location.origin + '/constructor/?mode=iframe&state_id=' + savedId
+    ? parentOrigin + '/constructor/?mode=iframe&state_id=' + savedId
     : null
 
   const handleCopyLink = useCallback(() => {

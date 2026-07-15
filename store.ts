@@ -25,6 +25,8 @@ export interface Store {
   modules: ModuleEntity[];
   currentRawModule: ModulePlacementSource | null;
   openMenuId: string | null;
+  /** Origin родительского сайта (yasnaya-mebel.ru) для формирования ссылки «Поделиться» */
+  parentOrigin: string | null;
 }
 
 const serColor = (c: Color) => {
@@ -112,6 +114,7 @@ export const store = proxy<Store>({
   room: { d: 3, w: 4, h: 2 },
   modules: [],
   currentRawModule: null,
+  parentOrigin: null,
 });
 
 export function hydrateStoreFromLocalStorage() {

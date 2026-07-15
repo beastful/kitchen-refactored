@@ -36,6 +36,12 @@ function Home() {
         const productId = getQueryParam('product_id');
         const stateId = getQueryParam('state_id');
 
+        // Сохраняем origin родительского сайта для ссылки «Поделиться»
+        const parentOrigin = getQueryParam('parent_origin');
+        if (parentOrigin) {
+            store.parentOrigin = parentOrigin;
+        }
+
         // Если есть state_id — загружаем проект по ссылке (публичный доступ)
         if (stateId) {
             loadSharedFromBitrix(stateId, (stateData: any) => {
