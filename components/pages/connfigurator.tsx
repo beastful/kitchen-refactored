@@ -559,7 +559,30 @@ function SaveModal({
   showSave: boolean
   onClose: () => void
 }) {
-  const [write, saving, saveSuccess] = useSaveToBack()
+  const [write, saving, saveSuccess, savedId] = useSaveToBack()
+  const [linkCopied, setLinkCopied] = useState(false)
+
+  const shareUrl = savedId
+    ? window.location.origin + '/constructor/?mode=iframe&state_id=' + savedId
+    : null
+
+  const handleCopyLink = useCallback(() => {
+    if (!shareUrl) return
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    }).catch(() => {
+      // fallback
+      const textArea = document.createElement('textarea')
+      textArea.value = shareUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    })
+  }, [shareUrl])
 
   if (!showSave) return null
 
@@ -588,15 +611,7 @@ function SaveModal({
         }}
       />
 
-      <div className="mt-4">
-        {saveSuccess && (
-          <p className="text-xs text-gray-500 text-center mb-2 bg-white p-2 rounded">
-            Перезайдите в это окно,
-            <br />
-            чтобы отобразился новый проект
-          </p>
-        )}
-
+      <div className="mt-4 space-y-3">
         <button
           type="button"
           onClick={() => write(getJson())}
@@ -606,8 +621,35 @@ function SaveModal({
             ${saveSuccess ? 'bg-green-600 hover:bg-green-700' : 'bg-[#F06900] hover:bg-[#d85e00]'}
             text-white shadow-md`}
         >
-          {saving ? 'Сохранение…' : saveSuccess ? 'Сохранено' : 'Сохранить текущий проект'}
+          {saving ? 'Сохранение…' : saveSuccess ? '✓ Сохранено' : 'Сохранить текущий проект'}
         </button>
+
+        {/* Показываем ссылку для шаринга после успешного сохранения */}
+        {saveSuccess && shareUrl && (
+          <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+            <p className="text-xs text-gray-500 mb-2 font-medium">Поделиться проектом</p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="flex-1 text-xs text-gray-700 bg-gray-50 rounded-md px-2 py-1.5 border border-gray-200 truncate"
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+              />
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer
+                  ${linkCopied
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-[#F06900] text-white hover:bg-[#d85e00]'
+                  }`}
+              >
+                {linkCopied ? 'Скопировано' : 'Копировать'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

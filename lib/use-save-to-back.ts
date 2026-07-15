@@ -11,16 +11,21 @@ const isLocalhost = () => {
 export function useSaveToBack(): [
     (payload: Record<string, unknown> | string) => void,
     boolean,
-    boolean
+    boolean,
+    string | null
 ] {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [savedId, setSavedId] = useState<string | null>(null);
     const pendingRef = useRef<Set<string>>(new Set());
 
-    /* ← новое: автосброс зелёной галочки через 5 секунд */
+    /* автосброс зелёной галочки через 10 секунд (чтобы успели скопировать ссылку) */
     useEffect(() => {
         if (!success) return;
-        const timer = setTimeout(() => setSuccess(false), 5000);
+        const timer = setTimeout(() => {
+            setSuccess(false);
+            setSavedId(null);
+        }, 10000);
         return () => clearTimeout(timer);
     }, [success]);
 
@@ -28,7 +33,8 @@ export function useSaveToBack(): [
         if (typeof window === 'undefined') return;
 
         setLoading(true);
-        setSuccess(false); // сброс при новом сохранении
+        setSuccess(false);
+        setSavedId(null); // сброс id при новом сохранении
         const requestId = String(Math.random());
         pendingRef.current.add(requestId);
 
@@ -55,8 +61,9 @@ export function useSaveToBack(): [
                 const collection = raw ? JSON.parse(raw) : { states: [] };
                 if (!Array.isArray(collection.states)) collection.states = [];
 
+                const localId = String(Date.now());
                 const newItem = {
-                    id: String(Date.now()),
+                    id: localId,
                     name: projectName,
                     state_data: stateData,
                     date_create: new Date().toISOString(),
@@ -69,11 +76,13 @@ export function useSaveToBack(): [
                 pendingRef.current.delete(requestId);
                 setLoading(false);
                 setSuccess(true);
+                setSavedId(localId);
             } catch (e) {
                 console.error('[useSaveToBack] localStorage failed:', e);
                 pendingRef.current.delete(requestId);
                 setLoading(false);
                 setSuccess(false);
+                setSavedId(null);
             }
             return;
         }
@@ -90,7 +99,13 @@ export function useSaveToBack(): [
                 pendingRef.current.delete(requestId);
                 window.removeEventListener('message', onMessage);
                 setLoading(false);
-                setSuccess(data.status === 'success');
+                const isSuccess = data.status === 'success';
+                setSuccess(isSuccess);
+                if (isSuccess && data.id) {
+                    setSavedId(String(data.id));
+                } else {
+                    setSavedId(null);
+                }
             }
         };
 
@@ -110,9 +125,10 @@ export function useSaveToBack(): [
                 window.removeEventListener('message', onMessage);
                 setLoading(false);
                 setSuccess(false);
+                setSavedId(null);
             }
         }, 10000);
     }, []);
 
-    return [write, loading, success];
+    return [write, loading, success, savedId];
 }
