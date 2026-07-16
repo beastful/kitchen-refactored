@@ -27,6 +27,7 @@ import { Hint } from '@/components/atoms/hint'
 import GroupEdit from '@/components/organisms/group-editor'
 import { GetStates } from '@/lib/get-states'
 import { useSaveToBack } from '@/lib/use-save-to-back'
+import { captureScenePreview } from '@/lib/capture-preview'
 
 import { data } from '@/data'
 import {
@@ -567,6 +568,17 @@ function SaveModal({
     ? parentOrigin + '/constructor/?mode=iframe&state_id=' + savedId
     : null
 
+  const handleSave = useCallback(async () => {
+    // Сначала захватываем превью 3D-сцены
+    const previewDataUrl = await captureScenePreview()
+    // Сохраняем проект вместе с превью
+    write({
+      name: 'Новый проект',
+      state_data: getJson(),
+      previewUrl: previewDataUrl || '',
+    })
+  }, [write])
+
   const handleCopyLink = useCallback(() => {
     if (!shareUrl) return
     navigator.clipboard.writeText(shareUrl).then(() => {
@@ -615,7 +627,7 @@ function SaveModal({
       <div className="mt-4 space-y-3">
         <button
           type="button"
-          onClick={() => write(getJson())}
+          onClick={handleSave}
           disabled={saving}
           className={`w-full py-2.5 px-4 rounded-lg font-medium transition cursor-pointer
             ${saving ? 'opacity-60 cursor-wait' : ''}
@@ -624,6 +636,11 @@ function SaveModal({
         >
           {saving ? 'Сохранение…' : saveSuccess ? '✓ Сохранено' : 'Сохранить текущий проект'}
         </button>
+
+        {/* Индикатор захвата превью */}
+        {saving && !saveSuccess && (
+          <p className="text-xs text-gray-400 text-center">Захват изображения проекта…</p>
+        )}
 
         {/* Показываем ссылку для шаринга после успешного сохранения */}
         {saveSuccess && shareUrl && (

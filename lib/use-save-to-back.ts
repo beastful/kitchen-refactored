@@ -110,11 +110,17 @@ export function useSaveToBack(): [
         };
 
         window.addEventListener('message', onMessage);
+        // Извлекаем previewUrl из payload, если передан
+        let previewUrl = '';
+        if (typeof payload === 'object' && payload !== null) {
+            previewUrl = (payload as Record<string, unknown>).previewUrl as string || '';
+        }
+
         window.parent.postMessage(
             JSON.stringify({
                 requestId,
                 action: 'save',
-                data: { name: projectName, state_data: stateData },
+                data: { name: projectName, state_data: stateData, previewUrl },
             }),
             '*'
         );

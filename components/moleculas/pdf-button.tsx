@@ -7,6 +7,7 @@ import { Color } from 'three';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { CATEGORY_ROOM } from '@/constants';
+import { getSceneCanvas, canvasToDataUrlSafe } from '@/lib/capture-preview';
 import {
   Loader,
   Printer,
@@ -46,62 +47,6 @@ export function PDFExportButton() {
   const tabletopArea = modules.reduce((area, m) => area + m.size.z * m.size.x, 0);
   const tabletopPrice = Math.ceil(tabletopArea * snap_tabletop[2]);
   const grandTotal = modulesTotalWithHinges + tabletopPrice;
-
-  const getSceneCanvas = (): HTMLCanvasElement | null => {
-    const direct = document.querySelector('canvas.config-scene');
-    if (direct instanceof HTMLCanvasElement) return direct;
-
-    const inside = document.querySelector('.config-scene canvas');
-    if (inside instanceof HTMLCanvasElement) return inside;
-
-    const anyCanvas = document.querySelector('canvas');
-    if (anyCanvas instanceof HTMLCanvasElement) return anyCanvas;
-
-    return null;
-  };
-
-  const dataUrlToBlob = async (dataUrl: string): Promise<Blob> => {
-    const res = await fetch(dataUrl);
-    return await res.blob();
-  };
-
-  const canvasToBlobSafe = async (canvas: any): Promise<Blob> => {
-    if (typeof canvas.toBlob === 'function') {
-      return await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((blob: Blob | null) => {
-          if (!blob) {
-            reject(new Error('Не удалось создать Blob из canvas'));
-            return;
-          }
-          resolve(blob);
-        }, 'image/png', 1);
-      });
-    }
-
-    if (typeof canvas.convertToBlob === 'function') {
-      return await canvas.convertToBlob({ type: 'image/png', quality: 1 });
-    }
-
-    if (typeof canvas.toDataURL === 'function') {
-      const dataUrl = canvas.toDataURL('image/png', 1);
-      return await dataUrlToBlob(dataUrl);
-    }
-
-    throw new Error('Canvas не поддерживает toBlob, convertToBlob или toDataURL');
-  };
-
-  const blobToDataUrl = (blob: Blob): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error('Не удалось прочитать Blob'));
-      reader.readAsDataURL(blob);
-    });
-
-  const canvasToDataUrlSafe = async (canvas: HTMLCanvasElement): Promise<string> => {
-    const blob = await canvasToBlobSafe(canvas);
-    return await blobToDataUrl(blob);
-  };
 
   const addMultiPageImage = (
     pdf: jsPDF,
