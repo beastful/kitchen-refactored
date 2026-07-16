@@ -22,7 +22,7 @@ let _savedMaxDistance = 10;
 let _savedMinDistance = 0;
 
 /* Ракурс, в который сбрасываем камеру для превью (вид слева-спереди-сверху, чтобы были видны фасады, а не правая стена) */
-const DEFAULT_POSITION = new THREE.Vector3(-7, 3.5, 5);
+const DEFAULT_POSITION = new THREE.Vector3(-8, 2, 3);
 const DEFAULT_TARGET = new THREE.Vector3(0, 0, 0);
 
 /**
