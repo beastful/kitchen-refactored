@@ -33,7 +33,7 @@ function FacadeComponent({ entity, model }: FacadeProps) {
     useEffect(() => {
         const originalMaterial = model.material;
 
-        let opacity = 0.4;
+        let opacity = 0;
         if (model.name.includes(`_${entity.facade}`)) {
             opacity = 1;
         } else if (
