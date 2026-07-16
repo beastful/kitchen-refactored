@@ -6,24 +6,6 @@ import React, { useState, useCallback, useRef, Suspense, useEffect } from 'react
 import * as THREE from 'three'
 import { ConstantForwardOrbitControls } from '@/3d/camera/dolly-orbit-controlls' // adjust path
 import Room from '@/3d/eviroment/room'
-import { registerCamera } from '@/lib/camera-helper'
-
-/**
- * Компонент, который регистрирует камеру и OrbitControls в глобальном helper.
- * Нужно, чтобы captureScenePreview() мог временно сбрасывать ракурс для скриншота.
- */
-function CameraRegistrar() {
-  const camera = useThree((s) => s.camera as THREE.PerspectiveCamera);
-  const controls = useThree((s) => s.controls as any);
-
-  useEffect(() => {
-    if (camera && controls && typeof controls.update === 'function') {
-      registerCamera(camera, controls);
-    }
-  }, [camera, controls]);
-
-  return null;
-}
 
 function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
   const { gl } = useThree()
@@ -55,7 +37,6 @@ function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
 
   return (
     <>
-      <CameraRegistrar />
       <Room />
       <ambientLight intensity={0.6} color="#fff8f0" />
       <directionalLight

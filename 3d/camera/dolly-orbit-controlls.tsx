@@ -2,6 +2,7 @@ import { OrbitControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { registerCamera } from '@/lib/camera-helper'
 
 export function ConstantForwardOrbitControls({
   stepSize = 1.0,
@@ -16,6 +17,9 @@ export function ConstantForwardOrbitControls({
   useEffect(() => {
     const controls = controlsRef.current
     if (!controls) return
+
+    // Регистрируем камеру и controls для captureScenePreview (сброс ракурса при скриншоте)
+    registerCamera(camera as THREE.PerspectiveCamera, controls)
 
     // --- Disable default zoom ---
     controls.enableZoom = false
