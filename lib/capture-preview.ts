@@ -1,5 +1,7 @@
 'use client';
 
+import { saveAndResetCamera, restoreCamera } from './camera-helper';
+
 /**
  * Ищет canvas 3D-сцены на странице.
  * Сначала ищет <canvas class="config-scene">,
@@ -73,18 +75,41 @@ export async function canvasToDataUrlSafe(canvas: HTMLCanvasElement): Promise<st
 
 /**
  * Захватывает превью 3D-сцены и возвращает base64 data URL.
+ * Перед захватом временно сбрасывает камеру в изначальный ракурс,
+ * после захвата возвращает камеру в положение пользователя.
  * Если canvas не найден — возвращает null.
  */
 export async function captureScenePreview(): Promise<string | null> {
   try {
+    // Сбрасываем камеру в красивый ракурс для превью
+    const wasReset = saveAndResetCamera();
+
+    // Ждём 2 кадра, чтобы сцена перерисовалась с новым ракурсом
+    if (wasReset) {
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
+    }
+
     const canvas = getSceneCanvas();
     if (!canvas) {
       console.warn('[capturePreview] Canvas 3D-сцены не найден');
+      if (wasReset) restoreCamera();
       return null;
     }
-    return await canvasToDataUrlSafe(canvas);
+
+    const result = await canvasToDataUrlSafe(canvas);
+
+    // Возвращаем камеру в положение пользователя
+    if (wasReset) {
+      restoreCamera();
+    }
+
+    return result;
   } catch (e) {
     console.error('[capturePreview] Ошибка захвата превью:', e);
+    // Пытаемся вернуть камеру даже при ошибке
+    try { restoreCamera(); } catch { /* ignore */ }
     return null;
   }
 }
