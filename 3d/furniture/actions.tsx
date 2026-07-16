@@ -144,11 +144,16 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
         <Html>
           <div
             onPointerDown={(e) => {
+              // e.stopPropagation();
+              // e.preventDefault();
+              // store.modules = store.modules.filter((m) => m.id !== entity.id) as ModuleEntity[];
+              // store.currentRawModule = toModuleDef(entity);
               e.stopPropagation();
               e.preventDefault();
               store.modules = store.modules.filter((m) => m.id !== entity.id) as ModuleEntity[];
-              store.currentRawModule = toModuleDef(entity);
+              store.currentRawModule = entity;
             }}
+
             className="bg-white rounded-md opacity-60 translate-[-50%] cursor-grab border-2 border-dashed px-3 py-6 flex items-center justify-center flex-col gap-5"
           >
             <Move />
