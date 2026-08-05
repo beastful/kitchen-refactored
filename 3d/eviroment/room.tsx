@@ -37,6 +37,14 @@ import { MemoryAudit } from './memory-audit';
 import { LocalRuler } from './local-ruler';
 import { useValtioKey } from './hooks/use-key';
 
+function getModuleModelSrc(name: string): string {
+	const parts = name.split('_');
+	const folder = parts.length > 1 ? parts.slice(0, -1).join('_') : parts[0];
+	const fileName = name === 'M_SPL_9' ? 'M_SPL_9_Correct' : name;
+
+	return `modules/${folder}/${fileName}.glb`;
+}
+
 function ZCorrection({
 	children,
 	halfExtents,
@@ -148,10 +156,6 @@ const CursorSystem = memo(function CursorSystem({
 
 	if (!cursor.name) return null;
 
-	const c_parts = cursor.name.split('_');
-	const c_folder =
-		c_parts.length > 1 ? c_parts.slice(0, -1).join('_') : c_parts[0];
-
 	return (
 		<CursorRoom
 			visibilityChange={handleVisibility}
@@ -167,7 +171,7 @@ const CursorSystem = memo(function CursorSystem({
 				scale={0.1}>
 				{typeof cursor.model != 'string' && cursor.model && (
 					<Center>
-						<Gltf src={`modules/${c_folder}/${cursor.name}.glb`} />
+						<Gltf src={getModuleModelSrc(cursor.name)} />
 					</Center>
 				)}
 				{typeof cursor.model == 'string' && (
@@ -196,10 +200,6 @@ const ModuleShell = memo(function ModuleShell({
 	if (!moduleProxy) return null;
 
 	const entity = useSnapshot(moduleProxy);
-	const e_parts = entity.name.split('_');
-	const e_folder =
-		e_parts.length > 1 ? e_parts.slice(0, -1).join('_') : e_parts[0];
-
 	return (
 		<group>
 			{snap.ruler && <LocalRuler entity={entity as ModuleEntity} />}
@@ -226,7 +226,7 @@ const ModuleShell = memo(function ModuleShell({
 											moduleName={entity.displayName || entity.name}>
 											{typeof entity.model != 'string' && (
 												<MeasuredModel
-													src={`modules/${e_folder}/${entity.name}.glb`}
+														src={getModuleModelSrc(entity.name)}
 													entity={entity as ModuleEntity}
 												/>
 											)}
@@ -242,7 +242,7 @@ const ModuleShell = memo(function ModuleShell({
 											moduleName={entity.displayName || entity.name}>
 											{typeof entity.model != 'string' && (
 												<FacadeConfig
-													src={`modules/${e_folder}/${entity.name}.glb`}
+														src={getModuleModelSrc(entity.name)}
 													entity={entity as ModuleEntity}
 												/>
 											)}
