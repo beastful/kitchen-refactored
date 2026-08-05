@@ -37,12 +37,12 @@ import { MemoryAudit } from './memory-audit';
 import { LocalRuler } from './local-ruler';
 import { useValtioKey } from './hooks/use-key';
 
-function getModuleModelSrc(name: string): string {
+function getModuleModelSrc(name: string, modelPath?: string): string {
+	if (modelPath) return modelPath;
+
 	const parts = name.split('_');
 	const folder = parts.length > 1 ? parts.slice(0, -1).join('_') : parts[0];
-	const fileName = name === 'M_SPL_9' ? 'M_SPL_9_Correct' : name;
-
-	return `modules/${folder}/${fileName}.glb`;
+	return `modules/${folder}/${name}.glb`;
 }
 
 function ZCorrection({
@@ -120,6 +120,7 @@ const CursorSystem = memo(function CursorSystem({
 	const [cursor, setCursor] = useState(() => ({
 		name: store.currentRawModule?.name ?? (null as string | null),
 		model: store.currentRawModule?.model,
+		modelPath: store.currentRawModule?.modelPath,
 		room: { w: store.room.w, h: store.room.h, d: store.room.d }
 	}));
 
@@ -129,6 +130,7 @@ const CursorSystem = memo(function CursorSystem({
 			const next = {
 				name: raw?.name ?? null,
 				model: raw?.model,
+				modelPath: raw?.modelPath,
 				room: { w: store.room.w, h: store.room.h, d: store.room.d }
 			};
 
@@ -136,6 +138,7 @@ const CursorSystem = memo(function CursorSystem({
 				if (
 					prev.name === next.name &&
 					prev.model === next.model &&
+					prev.modelPath === next.modelPath &&
 					prev.room.w === next.room.w &&
 					prev.room.h === next.room.h &&
 					prev.room.d === next.room.d
@@ -171,7 +174,7 @@ const CursorSystem = memo(function CursorSystem({
 				scale={0.1}>
 				{typeof cursor.model != 'string' && cursor.model && (
 					<Center>
-						<Gltf src={getModuleModelSrc(cursor.name)} />
+						<Gltf src={getModuleModelSrc(cursor.name, cursor.modelPath)} />
 					</Center>
 				)}
 				{typeof cursor.model == 'string' && (
@@ -226,7 +229,7 @@ const ModuleShell = memo(function ModuleShell({
 											moduleName={entity.displayName || entity.name}>
 											{typeof entity.model != 'string' && (
 												<MeasuredModel
-														src={getModuleModelSrc(entity.name)}
+														src={getModuleModelSrc(entity.name, entity.modelPath)}
 													entity={entity as ModuleEntity}
 												/>
 											)}
@@ -242,7 +245,7 @@ const ModuleShell = memo(function ModuleShell({
 											moduleName={entity.displayName || entity.name}>
 											{typeof entity.model != 'string' && (
 												<FacadeConfig
-														src={getModuleModelSrc(entity.name)}
+														src={getModuleModelSrc(entity.name, entity.modelPath)}
 													entity={entity as ModuleEntity}
 												/>
 											)}

@@ -62,6 +62,7 @@ function deserializeEntity(snapshot: any): ModuleEntity {
   return {
     ...snapshot,
     model: def?.model ?? snapshot.model ?? null,
+    modelPath: def?.modelPath ?? snapshot.modelPath,
     handleColor: deserColor(snapshot.handleColor),
     color: deserColor(snapshot.color),
     size: deserVec3(snapshot.size),

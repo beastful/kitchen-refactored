@@ -51,6 +51,8 @@ export type ModuleType = 'wall' | 'floor' | 'tall' | 'base' | 'corner' | 'tech' 
 
 export interface ModuleDef {
   model: React.FC<any> | null | string;
+  /** Optional GLB path for modules whose file does not follow the name convention. */
+  modelPath?: string;
   type: ModuleType;
   price: number;
   name: string;
@@ -76,6 +78,8 @@ export interface ModuleEntity {
   price: number;
   size: Vector3;
   model: React.FC<any> | null | string;
+  /** Optional GLB path for modules whose file does not follow the name convention. */
+  modelPath?: string;
   position: Vector3;
   normal: Vector3;
   lock: Vector3;
@@ -148,6 +152,7 @@ export function toModuleEntity(source: ModulePlacementSource, position: Vector3,
     price: source.price,
     size: new Vector3(0.6, 0.8, 0.6),
     model: source.model,
+    modelPath: source.modelPath,
     position: position.clone(),
     normal: normal ? normal.clone() : new Vector3(0, 0, 1),
     lock: new Vector3(0, 0, 0),
