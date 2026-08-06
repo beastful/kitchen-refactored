@@ -93,7 +93,7 @@ function deserializeState(saved: any): Partial<Store> {
   copy.wallHeight = saved.wallHeight ?? 0.7;
   copy.room = saved.room ?? { d: 3, w: 4, h: 2 };
 
-  return copy;
+	return copy;
 }
 
 export const store = proxy<Store>({
