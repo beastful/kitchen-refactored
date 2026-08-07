@@ -405,6 +405,17 @@ const floor_data: ModuleDef[] = [
     },
     {
         model: ModuleExample,
+        modelPath: '/modules/M_SPL/M_SPL_9_Correct2.glb',
+        type: 'floor',
+        price: 3220,
+        name: 'M_SPL_9_CORRECT2',
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION],
+        image: '3YNSD/M_3YNSD_1_F_9_NN.obj.png',
+        displayName: 'Шкаф нижний 2 дверки 60см — Correct2',
+        displaySize: '600'
+    },
+    {
+        model: ModuleExample,
         type: 'floor',
         price: 3320,
         name: 'M_SPL_10',
