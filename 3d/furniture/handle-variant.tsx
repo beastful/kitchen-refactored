@@ -4,9 +4,8 @@ import { Model as Handle3 } from "@/handles/Handle3";
 import { Model as Handle4 } from "@/handles/Handle4";
 import { Model as Handle5 } from "@/handles/Handle5";
 import { Color, Group, Material, Mesh, MeshStandardMaterial } from "three";
-import { CATEGORY_FLOOR, CATEGORY_WALL } from "@/constants";
-import { ThreeElements, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, memo } from "react";
+import { ThreeElements } from "@react-three/fiber";
+import { useEffect, useRef, memo } from "react";
 import { ModuleEntity } from "@/types";
 
 const handleMaterialCache = new Map<string, MeshStandardMaterial>();
@@ -22,26 +21,12 @@ function getHandleMaterial(color: string | Color): MeshStandardMaterial {
 
 type HandleVariantProps = ThreeElements["group"] & {
     entity: ModuleEntity;
-    worldYRef: React.RefObject<number | null>;
 };
 
-function HandleVariantComponent({ entity, worldYRef, ...props }: HandleVariantProps) {
+function HandleVariantComponent({ entity, ...props }: HandleVariantProps) {
     const variant = entity.handleVariant + 1;
     const groupRef = useRef<Group>(null);
-    const handle4Ref = useRef<Group>(null);
     const originalMaterialsRef = useRef<Map<Mesh, Material | Material[]>>(new Map());
-
-    const handle4BaseOffset = useMemo(() => {
-        if (entity.tags.includes(CATEGORY_WALL)) {
-            return entity.position.y - entity.halfExtents[1];
-        }
-        if (entity.tags.includes(CATEGORY_FLOOR)) {
-            return 0.09;
-        }
-        return 0;
-    }, [entity.tags, entity.position.y, entity.halfExtents]);
-
-    const isWall = entity.tags.includes(CATEGORY_WALL);
 
     /* ── Apply cached material once per color ── */
     useEffect(() => {
@@ -59,26 +44,14 @@ function HandleVariantComponent({ entity, worldYRef, ...props }: HandleVariantPr
             }
         });
 
+        const originalMaterials = originalMaterialsRef.current;
         return () => {
-            originalMaterialsRef.current.forEach((originalMat, mesh) => {
+            originalMaterials.forEach((originalMat, mesh) => {
                 mesh.material = originalMat;
             });
-            originalMaterialsRef.current.clear();
+            originalMaterials.clear();
         };
     }, [entity.handleColor, variant]);
-
-    /* ── Imperative Handle4 offset ── */
-    useFrame(() => {
-        if (!handle4Ref.current) return;
-
-        // entity.name.includes("3YNSD")
-        
-        const z = isWall
-            ? -(handle4BaseOffset - (worldYRef.current ?? 0))
-            : -handle4BaseOffset;
-
-        handle4Ref.current.position.set(0, -0.018, z);
-    });
 
     return (
         <group ref={groupRef}>
@@ -86,7 +59,7 @@ function HandleVariantComponent({ entity, worldYRef, ...props }: HandleVariantPr
             {variant === 2 && <Handle2 scale={0.05} {...props} />}
             {variant === 3 && <Handle3 scale={0.05} {...props} />}
             {variant === 4 && (
-                <group ref={handle4Ref} rotation={[0, Math.PI, 0]}>
+                <group position={[0, -0.018, 0]} rotation={[0, Math.PI, 0]}>
                     <Handle4 scale={0.05} {...props} />
                 </group>
             )}
