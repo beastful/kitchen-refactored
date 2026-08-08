@@ -18,6 +18,7 @@ import {
   ROTATATABLE,
 } from './constants';
 import { SnapPlane } from './snapping-tools/types';
+import { FLOOR_MODULE_HEIGHT } from './lib/placement-geometry';
 
 export type CategoryTag =
   | typeof CATEGORY_ROOM
@@ -115,6 +116,7 @@ function createModuleId(): string {
 
 export function toModuleEntity(source: ModuleDef, position: Vector3, normal?: Vector3): ModuleEntity;
 export function toModuleEntity(source: ModuleEntity, position: Vector3, normal?: Vector3): ModuleEntity;
+export function toModuleEntity(source: ModulePlacementSource, position: Vector3, normal?: Vector3): ModuleEntity;
 export function toModuleEntity(source: ModulePlacementSource, position: Vector3, normal?: Vector3): ModuleEntity {
   if (isModuleEntity(source)) {
     return {
@@ -131,6 +133,7 @@ export function toModuleEntity(source: ModulePlacementSource, position: Vector3,
       snapPlanes: source.snapPlanes.map((plane) => ({
         point: [...plane.point] as [number, number, number],
         normal: [...plane.normal] as [number, number, number],
+        offset: plane.offset,
       })),
       halfExtents: [...source.halfExtents] as [number, number, number],
     };
@@ -150,7 +153,7 @@ export function toModuleEntity(source: ModulePlacementSource, position: Vector3,
     handleColor: new Color('#807B77'),
     hingeReplacement: 0,
     price: source.price,
-    size: new Vector3(0.6, 0.8, 0.6),
+    size: new Vector3(0.6, source.type === 'floor' ? FLOOR_MODULE_HEIGHT : 0.8, 0.6),
     model: source.model,
     modelPath: source.modelPath,
     position: position.clone(),

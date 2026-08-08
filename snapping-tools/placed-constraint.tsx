@@ -52,7 +52,7 @@ function recalculate(
 
       const dir = Math.sign(_planeNormal[axis]);
       const h = axis === 'x' ? worldHalf.x : axis === 'y' ? worldHalf.y : worldHalf.z;
-      _result[axis] = _planePoint[axis] + h * dir;
+      _result[axis] = _planePoint[axis] + (h + (p.offset ?? 0)) * dir;
     }
 
     group.position.copy(_result);

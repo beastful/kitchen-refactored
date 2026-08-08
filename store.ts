@@ -93,6 +93,21 @@ function deserializeState(saved: any): Partial<Store> {
   copy.wallHeight = saved.wallHeight ?? 0.7;
   copy.room = saved.room ?? { d: 3, w: 4, h: 2 };
 
+  // Projects saved before the floor-height correction contain the old 800 mm
+  // slot and its old vertical centre. Migrate only that exact legacy value;
+  // future plinth variants can use their own explicit height without being
+  // overwritten here.
+  copy.modules = copy.modules.map((module: ModuleEntity) => {
+    if (module.type !== 'floor' || Math.abs(module.size.y - 0.8) > 0.001) {
+      return module;
+    }
+
+    module.size.y = 0.88;
+    module.position.y = -copy.room.h / 2 + module.size.y / 2;
+    module.lock = new Vector3(module.lock.x, module.position.y, module.lock.z);
+    return module;
+  });
+
 	return copy;
 }
 

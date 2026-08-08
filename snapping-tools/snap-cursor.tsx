@@ -15,7 +15,7 @@ const _v2 = new Vector3();
 const _v3 = new Vector3();
 const _bConstraint = new Box3();
 
-export function SnapCursor({ children, lockY = true, lock, ...groupProps }: SnapCursorProps) {
+export function SnapCursor({ children, lockY = true, lock, wallGap = 0, ...groupProps }: SnapCursorProps) {
   const snapContext = useSnapContext();
   const { position: cursorActualPos, rotationYaw, boundingBoxRef, halfExtents } = useSnapCursorTransform();
   const { updateCursorState } = useSnapCursor();
@@ -82,7 +82,13 @@ export function SnapCursor({ children, lockY = true, lock, ...groupProps }: Snap
       if (!normal) return;
 
       _v2.copy(normal).transformDirection(constraintObj.matrixWorld).normalize();
-      intersections.push([targetCenter, targetSize, _v2.clone()]);
+      const isRoomWall = Boolean(userData.roomWall) && wallGap > 0;
+      intersections.push([
+        targetCenter,
+        targetSize,
+        _v2.clone(),
+        isRoomWall ? wallGap : 0,
+      ]);
     });
 
     const isSnapped = intersections.length > 0;

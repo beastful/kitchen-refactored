@@ -17,7 +17,7 @@ import { SnapCursor } from '@/snapping-tools/snap-cursor';
 import { SnapPlacedObject } from '@/snapping-tools/placed-constraint';
 import { usePlacementData } from '@/snapping-tools/hooks/use-placement-data';
 import { store } from '@/store';
-import { ModuleEntity, toModuleEntity } from '@/types';
+import { ModuleDef, ModuleEntity, toModuleEntity } from '@/types';
 import { FacadeConfig } from '@/3d/furniture/assembler';
 import { MeasuredModel } from '@/3d/furniture/measured-model';
 import {
@@ -36,6 +36,7 @@ import { AnimationSystem } from './animation-system';
 import { MemoryAudit } from './memory-audit';
 import { LocalRuler } from './local-ruler';
 import { useValtioKey } from './hooks/use-key';
+import { FLOOR_MODULE_WALL_GAP } from '@/lib/placement-geometry';
 
 function getModuleModelSrc(name: string, modelPath?: string): string {
 	if (modelPath) return modelPath;
@@ -54,14 +55,16 @@ function ZCorrection({
 	halfExtents: [number, number, number];
 	entity: ModuleEntity;
 }) {
-	const largest_z = 0.73;
-	const z = halfExtents[2] * 2;
 	const type = entity.type;
+	const z = halfExtents[2] * 2;
 	const dontMove =
 		entity.tags.includes(CATEGORY_TECH) ||
 		entity.tags.includes(CATEGORY_ROOM) ||
-		type == 'wall';
-	const pos_z = dontMove == true ? 0 : (largest_z - z) * 10 - 0.5;
+		type == 'wall' ||
+		type == 'floor';
+	// Lower modules are normalized to their placement slot and must not receive
+	// the legacy depth correction that used to pull them toward the front.
+	const pos_z = dontMove ? 0 : (0.73 - z) * 10 - 0.5;
 	const isWindowOrDoor =
 		entity.tags.includes(EXPLICT_CASE_TUNNEL) || entity.name == 'Door';
 
@@ -119,6 +122,7 @@ const CursorSystem = memo(function CursorSystem({
 }) {
 	const [cursor, setCursor] = useState(() => ({
 		name: store.currentRawModule?.name ?? (null as string | null),
+		type: store.currentRawModule?.type ?? null,
 		model: store.currentRawModule?.model,
 		modelPath: store.currentRawModule?.modelPath,
 		room: { w: store.room.w, h: store.room.h, d: store.room.d }
@@ -129,6 +133,7 @@ const CursorSystem = memo(function CursorSystem({
 			const raw = store.currentRawModule;
 			const next = {
 				name: raw?.name ?? null,
+				type: raw?.type ?? null,
 				model: raw?.model,
 				modelPath: raw?.modelPath,
 				room: { w: store.room.w, h: store.room.h, d: store.room.d }
@@ -137,6 +142,7 @@ const CursorSystem = memo(function CursorSystem({
 			setCursor((prev) => {
 				if (
 					prev.name === next.name &&
+					prev.type === next.type &&
 					prev.model === next.model &&
 					prev.modelPath === next.modelPath &&
 					prev.room.w === next.room.w &&
@@ -169,6 +175,7 @@ const CursorSystem = memo(function CursorSystem({
 			<SnapCursor
 				lockY={lockY}
 				lock={lock}
+				wallGap={cursor.type === 'floor' ? FLOOR_MODULE_WALL_GAP : 0}
 				userData={{ layer: 'modules' }}
 				name='cursor'
 				scale={0.1}>
@@ -303,12 +310,15 @@ export default function Room() {
 			const position = new Vector3(...placement.position);
 			const normal = new Vector3(0, 0, 1);
 
+			// currentRawModule can contain either a catalog definition or a copied
+			// entity; toModuleEntity performs the runtime discrimination.
 			const entity = toModuleEntity(source, position, normal);
 			entity.openAngle = placement.rotation[1];
 
 			const snapPlanes = placement.snapPlanes.map((plane) => ({
 				point: [...plane.point] as [number, number, number],
-				normal: [...plane.normal] as [number, number, number]
+				normal: [...plane.normal] as [number, number, number],
+				offset: plane.offset,
 			}));
 
 			entity.lockY = lockYRef.current;

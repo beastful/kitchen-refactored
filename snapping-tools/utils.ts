@@ -209,13 +209,13 @@ export function computeSnappedPosition(
     let winnerDist = Infinity;
 
     for (const inter of group) {
-      const [center, targetSize, normal] = inter;
+      const [center, targetSize, normal, offset = 0] = inter;
       const dir = Math.sign(normal[axis]) || 1;
       const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
       const half = axis === 'y'
         ? cursorHalfExtents.y
         : (axis === 'x' ? worldHalfX : worldHalfZ);
-      const snappedCoord = surface + half * dir;
+      const snappedCoord = surface + (half + offset) * dir;
       const dist = Math.abs(cursorPos[axis] - snappedCoord);
 
       if (dist < winnerDist) {
@@ -225,13 +225,13 @@ export function computeSnappedPosition(
     }
 
     if (winner) {
-      const [center, targetSize, normal] = winner;
+      const [center, targetSize, normal, offset = 0] = winner;
       const dir = Math.sign(normal[axis]) || 1;
       const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
       const half = axis === 'y'
         ? cursorHalfExtents.y
         : (axis === 'x' ? worldHalfX : worldHalfZ);
-      out[axis] = surface + half * dir;
+      out[axis] = surface + (half + offset) * dir;
     }
   }
 
@@ -272,13 +272,13 @@ export function buildSnapPlanes(
     let winnerDist = Infinity;
 
     for (const inter of group) {
-      const [center, targetSize, normal] = inter;
+      const [center, targetSize, normal, offset = 0] = inter;
       const dir = Math.sign(normal[axis]) || 1;
       const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
       const half = axis === 'y'
         ? cursorHalfExtents.y
         : (axis === 'x' ? worldHalfX : worldHalfZ);
-      const snappedCoord = surface + half * dir;
+      const snappedCoord = surface + (half + offset) * dir;
       const dist = Math.abs(cursorPos[axis] - snappedCoord);
 
       if (dist < winnerDist) {
@@ -290,7 +290,7 @@ export function buildSnapPlanes(
     if (winner) winners.push(winner);
   }
 
-  return winners.map(([center, targetSize, normal]) => {
+  return winners.map(([center, targetSize, normal, offset = 0]) => {
     const axis = getDominantAxis(normal);
     const dir = Math.sign(normal[axis]) || 1;
     const surface = center[axis] + (targetSize[axis] * 0.5) * dir;
@@ -301,6 +301,7 @@ export function buildSnapPlanes(
     return {
       point,
       normal: [normal.x, normal.y, normal.z] as [number, number, number],
+      offset,
     };
   });
 }

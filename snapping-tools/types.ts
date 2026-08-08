@@ -10,6 +10,8 @@ export type StoredPointerEvent = ThreeEvent<PointerEvent> | null;
 export type SnapPlane = {
     point: [number, number, number];
     normal: [number, number, number];
+    /** Extra distance to keep between the snapped object's face and the plane. */
+    offset?: number;
 };
 
 export type CursorLiveState = {
@@ -40,12 +42,14 @@ export type SnapConstraintProps = ThreeElements['group'] & {
     ignoreNormals?: Vector3Tuple[];
     useCursor?: boolean;
     useDistance?: boolean;
+    roomWall?: boolean;
 };
 
 export interface SnapConstraintUserDataType {
     useCursor: boolean;
     useDistance: boolean;
     ignoreNormals: Vector3Tuple[];
+    roomWall?: boolean;
 }
 
 export interface StoredConstraint {
@@ -70,10 +74,12 @@ export type SnapCursorProps = ThreeElements['group'] & {
     children?: ReactNode;
     lockY: boolean;
     lock: Vector3;
+    wallGap?: number;
+    floorBaseY?: number;
     flipToFace?: boolean;
 };
 
-export type Intersection = [center: Vector3, size: Vector3, normal: Vector3];
+export type Intersection = [center: Vector3, size: Vector3, normal: Vector3, surfaceOffset?: number];
 
 export type SnapPlacedObjectProps = {
     id: string;

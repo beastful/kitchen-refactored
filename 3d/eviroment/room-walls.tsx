@@ -242,6 +242,7 @@ export function RoomWalls() {
         name="wall-z"
         useCursor
         useDistance
+        roomWall
         position={[0, 0, snap.room.w * 0.5 + depth * 0.5]}
       >
         <mesh name="wall" receiveShadow castShadow>
@@ -255,6 +256,7 @@ export function RoomWalls() {
         name="wall-x"
         useCursor
         useDistance
+        roomWall
         position={[snap.room.d * 0.5 + depth * 0.5, 0, 0]}
       >
         <mesh name="wall" receiveShadow castShadow>
@@ -268,6 +270,7 @@ export function RoomWalls() {
         name="wall-x"
         useCursor
         useDistance
+        roomWall
         position={[0, 0, -snap.room.w * 0.5 - depth * 0.5]}
       >
         <mesh name="wall" receiveShadow castShadow>
@@ -281,6 +284,7 @@ export function RoomWalls() {
         name="wall-m"
         useCursor
         useDistance
+        roomWall
         position={[
           -snap.room.d * 0.5 + depth * 0.5 - depth,
           0,
@@ -298,6 +302,7 @@ export function RoomWalls() {
         name="wall-m"
         useCursor
         useDistance
+        roomWall
         position={[
           -snap.room.d * 0.5 + depth * 0.5 - depth,
           0,

@@ -10,6 +10,7 @@ export function SnapConstraint({
     ignoreNormals,
     radius = 0.1,
     children,
+    roomWall = false,
     ...groupProps
 }: SnapConstraintProps) {
 
@@ -28,12 +29,18 @@ export function SnapConstraint({
     const userData: SnapConstraintUserDataType = {
         useCursor,
         useDistance,
-        ignoreNormals: ignoreNormals ?? []
+        ignoreNormals: ignoreNormals ?? [],
+        roomWall,
     };
 
     useEffect(() => {
         const id = Math.random().toString(36);
-        const userData: SnapConstraintUserDataType = { useCursor, useDistance, ignoreNormals: ignoreNormals ?? [] };
+        const userData: SnapConstraintUserDataType = {
+            useCursor,
+            useDistance,
+            ignoreNormals: ignoreNormals ?? [],
+            roomWall,
+        };
         const unregister = snapContext.registerConstraint({
             id,
             ref: realRef,
@@ -41,7 +48,7 @@ export function SnapConstraint({
             userData
         });
         return unregister;
-    }, [useCursor, useDistance, ignoreNormals, halfExtents, snapContext]);
+    }, [useCursor, useDistance, ignoreNormals, halfExtents, roomWall, snapContext]);
 
     return <>
         <group visible={false} ref={ref}>{children}</group>
