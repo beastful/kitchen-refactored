@@ -2,6 +2,7 @@ import { proxy, subscribe } from 'valtio';
 import { Color, Vector3 } from 'three';
 import { ModuleDef, ModuleEntity, ModulePlacementSource } from './types';
 import { data } from '@/data';
+import { FLOOR_MODULE_HEIGHT, getFloorModuleCenterY } from '@/lib/placement-geometry';
 
 const STORAGE_KEY = 'room-configurator-store';
 const DEFAULT_FLOOR_VALUE = 'assets/laminate_floor_02_diff_1k.jpg';
@@ -94,16 +95,17 @@ function deserializeState(saved: any): Partial<Store> {
   copy.room = saved.room ?? { d: 3, w: 4, h: 2 };
 
   // Projects saved before the floor-height correction contain the old 800 mm
-  // slot and its old vertical centre. Migrate only that exact legacy value;
-  // future plinth variants can use their own explicit height without being
-  // overwritten here.
+  // slot and its old vertical centre. Migrate only that exact legacy height;
+  // future plinth variants keep their own explicit geometry.
   copy.modules = copy.modules.map((module: ModuleEntity) => {
-    if (module.type !== 'floor' || Math.abs(module.size.y - 0.8) > 0.001) {
+    const legacyHeight = Math.abs(module.size.y - 0.8) <= 0.001;
+
+    if (module.type !== 'floor' || !legacyHeight) {
       return module;
     }
 
-    module.size.y = 0.88;
-    module.position.y = -copy.room.h / 2 + module.size.y / 2;
+    module.size.y = FLOOR_MODULE_HEIGHT;
+    module.position.y = getFloorModuleCenterY(copy.room.h, module.size.y / 2);
     module.lock = new Vector3(module.lock.x, module.position.y, module.lock.z);
     return module;
   });

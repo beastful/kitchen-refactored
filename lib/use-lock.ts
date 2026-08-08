@@ -4,7 +4,10 @@ import { ModuleEntity } from "@/types";
 import { useSnapshot } from "valtio";
 import { useSnapContext } from "@/snapping-tools/snap-provider";
 import { Store, store } from "@/store";
-import { FLOOR_MODULE_HEIGHT } from "@/lib/placement-geometry";
+import {
+    FLOOR_MODULE_HEIGHT,
+    getFloorModuleCenterY,
+} from "@/lib/placement-geometry";
 
 export function useLock() {
     const snap = useSnapshot(store)
@@ -35,16 +38,14 @@ export function useLock() {
     // Floor modules are centered at half their full 880 mm height.
     // Keeping this derived from one constant leaves room for a future
     // 100 mm plinth option without another magic offset here.
-    let floorY = -snap.room.h / 2 + FLOOR_MODULE_HEIGHT / 2;
+    const floorY = entityType === 'floor'
+        ? getFloorModuleCenterY(snap.room.h, FLOOR_MODULE_HEIGHT / 2)
+        : -snap.room.h / 2 + 0.43;
 
     if (snap.currentRawModule.tags.includes(EXPLICT_CASE_WINDOW)) {
         wallY = -(snap.room.h / 2 - state.halfExtents.y) + 0.5
     } else {
         wallY = -(snap.room.h / 2 - state.halfExtents.y) + snap.wallHeight + 0.9;
-    }
-
-    if (snap.currentRawModule.name == 'Door') {
-        floorY = -snap.room.h / 2;
     }
 
     return {
@@ -62,7 +63,9 @@ export function getLock(mod: ModuleEntity, snap: Store) {
     // Floor modules are centered at half their full 880 mm height.
     // Keeping this derived from one constant leaves room for a future
     // 100 mm plinth option without another magic offset here.
-    let floorY = -snap.room.h / 2 + FLOOR_MODULE_HEIGHT / 2;
+    const floorY = mod.type === 'floor'
+        ? getFloorModuleCenterY(snap.room.h, FLOOR_MODULE_HEIGHT / 2)
+        : -snap.room.h / 2 + 0.43;
 
     if (mod.tags.includes(EXPLICT_CASE_WINDOW)) {
         wallY = -(snap.room.h / 2 - mod.halfExtents[1]) + 0.5
