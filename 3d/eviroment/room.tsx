@@ -17,7 +17,7 @@ import { SnapCursor } from '@/snapping-tools/snap-cursor';
 import { SnapPlacedObject } from '@/snapping-tools/placed-constraint';
 import { usePlacementData } from '@/snapping-tools/hooks/use-placement-data';
 import { store } from '@/store';
-import { ModuleDef, ModuleEntity, toModuleEntity } from '@/types';
+import { ModuleEntity, ModulePlacementSource, toModuleEntity } from '@/types';
 import { FacadeConfig } from '@/3d/furniture/assembler';
 import { MeasuredModel } from '@/3d/furniture/measured-model';
 import {
@@ -27,7 +27,7 @@ import {
 import { ModuleMenu } from '@/3d/furniture/actions';
 import { RoomWalls } from '@/3d/eviroment/room-walls';
 import { Tabletop } from '@/3d/furniture/tabletop';
-import { Center, Gltf } from '@react-three/drei';
+import { Center } from '@react-three/drei';
 import { CATEGORY_ROOM, CATEGORY_TECH, EXPLICT_CASE_TUNNEL } from '@/constants';
 import { getLock, useLock } from '@/lib/use-lock';
 import { CursorRoom } from '@/snapping-tools/cursor-room';
@@ -120,8 +120,16 @@ const CursorSystem = memo(function CursorSystem({
 	lock: any;
 	visibilityRef: React.MutableRefObject<boolean>;
 }) {
-	const [cursor, setCursor] = useState(() => ({
-		name: store.currentRawModule?.name ?? (null as string | null),
+	const [cursor, setCursor] = useState<{
+		source: ModulePlacementSource | null;
+		name: string | null;
+		type: string | null;
+		model: ModulePlacementSource['model'] | undefined;
+		modelPath: string | undefined;
+		room: { w: number; h: number; d: number };
+	}>(() => ({
+		source: store.currentRawModule,
+		name: store.currentRawModule?.name ?? null,
 		type: store.currentRawModule?.type ?? null,
 		model: store.currentRawModule?.model,
 		modelPath: store.currentRawModule?.modelPath,
@@ -132,6 +140,7 @@ const CursorSystem = memo(function CursorSystem({
 		return subscribe(store, () => {
 			const raw = store.currentRawModule;
 			const next = {
+				source: raw,
 				name: raw?.name ?? null,
 				type: raw?.type ?? null,
 				model: raw?.model,
@@ -141,6 +150,7 @@ const CursorSystem = memo(function CursorSystem({
 
 			setCursor((prev) => {
 				if (
+					prev.source === next.source &&
 					prev.name === next.name &&
 					prev.type === next.type &&
 					prev.model === next.model &&
@@ -163,7 +173,31 @@ const CursorSystem = memo(function CursorSystem({
 		[visibilityRef]
 	);
 
-	if (!cursor.name) return null;
+	// Use the same classified/normalized model as the placed module. Measuring
+	// the raw GLB here makes the cursor and its tabletop hitbox larger whenever
+	// a model was exported in a different unit scale.
+	const previewEntity = useMemo(
+		() => cursor.source ? toModuleEntity(cursor.source, new Vector3()) : null,
+		[cursor.source]
+	);
+	const previewSrc = cursor.source && cursor.model
+		? typeof cursor.model === 'string'
+			? cursor.model
+			: getModuleModelSrc(cursor.name ?? '', cursor.modelPath)
+		: null;
+	const isMeasuredPreview = Boolean(
+		previewEntity &&
+		(previewEntity.tags.includes(CATEGORY_TECH) || previewEntity.tags.includes(CATEGORY_ROOM))
+	);
+	const previewModel = previewEntity && previewSrc ? (
+		isMeasuredPreview ? (
+			<MeasuredModel src={previewSrc} entity={previewEntity} />
+		) : (
+			<FacadeConfig src={previewSrc} entity={previewEntity} />
+		)
+	) : null;
+
+	if (!cursor.name || !previewModel) return null;
 
 	return (
 		<CursorRoom
@@ -179,16 +213,7 @@ const CursorSystem = memo(function CursorSystem({
 				userData={{ layer: 'modules' }}
 				name='cursor'
 				scale={0.1}>
-				{typeof cursor.model != 'string' && cursor.model && (
-					<Center>
-						<Gltf src={getModuleModelSrc(cursor.name, cursor.modelPath)} />
-					</Center>
-				)}
-				{typeof cursor.model == 'string' && (
-					<Center>
-						<Gltf src={cursor.model} />
-					</Center>
-				)}
+				<Center>{previewModel}</Center>
 			</SnapCursor>
 		</CursorRoom>
 	);
