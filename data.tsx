@@ -314,6 +314,17 @@ const floor_data: ModuleDef[] = [
     },
     {
         model: ModuleExample,
+        modelPath: '/modules/M_SPL/m_spl_1_Correct1.glb',
+        type: 'floor',
+        price: 2580,
+        name: 'M_SPL_1_CORRECT1',
+        tags: [CATEGORY_FLOOR, HAS_TABLETOP, HAS_CONFIGURATION, EXPLICT_CASE_STRAIGHT],
+        image: '/3YNSD/M_3YNSD_1_F_1_NN.obj.png',
+        displayName: 'Шкаф нижний с полкой 20см — Correct1',
+        displaySize: '200'
+    },
+    {
+        model: ModuleExample,
         type: 'floor',
         price: 2330,
         name: 'M_SPL_2',
