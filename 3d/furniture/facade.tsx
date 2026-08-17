@@ -34,7 +34,11 @@ function FacadeComponent({ entity, model }: FacadeProps) {
         const originalMaterial = model.material;
 
         let opacity = 0;
-        if (model.name.includes(`_${entity.facade}`)) {
+        if (entity.facade === "Gola") {
+            // The test GLB contains a dedicated shortened Gola facade.
+            // GLTFLoader removes dots from Blender duplicate suffixes.
+            opacity = model.name === "M_SPL_1_F_F001" ? 1 : 0;
+        } else if (model.name.includes(`_${entity.facade}`)) {
             opacity = 1;
         } else if (
             !model.name.includes(`_A`) &&

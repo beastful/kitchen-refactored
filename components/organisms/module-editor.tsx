@@ -20,6 +20,9 @@ export function ModuleConfig() {
         [snap.modules, snap.configurableEntity]
     );
 
+    // Gola is currently available only for the dedicated GLB test module.
+    const isGolaModule = currentModule?.name === "M_SPL_1_CORRECT1";
+
     // Sync local facade state when currentModule changes
     useEffect(() => {
         if (currentModule) {
@@ -103,6 +106,18 @@ export function ModuleConfig() {
                                         />
                                     </button>
                                 ))}
+                                {isGolaModule && (
+                                    <button
+                                        onClick={() => {
+                                            updateModuleField("facade", "Gola");
+                                            setCurrentFacade("Gola");
+                                        }}
+                                        className={`aspect-square rounded-2xl overflow-hidden shadow-md transition-all hover:scale-105 bg-[#807B77] text-white p-3 font-semibold ${currentFacade === "Gola" ? "ring-2 ring-[#F06900] ring-offset-2" : ""
+                                            }`}
+                                    >
+                                        Профиль Гола
+                                    </button>
+                                )}
                             </div>
                         </div>
 

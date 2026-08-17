@@ -51,9 +51,10 @@ function HandleComponent({ entity, model }: HandleProps) {
             isV: includesV,
             flagH: entity.handles === "H",
             flagV: entity.handles !== "H",
+            isGola: entity.facade === "Gola",
             UMFAngle: entity.tags.includes(EXPLICT_CASE_EXTRA_QPI) ? Math.PI / 4 : 0,
         };
-    }, [model.name, entity.handles, entity.tags]);
+    }, [model.name, entity.facade, entity.handles, entity.tags]);
 
     const syncHandleTransform = useCallback(() => {
         if (!meshRef.current || !model.parent) return;
@@ -110,7 +111,7 @@ function HandleComponent({ entity, model }: HandleProps) {
     return createPortal(
         <group ref={meshRef}>
             <group rotation={[0, flags.UMFAngle, 0]}>
-                {((flags.includesH && flags.flagH) || (flags.includesNoneOfFlags && flags.flagH)) && (
+                {!flags.isGola && ((flags.includesH && flags.flagH) || (flags.includesNoneOfFlags && flags.flagH)) && (
                     <group rotation={[Math.PI / 2, 0, 0]}>
                         <HandleVariant
                             entity={entity}
@@ -119,7 +120,7 @@ function HandleComponent({ entity, model }: HandleProps) {
                         />
                     </group>
                 )}
-                {((flags.isV && flags.flagV) || (flags.includesNoneOfFlags && flags.flagV)) && (
+                {!flags.isGola && ((flags.isV && flags.flagV) || (flags.includesNoneOfFlags && flags.flagV)) && (
                     <group rotation={[Math.PI / 2, 0, 0]}>
                         <HandleVariant
                             entity={entity}

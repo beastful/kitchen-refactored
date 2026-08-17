@@ -26,12 +26,20 @@ export function Shell({ entity, model }: ShellProps) {
 
     useEffect(() => {
         const originalMaterial = model.material;
+        const originalVisible = model.visible;
+        const isGolaModule = entity.name === "M_SPL_1_CORRECT1" && entity.facade === "Gola";
+
+        // The new GLB stores both cabinet variants in one scene.
+        // Gola uses the dedicated .002 cabinet; the regular cabinet is hidden.
+        // GLTFLoader removes dots from Blender duplicate suffixes.
+        model.visible = !isGolaModule || model.name === "M_SPL_1002";
         model.material = getMatcapMaterial(matcapTexture);
 
         return () => {
+            model.visible = originalVisible;
             model.material = originalMaterial;
         };
-    }, [model, matcapTexture]);
+    }, [entity.facade, entity.name, model, matcapTexture]);
 
     return null;
 }
