@@ -18,8 +18,8 @@ export function getFloorModuleCenterY(
   return -roomHeight / 2 + ROOM_FLOOR_TOP_OFFSET + moduleHalfHeight;
 }
 
-/** Standard countertop depth in world metres. */
-export const TABLETOP_DEPTH = 0.6;
+/** Standard countertop depth used by the previous stable layout. */
+export const TABLETOP_DEPTH = 0.7;
 
-/** Countertop front overhang relative to the normalized cabinet depth. */
-export const TABLETOP_FRONT_OVERHANG = 0.03;
+/** Local placement offset used by the previous stable countertop layout. */
+export const TABLETOP_LOCAL_OFFSET = 3.3;

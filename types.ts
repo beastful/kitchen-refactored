@@ -54,6 +54,8 @@ export interface ModuleDef {
   model: React.FC<any> | null | string;
   /** Optional GLB path for modules whose file does not follow the name convention. */
   modelPath?: string;
+  /** Physical dimensions in metres: width, height, depth. */
+  size?: [number, number, number];
   type: ModuleType;
   price: number;
   name: string;
@@ -153,7 +155,9 @@ export function toModuleEntity(source: ModulePlacementSource, position: Vector3,
     handleColor: new Color('#807B77'),
     hingeReplacement: 0,
     price: source.price,
-    size: new Vector3(0.6, source.type === 'floor' ? FLOOR_MODULE_HEIGHT : 0.8, 0.6),
+    size: source.size
+      ? new Vector3(...source.size)
+      : new Vector3(0.6, source.type === 'floor' ? FLOOR_MODULE_HEIGHT : 0.8, 0.6),
     model: source.model,
     modelPath: source.modelPath,
     position: position.clone(),
@@ -173,6 +177,8 @@ export function toModuleEntity(source: ModulePlacementSource, position: Vector3,
 export function toModuleDef(entity: ModuleEntity): ModuleDef {
   return {
     model: entity.model,
+    modelPath: entity.modelPath,
+    size: [entity.size.x, entity.size.y, entity.size.z],
     type: entity.type as ModuleType,
     price: entity.price,
     name: entity.name,

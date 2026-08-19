@@ -6,7 +6,7 @@ import { useTexture } from '@react-three/drei';
 import { ReactNode, useMemo } from 'react';
 import { useSnapshot } from 'valtio';
 import * as THREE from 'three';
-import { TABLETOP_DEPTH, TABLETOP_FRONT_OVERHANG } from '@/lib/placement-geometry';
+import { TABLETOP_DEPTH, TABLETOP_LOCAL_OFFSET } from '@/lib/placement-geometry';
 
 const isTextureValue = (value?: string | null) => {
 	if (!value) return false;
@@ -66,12 +66,13 @@ export function Tabletop({
 }) {
 	const snap = useSnapshot(store);
 	const tabletopWidth = entity.halfExtents[0] * 2 * 10;
-	const cabinetDepth = entity.halfExtents[2] * 2;
 	const tabletopDepth = TABLETOP_DEPTH;
-	const tabletopLocalY = entity.size.y * 5 + snap.tabletop[0] * 5;
-	// The room wall is behind the cabinet (+z), so its front edge is -z.
-	// Solve from that front edge to leave exactly 30 mm of overhang.
-	const tabletopLocalZ = (tabletopDepth - cabinetDepth) * 5 - TABLETOP_FRONT_OVERHANG * 10;
+	// Keep the previously tested position: the countertop is 70 cm deep,
+	// its centre is 3.3 local units in front of the cabinet rear edge, and it
+	// extends slightly beyond the facade.
+	const tabletopLocalY = 4.4;
+	const tabletopLocalZ =
+		-entity.halfExtents[2] * 10 + TABLETOP_LOCAL_OFFSET;
 
 	return (
 		<group>

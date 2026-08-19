@@ -314,7 +314,8 @@ const floor_data: ModuleDef[] = [
     },
     {
         model: ModuleExample,
-        modelPath: '/modules/M_SPL/m_spl_1_Correct1.glb',
+        modelPath: '/modules/M_SPL/M_SPL_1_Correct.glb',
+        size: [0.2, 0.88, 0.6],
         type: 'floor',
         price: 2580,
         name: 'M_SPL_1_CORRECT1',

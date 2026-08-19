@@ -8,8 +8,14 @@ import { ModuleEntity } from "@/types";
 
 export interface FacadeAnimData {
   mesh: Mesh;
+  originalX: number;
   originalZ: number;
   originalRotX: number;
+  hingeSign: number;
+  hingeLocalX: number;
+  hingeLocalZ: number;
+  hingePivotX: number;
+  hingePivotZ: number;
   originalRotY: number;
   entity: ModuleEntity;
 }
@@ -30,7 +36,18 @@ export function AnimationSystem() {
 
     // ── Facades ──
     for (const data of animationRegistry.facades.values()) {
-      const { mesh, originalZ, originalRotX, originalRotY, entity } = data;
+      const {
+        mesh,
+        originalZ,
+        originalRotX,
+        originalRotY,
+        hingeSign,
+        hingeLocalX,
+        hingeLocalZ,
+        hingePivotX,
+        hingePivotZ,
+        entity,
+      } = data;
       const sideSign = Math.sign(mesh.position.x);
       const signY = Math.sign(mesh.position.y);
 
@@ -39,7 +56,18 @@ export function AnimationSystem() {
       let targetRotY = originalRotY;
 
       if (entity.tags.includes(EXPLICT_CASE_STRAIGHT)) {
-        targetZ = originalZ + open * 3;
+        if (entity.name === "M_SPL_1_CORRECT1") {
+          // Correct1 is a hinged door. Its old straight-case rule translated
+          // the whole facade by open * 3 instead of rotating it around a side.
+          const delta = hingeSign * open;
+          const cos = Math.cos(delta);
+          const sin = Math.sin(delta);
+          targetRotY = originalRotY + delta;
+          targetZ = hingePivotZ - (-sin * hingeLocalX + cos * hingeLocalZ);
+          mesh.position.x = hingePivotX - (cos * hingeLocalX + sin * hingeLocalZ);
+        } else {
+          targetZ = originalZ + open * 3;
+        }
       } else if (entity.tags.includes(EXPLICT_CASE_TOP)) {
         targetRotX = originalRotX + (-sideSign * open);
       } else if (entity.tags.includes(EXPLICT_CASE_FOLD)) {
@@ -50,6 +78,9 @@ export function AnimationSystem() {
       }
 
       mesh.position.z = targetZ;
+      if (!(entity.tags.includes(EXPLICT_CASE_STRAIGHT) && entity.name === "M_SPL_1_CORRECT1") || open === 0) {
+        mesh.position.x = data.originalX;
+      }
       mesh.rotation.x = targetRotX;
       mesh.rotation.y = targetRotY;
     }

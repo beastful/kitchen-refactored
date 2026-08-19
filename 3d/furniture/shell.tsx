@@ -3,6 +3,10 @@ import { useEffect, useRef } from "react";
 import { Color, Material, Mesh, MeshMatcapMaterial, Texture } from "three";
 import { ModuleEntity } from "@/types";
 
+function canonicalNodeName(name: string): string {
+    return name.replace(/[.]/g, "");
+}
+
 const matcapMaterialCache = new Map<string, MeshMatcapMaterial>();
 
 function getMatcapMaterial(texture: Texture): MeshMatcapMaterial {
@@ -29,10 +33,15 @@ export function Shell({ entity, model }: ShellProps) {
         const originalVisible = model.visible;
         const isGolaModule = entity.name === "M_SPL_1_CORRECT1" && entity.facade === "Gola";
 
-        // The new GLB stores both cabinet variants in one scene.
-        // Gola uses the dedicated .002 cabinet; the regular cabinet is hidden.
-        // GLTFLoader removes dots from Blender duplicate suffixes.
-        model.visible = !isGolaModule || model.name === "M_SPL_1002";
+        // The new GLB stores both cabinet variants in one scene. Hide only
+        // the regular cabinet in Gola mode: hiding every non-target object
+        // would also hide the parent scene that contains the Gola cabinet.
+        const name = canonicalNodeName(model.name);
+        if (name === "M_SPL_1001") {
+            Object.assign(model, { visible: !isGolaModule });
+        } else if (name === "M_SPL_1002") {
+            Object.assign(model, { visible: isGolaModule });
+        }
         model.material = getMatcapMaterial(matcapTexture);
 
         return () => {
