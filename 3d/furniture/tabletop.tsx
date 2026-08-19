@@ -6,7 +6,11 @@ import { useTexture } from '@react-three/drei';
 import { ReactNode, useMemo } from 'react';
 import { useSnapshot } from 'valtio';
 import * as THREE from 'three';
-import { TABLETOP_DEPTH, TABLETOP_LOCAL_OFFSET } from '@/lib/placement-geometry';
+import {
+	FLOOR_MODULE_HEIGHT,
+	TABLETOP_DEPTH,
+	TABLETOP_FRONT_OVERHANG
+} from '@/lib/placement-geometry';
 
 const isTextureValue = (value?: string | null) => {
 	if (!value) return false;
@@ -67,12 +71,21 @@ export function Tabletop({
 	const snap = useSnapshot(store);
 	const tabletopWidth = entity.halfExtents[0] * 2 * 10;
 	const tabletopDepth = TABLETOP_DEPTH;
-	// Keep the previously tested position: the countertop is 70 cm deep,
-	// its centre is 3.3 local units in front of the cabinet rear edge, and it
-	// extends slightly beyond the facade.
-	const tabletopLocalY = 4.4;
+	// Position the countertop by its real front overhang instead of a fixed
+	// offset. The cabinet is centered at zero and the local scene is scaled by
+	// 0.1, so convert the world dimensions to the module's local units.
+	const cabinetHeight =
+		entity.type === 'floor'
+			? FLOOR_MODULE_HEIGHT
+			: entity.halfExtents[1] * 2;
+	const tabletopLocalY =
+		(cabinetHeight * 10) / 2 +
+		(snap.tabletop[0] * 10) / 2 +
+		0.001 * 10;
 	const tabletopLocalZ =
-		-entity.halfExtents[2] * 10 + TABLETOP_LOCAL_OFFSET;
+		entity.halfExtents[2] * 10 -
+		(tabletopDepth * 10) / 2 +
+		TABLETOP_FRONT_OVERHANG * 10;
 
 	return (
 		<group>

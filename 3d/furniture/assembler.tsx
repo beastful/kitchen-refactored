@@ -56,14 +56,9 @@ export function FacadeConfig({ src, entity }: AssemblerProps) {
     const tmpModules: Object3D[] = [];
 
     model.traverse((obj: Object3D) => {
-      // In the Correct GLB this node is the built-in Gola profile inside
-      // M_SPL_1.002, not a door. Keep it with the static cabinet so it does
-      // not rotate when the facade opens.
-      const isGolaProfilePart = obj.name.replace(/[.]/g, "") === "M_SPL_1_F_F001";
-
-      if (obj.name.includes("_F") && classifier.isFacade(obj) && !isGolaProfilePart) {
+      if (obj.name.includes("_F") && classifier.isFacade(obj)) {
         tmpFacades.push(obj);
-      } else if (obj.name.includes("_F") && classifier.isShelf(obj) && !obj.name.includes("_IC") && !isGolaProfilePart) {
+      } else if (obj.name.includes("_F") && classifier.isShelf(obj) && !obj.name.includes("_IC")) {
         tmpShelves.push(obj);
       } else if (obj.name.includes("_IC")) {
         tmpFacades.push(obj);
