@@ -562,6 +562,7 @@ function SaveModal({
 }) {
   const [write, saving, saveSuccess, savedId] = useSaveToBack()
   const [linkCopied, setLinkCopied] = useState(false)
+  const [checkoutPending, setCheckoutPending] = useState(false)
 
   const parentOrigin = useSnapshot(store).parentOrigin || window.location.origin
   const shareUrl = savedId
@@ -578,6 +579,37 @@ function SaveModal({
       previewUrl: previewDataUrl || '',
     })
   }, [write])
+
+  /* Переход на страницу оформления /constructor/order/?id=... */
+  const sendCheckout = useCallback((id: string) => {
+    window.parent.postMessage(
+      JSON.stringify({ requestId: String(Math.random()), action: 'checkout', data: { id } }),
+      '*'
+    )
+  }, [])
+
+  /* «Отправить на проверку»: сохраняем проект (если ещё не сохранён), затем
+     родительская страница (constructor/index.php) редиректит на /constructor/order/?id=... */
+  const handleCheckout = useCallback(() => {
+    if (savedId) {
+      sendCheckout(savedId)
+      return
+    }
+    setCheckoutPending(true)
+    captureScenePreview().then((previewDataUrl) => {
+      write(
+        {
+          name: 'Новый проект',
+          state_data: getJson(),
+          previewUrl: previewDataUrl || '',
+        },
+        (newId) => {
+          setCheckoutPending(false)
+          sendCheckout(newId)
+        }
+      )
+    })
+  }, [savedId, sendCheckout, write])
 
   const handleCopyLink = useCallback(() => {
     if (!shareUrl) return
@@ -635,6 +667,18 @@ function SaveModal({
             text-white shadow-md`}
         >
           {saving ? 'Сохранение…' : saveSuccess ? '✓ Сохранено' : 'Сохранить текущий проект'}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleCheckout}
+          disabled={saving || checkoutPending}
+          className={`w-full py-2.5 px-4 rounded-lg font-medium transition cursor-pointer
+            ${saving || checkoutPending ? 'opacity-60 cursor-wait' : ''}
+            bg-[#2b2620] hover:bg-[#1d1915]
+            text-white shadow-md`}
+        >
+          {saving || checkoutPending ? 'Сохранение…' : 'Отправить на проверку'}
         </button>
 
         {/* Индикатор захвата превью */}

@@ -9,7 +9,7 @@ const isLocalhost = () => {
 };
 
 export function useSaveToBack(): [
-    (payload: Record<string, unknown> | string) => void,
+    (payload: Record<string, unknown> | string, onSuccess?: (id: string) => void) => void,
     boolean,
     boolean,
     string | null
@@ -29,7 +29,7 @@ export function useSaveToBack(): [
         return () => clearTimeout(timer);
     }, [success]);
 
-    const write = useCallback((payload: Record<string, unknown> | string) => {
+    const write = useCallback((payload: Record<string, unknown> | string, onSuccess?: (id: string) => void) => {
         if (typeof window === 'undefined') return;
 
         setLoading(true);
@@ -77,6 +77,7 @@ export function useSaveToBack(): [
                 setLoading(false);
                 setSuccess(true);
                 setSavedId(localId);
+                onSuccess?.(localId);
             } catch (e) {
                 console.error('[useSaveToBack] localStorage failed:', e);
                 pendingRef.current.delete(requestId);
@@ -103,6 +104,7 @@ export function useSaveToBack(): [
                 setSuccess(isSuccess);
                 if (isSuccess && data.id) {
                     setSavedId(String(data.id));
+                    onSuccess?.(String(data.id));
                 } else {
                     setSavedId(null);
                 }
