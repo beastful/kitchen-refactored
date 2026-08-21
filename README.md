@@ -34,3 +34,33 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Деплой (тестовый хостинг на NetAngels)
+
+Собирается как статический экспорт (`output: 'export'`, `basePath: '/constructor3d'`),
+раздаётся с того же сервера, что и сайт: `https://yasnaya-mebel.na4u.ru/constructor3d/`.
+
+```bash
+npm run build                       # собирает out/
+FTP_USER=... FTP_PASS=... ./deploy-netangels.sh
+```
+
+Родительская страница конструктора (`constructor/index.php` на сайте) по умолчанию
+грузит приложение с `https://kitchen-demo.onrender.com/`. Для теста локальной копии:
+
+```
+https://yasnaya-mebel.na4u.ru/constructor/?app=constructor3d
+```
+
+`?app=` принимает относительный путь на том же домене; дефолт не меняется.
+Когда появится доступ к onrender (или другому хостингу) — поменять адрес в
+`constructor/index.php` и при желании удалить override.
+
+Важно: все пути к ассетам в коде относительные (без ведущего `/`) — это позволяет
+хостить приложение в любой подпапке. На корневом хостинге (onrender) они тоже работают.
+
+Проверка после деплоя:
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://yasnaya-mebel.na4u.ru/constructor3d/
+curl -s -o /dev/null -w "%{http_code}\n" https://yasnaya-mebel.na4u.ru/constructor3d/modules/M_SPL/M_SPL_1_Correct.glb
+```

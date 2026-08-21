@@ -10,9 +10,9 @@ import { SnapProvider } from '@/snapping-tools/snap-provider';
 import { useTexture } from '@react-three/drei';
 import { loadProductFromBitrix, loadSharedFromBitrix } from '@/lib/get-states';
 
-useTexture.preload('/matcap/mc1.png');
-useTexture.preload('/matcap/mc2.png');
-useTexture.preload('/matcap/mc3.png');
+useTexture.preload('matcaps/mc1.png');
+useTexture.preload('matcaps/mc2.png');
+useTexture.preload('matcaps/mc3.png');
 
 function BiggerScreen() {
   return
@@ -99,7 +99,7 @@ function Home() {
             <div className="w-full h-[100vh] flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #faf0ea 0%, #f5e6d8 100%)' }}>
                 <div className="flex flex-col items-center gap-6">
                     {/* Логотип */}
-                    <img src="/logo.png" alt="Ясная Мебель" className="h-10 mb-2" />
+                    <img src="logo.png" alt="Ясная Мебель" className="h-10 mb-2" />
                     
                     {/* Спиннер */}
                     <div className="relative w-16 h-16">

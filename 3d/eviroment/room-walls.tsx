@@ -10,8 +10,8 @@ const DEFAULT_FLOOR_TEXTURE = 'assets/laminate_floor_02_diff_1k.jpg'
 
 const FLOOR_TEXTURES: Record<string, string> = {
   'floor-laminate-default': DEFAULT_FLOOR_TEXTURE,
-  'floor-laminate-gray-v1': '/floor/floor-gray-v1.jpg',
-  'floor-laminate-gray-v2': '/floor/floor-gray-v2.jpg',
+  'floor-laminate-gray-v1': 'floor/floor-gray-v1.jpg',
+  'floor-laminate-gray-v2': 'floor/floor-gray-v2.jpg',
 }
 
 const isTexturePath = (value?: string | null) => {

@@ -65,8 +65,8 @@ const TABLETOP_SURFACE_OPTIONS: SurfaceOption[] = [
   })),
   {
     type: 'texture',
-    value: '/tabletop/marble.png',
-    preview: '/tabletop/marble.png',
+    value: 'tabletop/marble.png',
+    preview: 'tabletop/marble.png',
     label: 'Чёрный тунис',
   },
   // {
@@ -93,13 +93,13 @@ const FLOOR_SURFACE_OPTIONS: SurfaceOption[] = [
   {
     type: 'texture',
     value: 'floor-laminate-gray-v1',
-    preview: '/floor/floor-gray-v1.jpg',
+    preview: 'floor/floor-gray-v1.jpg',
     label: 'Серый ламинат 1',
   },
   {
     type: 'texture',
     value: 'floor-laminate-gray-v2',
-    preview: '/floor/floor-gray-v2.jpg',
+    preview: 'floor/floor-gray-v2.jpg',
     label: 'Серый ламинат 2',
   },
 ]
@@ -724,7 +724,7 @@ function Header() {
 
   return (
     <header className="flex items-center w-full absolute top-0 left-0 p-5 gap-5 pr-15">
-      <img src="/logo.png" alt="Logo" className="h-8" />
+      <img src="logo.png" alt="Logo" className="h-8" />
       <div className="flex-1" />
       <Hint
         lineStyle="w-[4px] h-[60px] translate-x-[25px] translate-y-[90%]"

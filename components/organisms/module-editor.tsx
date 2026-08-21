@@ -186,7 +186,7 @@ export function ModuleConfig() {
                                             }`}
                                     >
                                         <img
-                                            src={`/handles/Handle_0${variant + 1}.png`}
+                                            src={`handles/Handle_0${variant + 1}.png`}
                                             alt={`Ручка вариант ${variant + 1}`}
                                             className="rounded-md w-full aspect-auto"
                                         />

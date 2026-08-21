@@ -7,7 +7,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('/Handle5.glb')
+  const { nodes, materials } = useGLTF('Handle5.glb')
   return (
     <group {...props} dispose={null}>
       <group name="Scene" />
@@ -15,4 +15,4 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('/Handle5.glb')
+useGLTF.preload('Handle5.glb')

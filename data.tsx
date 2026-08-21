@@ -314,7 +314,7 @@ const floor_data: ModuleDef[] = [
     },
     {
         model: ModuleExample,
-        modelPath: '/modules/M_SPL/M_SPL_1_Correct.glb',
+        modelPath: 'modules/M_SPL/M_SPL_1_Correct.glb',
         size: [0.2, 0.88, 0.6],
         type: 'floor',
         price: 2580,
@@ -406,7 +406,7 @@ const floor_data: ModuleDef[] = [
     },
     {
         model: ModuleExample,
-        modelPath: '/modules/M_SPL/M_SPL_9_Correct.glb',
+        modelPath: 'modules/M_SPL/M_SPL_9_Correct.glb',
         type: 'floor',
         price: 3220,
         name: 'M_SPL_9_CORRECT',
@@ -417,7 +417,7 @@ const floor_data: ModuleDef[] = [
     },
     {
         model: ModuleExample,
-        modelPath: '/modules/M_SPL/M_SPL_9_Correct2.glb',
+        modelPath: 'modules/M_SPL/M_SPL_9_Correct2.glb',
         type: 'floor',
         price: 3220,
         name: 'M_SPL_9_CORRECT2',
@@ -2299,42 +2299,42 @@ const tech_data: ModuleDef[] = [
     //     image: '/UML/UML/M_UML_1_F_1.obj.png'
     // },
     {
-        model: '/modules/TECH/Stove.glb',
+        model: 'modules/TECH/Stove.glb',
         type: 'floor',
         price: 14500,
         name: 'Stove',
         tags: [CATEGORY_TECH, INCONFIGURABLE],
-        image: '/previews/TECH/Stove.png',
+        image: 'previews/TECH/Stove.png',
         displayName: 'Плита',
         displaySize: ''
     },
     {
-        model: '/modules/TECH/Refrigirator.glb',
+        model: 'modules/TECH/Refrigirator.glb',
         type: 'floor',
         price: 14500,
         name: 'Refrigirator',
         tags: [CATEGORY_TECH, INCONFIGURABLE],
-        image: '/previews/TECH/Refrigirator.png',
+        image: 'previews/TECH/Refrigirator.png',
         displayName: 'Холодильник',
         displaySize: ''
     },
     {
-        model: '/modules/TECH/KitchenHoodLarge.glb',
+        model: 'modules/TECH/KitchenHoodLarge.glb',
         type: 'wall',
         price: 14500,
         name: 'KitchenHoodLarge',
         tags: [CATEGORY_TECH, INCONFIGURABLE],
-        image: '/previews/TECH/kitchen_hood_large.png',
+        image: 'previews/TECH/kitchen_hood_large.png',
         displayName: 'Вытяжка',
         displaySize: ''
     },
     {
-        model: '/modules/TECH/Microwave.glb',
+        model: 'modules/TECH/Microwave.glb',
         type: 'floor',
         price: 14500,
         name: 'Microwave',
         tags: [CATEGORY_TECH, INCONFIGURABLE, ROTATATABLE],
-        image: '/previews/TECH/microwave.png',
+        image: 'previews/TECH/microwave.png',
         displayName: 'Микроволновка',
         displaySize: ''
     },
@@ -2354,7 +2354,7 @@ const tech_data: ModuleDef[] = [
         price: 3460,
         name: 'M_DSY_1',
         tags: [HAS_TABLETOP, CATEGORY_TECH, INCONFIGURABLE],
-        image: '/previews/DSY/M_DSY_1.png',
+        image: 'previews/DSY/M_DSY_1.png',
         displayName: 'Шкаф под духовку 45см',
         displaySize: '450'
     },
@@ -2364,29 +2364,29 @@ const tech_data: ModuleDef[] = [
         price: 3750,
         name: 'M_DSY_2',
         tags: [HAS_TABLETOP, CATEGORY_TECH, INCONFIGURABLE],
-        image: '/previews/DSY/M_DSY_2.png',
+        image: 'previews/DSY/M_DSY_2.png',
         displayName: 'Шкаф под духовку 60см',
         displaySize: '600'
     },
 ]
 const room_data: ModuleDef[] = [
     {
-        model: '/modules/ROOM/Window.glb',
+        model: 'modules/ROOM/Window.glb',
         type: 'wall',
         price: 14500,
         name: 'Window',
         tags: [CATEGORY_ROOM, EXPLICT_CASE_TUNNEL, EXPLICT_CASE_WINDOW, INCONFIGURABLE],
-        image: '/previews/ROOM/Window.png',
+        image: 'previews/ROOM/Window.png',
         displayName: '',
         displaySize: ''
     },
     {
-        model: '/modules/ROOM/Door.glb',
+        model: 'modules/ROOM/Door.glb',
         type: 'floor',
         price: 14500,
         name: 'Door',
         tags: [EXPLICT_CASE_DOUBLE, CATEGORY_ROOM, EXPLICT_CASE_TUNNEL, INCONFIGURABLE],
-        image: '/previews/ROOM/Door2.png',
+        image: 'previews/ROOM/Door2.png',
         displayName: '',
         displaySize: ''
     },

@@ -251,7 +251,7 @@ export function PDFExportButton() {
         }}
       >
         <div style={{ marginBottom: '24px' }}>
-          <img src="/logo.png" alt="Logo" style={{ maxHeight: '50px' }} />
+          <img src="logo.png" alt="Logo" style={{ maxHeight: '50px' }} />
         </div>
 
         <div

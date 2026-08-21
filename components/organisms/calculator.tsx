@@ -92,7 +92,7 @@ export function CalculatorComponent() {
                                                         <div className="flex items-center gap-4">
                                                             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                                                                 <img
-                                                                    src={`/previews/${m_folder}/${module.name}.png`}
+                                                                    src={`previews/${m_folder}/${module.name}.png`}
                                                                     alt={module.name}
                                                                     className="w-10 h-10 object-contain"
                                                                 />
