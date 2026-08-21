@@ -632,7 +632,8 @@ function SaveModal({
   if (!showSave) return null
 
   return (
-    <div className="fixed top-[50%] right-[50%] translate-x-[-50%] translate-y-[-50%] z-[100]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
+      <div className="pointer-events-auto max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl">
       <div className="flex pb-2">
         <div className="w-full" />
         <div
@@ -712,6 +713,7 @@ function SaveModal({
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   )
