@@ -4,7 +4,7 @@
 # Приложение собирается в out/ (см. next.config.ts: output: 'export', basePath: '/constructor3d')
 # и раздаётся из подпапки https://yasnaya-mebel.na4u.ru/constructor3d/
 # Родительская страница конструктора (constructor/index.php) подключает его через
-# ?app=constructor3d, дефолт остаётся https://kitchen-demo.onrender.com/
+# ?app=constructor3d; по умолчанию сайт использует этот же сервер.
 #
 # Использование:
 #   npm run build
@@ -36,12 +36,21 @@ fi
 cd "$SRC"
 
 TMPLIST=$(mktemp)
-find . -type f ! -name '.DS_Store' | sed 's|^\./||' > "$TMPLIST"
-TOTAL=$(wc -l < "$TMPLIST" | tr -d ' ')
+trap 'rm -f "$TMPLIST"' EXIT
+# Список строится заново при каждом запуске: статического лимита на число файлов нет.
+# Нулевой разделитель позволяет корректно загружать имена с пробелами и спецсимволами.
+find . -type f ! -name '.DS_Store' -print0 > "$TMPLIST"
+TOTAL=$(tr -cd '\0' < "$TMPLIST" | wc -c | tr -d ' ')
 echo "Загружаю $TOTAL файлов в ftp://$FTP_HOST$REMOTE_DIR/ (JOBS=$JOBS) ..."
 
+if [ "$TOTAL" -eq 0 ]; then
+  echo "В каталоге $SRC нет файлов для загрузки."
+  exit 0
+fi
+
+
 upload_one() {
-  local rel="$1"
+  local rel="${1#./}"
   local target="${REMOTE_DIR}/${rel}"
   local attempt ok=0
   for attempt in 1 2 3; do
@@ -64,8 +73,9 @@ export -f upload_one
 export REMOTE_DIR FTP_HOST FTP_USER FTP_PASS
 
 FAILED=0
-xargs -P "$JOBS" -I{} bash -c 'upload_one "$1" || exit 255' _ {} < "$TMPLIST" || FAILED=1
-rm -f "$TMPLIST"
+# Не используем код выхода 255: xargs прекращает обработку очереди при 255,
+# а нам важно попытаться отправить каждый найденный файл и собрать все ошибки.
+xargs -0 -P "$JOBS" -I{} bash -c 'upload_one "$1" || exit 1' _ {} < "$TMPLIST" || FAILED=1
 
 if [ "$FAILED" -ne 0 ]; then
   echo "Есть ошибки загрузки — проверьте вывод выше." >&2
