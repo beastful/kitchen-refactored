@@ -5,14 +5,13 @@ import { useSnapshot } from "valtio";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { Color } from "three";
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { hinges } from "@/data";
 import { COLORS } from "@/constants";
 import { ModuleEntity } from "@/types";
 
 export function ModuleConfig() {
     const snap = useSnapshot(store);
-    const [currentFacade, setCurrentFacade] = useState("A");
 
     // Find the configurable module from the store
     const currentModule = useMemo(
@@ -23,12 +22,6 @@ export function ModuleConfig() {
     // Gola is currently available only for the dedicated GLB test module.
     const isGolaModule = currentModule?.name === "M_SPL_1_CORRECT1";
 
-    // Sync local facade state when currentModule changes
-    useEffect(() => {
-        if (currentModule) {
-            setCurrentFacade(currentModule.facade);
-        }
-    }, [currentModule]);
     // Helper to update module fields directly in the store
     const updateModuleField = <K extends Exclude<keyof ModuleEntity, 'snapPlanes'>>(
         field: K,
@@ -37,8 +30,48 @@ export function ModuleConfig() {
         if (!currentModule) return;
         const index = store.modules.findIndex((m) => m.id === currentModule.id);
         if (index !== -1) {
+            // Valtio uses this intentional nested mutation to preserve Three.js object identity.
+            // eslint-disable-next-line react-hooks/immutability
             store.modules[index][field] = value;
         }
+    };
+
+    const replacementSlots = currentModule?.bpapi_replaces_catalog ?? [];
+
+    const getReplacementEffectTotal = (slotId: number, replaceId: number) => {
+        const slot = replacementSlots.find((item) => item.slot_id === slotId);
+        const option = slot?.options.find((item) => item.replace_id === replaceId);
+        return Number(option?.effect?.total ?? 0);
+    };
+
+    const selectReplacement = (slotId: number, replaceId: number | null) => {
+        if (!currentModule || !currentModule.supplier_id) return;
+
+        const index = store.modules.findIndex((module) => module.id === currentModule.id);
+        if (index === -1) return;
+
+        const currentSelections = [...(store.modules[index].bpapi_replaces ?? [])];
+        const previousSelection = currentSelections.find((item) => item.slot_id === slotId);
+        const previousTotal = previousSelection
+            ? getReplacementEffectTotal(slotId, previousSelection.replace_id)
+            : 0;
+        const basePrice = Number(store.modules[index].price ?? 0) - previousTotal;
+        const nextSelections = currentSelections.filter((item) => item.slot_id !== slotId);
+
+        if (replaceId !== null) {
+            nextSelections.push({
+                module_id: Number(currentModule.supplier_id),
+                slot_id: slotId,
+                replace_id: replaceId,
+            });
+        }
+
+        const nextTotal = nextSelections.reduce(
+            (sum, item) => sum + getReplacementEffectTotal(item.slot_id, item.replace_id),
+            0
+        );
+        updateModuleField("bpapi_replaces", nextSelections);
+        updateModuleField("price", basePrice + nextTotal);
     };
 
     if (!currentModule) return null;
@@ -94,9 +127,8 @@ export function ModuleConfig() {
                                         key={type}
                                         onClick={() => {
                                             updateModuleField("facade", type);
-                                            setCurrentFacade(type);
                                         }}
-                                        className={`relative aspect-square rounded-2xl overflow-hidden shadow-md transition-all hover:scale-105 ${currentFacade === type ? "ring-2 ring-[#F06900] ring-offset-2" : ""
+                                        className={`relative aspect-square rounded-2xl overflow-hidden shadow-md transition-all hover:scale-105 ${currentModule.facade === type ? "ring-2 ring-[#F06900] ring-offset-2" : ""
                                             }`}
                                     >
                                         <img
@@ -110,9 +142,8 @@ export function ModuleConfig() {
                                     <button
                                         onClick={() => {
                                             updateModuleField("facade", "Gola");
-                                            setCurrentFacade("Gola");
                                         }}
-                                        className={`aspect-square rounded-2xl overflow-hidden shadow-md transition-all hover:scale-105 bg-[#807B77] text-white p-3 font-semibold ${currentFacade === "Gola" ? "ring-2 ring-[#F06900] ring-offset-2" : ""
+                                        className={`aspect-square rounded-2xl overflow-hidden shadow-md transition-all hover:scale-105 bg-[#807B77] text-white p-3 font-semibold ${currentModule.facade === "Gola" ? "ring-2 ring-[#F06900] ring-offset-2" : ""
                                             }`}
                                     >
                                         Профиль Гола
@@ -192,7 +223,60 @@ export function ModuleConfig() {
                             </div>
                         </div>
 
-                        {/* Hinge replacement */}
+                        {/* BpApi replacements */}
+                        {replacementSlots.length > 0 && currentModule.supplier_id && (
+                            <div>
+                                <div className="text-base font-semibold text-gray-700 mb-3">Варианты замены</div>
+                                <div className="space-y-5">
+                                    {replacementSlots.map((slot) => {
+                                        const selected = (currentModule.bpapi_replaces ?? []).find(
+                                            (item) => item.slot_id === slot.slot_id
+                                        );
+                                        return (
+                                            <div key={slot.slot_id} className="space-y-2">
+                                                <div className="text-sm text-gray-600">
+                                                    {slot.name || `Слот ${slot.slot_id}`}
+                                                </div>
+                                                <div className="grid grid-cols-1 gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => selectReplacement(slot.slot_id, null)}
+                                                        className={`px-3 py-2 text-left rounded-lg border text-sm ${
+                                                            !selected
+                                                                ? 'border-[#F06900] bg-orange-50 text-[#F06900]'
+                                                                : 'border-gray-200 hover:bg-gray-50'
+                                                        }`}
+                                                    >
+                                                        По умолчанию
+                                                    </button>
+                                                    {slot.options.map((option) => (
+                                                        <button
+                                                            type="button"
+                                                            key={`${slot.slot_id}-${option.replace_id}`}
+                                                            onClick={() => selectReplacement(slot.slot_id, option.replace_id)}
+                                                            className={`px-3 py-2 text-left rounded-lg border text-sm ${
+                                                                selected?.replace_id === option.replace_id
+                                                                    ? 'border-[#F06900] bg-orange-50 text-[#F06900]'
+                                                                    : 'border-gray-200 hover:bg-gray-50'
+                                                            }`}
+                                                        >
+                                                            <span>{option.name}</span>
+                                                            {option.effect?.label && (
+                                                                <span className="ml-2 text-xs opacity-70">
+                                                                    ({option.effect.label})
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Legacy local hinge replacement */}
                         <div>
                             <div className="text-base font-semibold text-gray-700 mb-3">Замена петель</div>
                             <div className="flex gap-4">

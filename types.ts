@@ -44,6 +44,36 @@ export type CaseTag =
 
 export type TabletopOption = [thickness: number, name: string, pricePerM2: number];
 
+export interface BpApiEffect {
+  type?: string;
+  delta?: number;
+  total?: number;
+  label?: string;
+}
+
+export interface BpApiReplaceOption {
+  replace_id: number;
+  id?: number;
+  name: string;
+  effect?: BpApiEffect;
+  groups?: Array<{ level?: number; id?: number; name?: string }>;
+}
+
+export interface BpApiReplaceSlot {
+  slot_id: number;
+  default_id?: number;
+  name: string;
+  quantity?: number;
+  groups?: Array<{ level?: number; id?: number; name?: string }>;
+  options: BpApiReplaceOption[];
+}
+
+export interface BpApiReplaceSelection {
+  module_id: number;
+  slot_id: number;
+  replace_id: number;
+}
+
 export type WallHeight = 0.6 | 0.7;
 
 export type ModuleTag = CategoryTag | FeatureTag | CaseTag;
@@ -63,6 +93,10 @@ export interface ModuleDef {
   image: string;
   displayName: string;
   displaySize: string;
+  /** ID номенклатуры CRM Business Plus, если модуль пришёл из BpApi. */
+  supplier_id?: number | null;
+  /** Доступные слоты замен, полученные с сервера; это не выбранные замены. */
+  bpapi_replaces_catalog?: BpApiReplaceSlot[];
 }
 
 export interface ModuleEntity {
@@ -94,6 +128,12 @@ export interface ModuleEntity {
   color: Color;
   snapPlanes: SnapPlane[];
   halfExtents: [number, number, number];
+  /** ID номенклатуры CRM Business Plus. */
+  supplier_id?: number | null;
+  /** Выбранные замены в формате importOrder.replaces. */
+  bpapi_replaces: BpApiReplaceSelection[];
+  /** Доступные слоты замен, полученные с сервера. */
+  bpapi_replaces_catalog?: BpApiReplaceSlot[];
 }
 
 export type ModulePlacementSource = ModuleDef | ModuleEntity;
@@ -138,6 +178,17 @@ export function toModuleEntity(source: ModulePlacementSource, position: Vector3,
         offset: plane.offset,
       })),
       halfExtents: [...source.halfExtents] as [number, number, number],
+      supplier_id: source.supplier_id,
+      bpapi_replaces: source.bpapi_replaces?.map((replace) => ({ ...replace })) ?? [],
+      bpapi_replaces_catalog: source.bpapi_replaces_catalog?.map((slot) => ({
+        ...slot,
+        groups: slot.groups?.map((group) => ({ ...group })),
+        options: slot.options.map((option) => ({
+          ...option,
+          effect: option.effect ? { ...option.effect } : undefined,
+          groups: option.groups?.map((group) => ({ ...group })),
+        })),
+      })),
     };
   }
 
@@ -171,6 +222,9 @@ export function toModuleEntity(source: ModulePlacementSource, position: Vector3,
     color: new Color('#CAC0B4'),
     snapPlanes: [],
     halfExtents: [0, 0, 0],
+    supplier_id: source.supplier_id,
+    bpapi_replaces: [],
+    bpapi_replaces_catalog: source.bpapi_replaces_catalog,
   };
 }
 
@@ -186,6 +240,8 @@ export function toModuleDef(entity: ModuleEntity): ModuleDef {
     image: entity.image,
     displayName: entity.displayName,
     displaySize: '',
+    supplier_id: entity.supplier_id,
+    bpapi_replaces_catalog: entity.bpapi_replaces_catalog,
   };
 }
 
