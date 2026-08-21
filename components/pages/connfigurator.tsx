@@ -251,7 +251,7 @@ const ToolButton = memo(
     icon,
   }: {
     active: boolean
-    onClick: () => void
+    onClick: React.MouseEventHandler<HTMLButtonElement>
     icon: React.ReactNode
   }) => (
     <button
@@ -267,7 +267,12 @@ const ToolButton = memo(
 )
 ToolButton.displayName = 'ToolButton'
 
-function Toolbar({ onOpenSaveModal }: { onOpenSaveModal: () => void }) {
+type SaveModalAnchor = {
+  left: number
+  bottom: number
+}
+
+function Toolbar({ onOpenSaveModal }: { onOpenSaveModal: (anchor: SaveModalAnchor) => void }) {
   const snap = useSnapshot(store)
 
   const handleToggleDoors = useCallback(() => {
@@ -286,13 +291,33 @@ function Toolbar({ onOpenSaveModal }: { onOpenSaveModal: () => void }) {
     store.calculatorWindow = true
   }, [])
 
+  const handleOpenSave = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      const rect = event.currentTarget.getBoundingClientRect()
+      const modalWidth = Math.min(320, window.innerWidth - 32)
+      const halfModalWidth = modalWidth / 2
+      const viewportPadding = 16
+      const buttonCenter = rect.left + rect.width / 2
+      const left = Math.min(
+        Math.max(buttonCenter, viewportPadding + halfModalWidth),
+        window.innerWidth - viewportPadding - halfModalWidth
+      )
+
+      onOpenSaveModal({
+        left,
+        bottom: window.innerHeight - rect.top + 16,
+      })
+    },
+    [onOpenSaveModal]
+  )
+
   return (
     <footer className="flex items-end gap-4 w-full absolute bottom-0 left-0 p-5 z-10 pr-15">
       <ToolButton active={snap.openAngle !== 0} onClick={handleToggleDoors} icon={<DoorOpen size={20} />} />
       <ToolButton active={snap.ruler} onClick={handleToggleRuler} icon={<Ruler size={20} />} />
       <ToolButton active={snap.groupEdit} onClick={handleOpenGroupEdit} icon={<Columns3Cog size={20} />} />
       <div className="flex-1" />
-      <ToolButton active={false} onClick={onOpenSaveModal} icon={<Save size={20} />} />
+      <ToolButton active={false} onClick={handleOpenSave} icon={<Save size={20} />} />
       <ToolButton active={false} onClick={() => {}} icon={<Printer size={20} />} />
       <ToolButton active={false} onClick={handleOpenCalculator} icon={<Calculator size={20} />} />
       <PDFExportButton />
@@ -555,9 +580,11 @@ function SidebarContent() {
 
 function SaveModal({
   showSave,
+  anchor,
   onClose,
 }: {
   showSave: boolean
+  anchor: SaveModalAnchor | null
   onClose: () => void
 }) {
   const [write, saving, saveSuccess, savedId] = useSaveToBack()
@@ -629,11 +656,18 @@ function SaveModal({
     })
   }, [shareUrl])
 
-  if (!showSave) return null
+  if (!showSave || !anchor) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
-      <div className="pointer-events-auto w-80 max-w-full max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl">
+    <div className="fixed inset-0 z-[100] pointer-events-none">
+      <div
+        className="pointer-events-auto absolute w-80 max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl"
+        style={{
+          left: anchor.left,
+          bottom: anchor.bottom,
+          transform: 'translateX(-50%)',
+        }}
+      >
       <div className="flex pb-2">
         <div className="w-full" />
         <div
@@ -741,18 +775,26 @@ function Header() {
 
 export default function Configurator() {
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [saveModalAnchor, setSaveModalAnchor] = useState<SaveModalAnchor | null>(null)
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  const handleOpenSaveModal = useCallback(() => setShowSaveModal(true), [])
+  const handleOpenSaveModal = useCallback((anchor: SaveModalAnchor) => {
+    setSaveModalAnchor(anchor)
+    setShowSaveModal(true)
+  }, [])
   const handleCloseSaveModal = useCallback(() => setShowSaveModal(false), [])
 
   return (
     <>
-      <SaveModal showSave={showSaveModal} onClose={handleCloseSaveModal} />
+      <SaveModal
+        showSave={showSaveModal}
+        anchor={saveModalAnchor}
+        onClose={handleCloseSaveModal}
+      />
 
       <div className="flex h-screen w-full bg-indigo-100">
         <div className="w-full relative">
