@@ -632,8 +632,8 @@ function SaveModal({
   if (!showSave) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
-      <div className="pointer-events-auto max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
+      <div className="pointer-events-auto w-80 max-w-full max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl">
       <div className="flex pb-2">
         <div className="w-full" />
         <div
@@ -696,7 +696,7 @@ function SaveModal({
                 type="text"
                 readOnly
                 value={shareUrl}
-                className="flex-1 text-xs text-gray-700 bg-gray-50 rounded-md px-2 py-1.5 border border-gray-200 truncate"
+                className="flex-1 min-w-0 text-xs text-gray-700 bg-gray-50 rounded-md px-2 py-1.5 border border-gray-200 truncate"
                 onClick={(e) => (e.target as HTMLInputElement).select()}
               />
               <button
