@@ -103,7 +103,7 @@ export function GroupEdit() {
                                                 className="aspect-square bg-gray-100 rounded-xl p-2 transition-all hover:scale-105"
                                             >
                                                 <img
-                                                    src={`handles/Handle_0${variant + 1}.png`}
+                                                    src={`./handles/Handle_0${variant + 1}.png`}
                                                     alt={`Ручка ${variant + 1}`}
                                                     className="w-full h-full object-contain"
                                                 />
@@ -124,7 +124,7 @@ export function GroupEdit() {
                                                 style={{ backgroundColor: color }}
                                             >
                                                 <img
-                                                    src="/handle_template.png"
+                                                    src="./handle_template.png"
                                                     alt=""
                                                     className="w-full h-full object-cover mix-blend-multiply opacity-80"
                                                 />
@@ -201,7 +201,7 @@ export function GroupEdit() {
                                                 className="aspect-square bg-gray-100 rounded-xl p-2 transition-all hover:scale-105"
                                             >
                                                 <img
-                                                    src={`handles/Handle_0${variant + 1}.png`}
+                                                    src={`./handles/Handle_0${variant + 1}.png`}
                                                     alt={`Ручка ${variant + 1}`}
                                                     className="w-full h-full object-contain"
                                                 />
@@ -222,7 +222,7 @@ export function GroupEdit() {
                                                 style={{ backgroundColor: color }}
                                             >
                                                 <img
-                                                    src="/handle_template.png"
+                                                    src="./handle_template.png"
                                                     alt=""
                                                     className="w-full h-full object-cover mix-blend-multiply opacity-80"
                                                 />

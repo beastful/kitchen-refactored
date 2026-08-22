@@ -5,7 +5,6 @@ import { useSnapshot } from "valtio";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { Color } from "three";
-import { useMemo } from "react";
 import { hinges } from "@/data";
 import { COLORS } from "@/constants";
 import { ModuleEntity } from "@/types";
@@ -14,10 +13,7 @@ export function ModuleConfig() {
     const snap = useSnapshot(store);
 
     // Find the configurable module from the store
-    const currentModule = useMemo(
-        () => snap.modules.find((m) => m.id === snap.configurableEntity),
-        [snap.modules, snap.configurableEntity]
-    );
+    const currentModule = snap.modules.find((m) => m.id === snap.configurableEntity);
 
     // Gola is currently available only for the dedicated GLB test module.
     const isGolaModule = currentModule?.name === "M_SPL_1_CORRECT1";
@@ -28,7 +24,7 @@ export function ModuleConfig() {
         value: ModuleEntity[K]
     ) => {
         if (!currentModule) return;
-        const index = store.modules.findIndex((m) => m.id === currentModule.id);
+        const index = store.modules.findIndex((m) => m.id === snap.configurableEntity);
         if (index !== -1) {
             // Valtio uses this intentional nested mutation to preserve Three.js object identity.
             store.modules[index][field] = value;
@@ -185,7 +181,7 @@ export function ModuleConfig() {
                                             }`}
                                     >
                                         <img
-                                            src={`handles/Handle_0${variant + 1}.png`}
+                                            src={`./handles/Handle_0${variant + 1}.png`}
                                             alt={`Ручка вариант ${variant + 1}`}
                                             className="rounded-md w-full aspect-auto"
                                         />
@@ -208,14 +204,14 @@ export function ModuleConfig() {
                                         <div
                                             style={{
                                                 backgroundColor: color,
-                                                maskImage: "url(/handle_template_mask.svg)",
+                                                maskImage: "url(./handle_template_mask.svg)",
                                                 maskSize: "100%",
-                                                WebkitMaskImage: "url(/handle_template_mask.svg)",
+                                                WebkitMaskImage: "url(./handle_template_mask.svg)",
                                                 WebkitMaskSize: "100%",
                                             }}
                                             className="w-full aspect-square rounded-xl cursor-pointer"
                                         >
-                                            <img src="/handle_template.png" alt="Шаблон ручки" className="opacity-0 w-full h-full" />
+                                            <img src="./handle_template.png" alt="Шаблон ручки" className="opacity-0 w-full h-full" />
                                         </div>
                                     </button>
                                 ))}

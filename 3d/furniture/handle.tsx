@@ -151,6 +151,7 @@ function HandleComponent({ entity, model }: HandleProps) {
                 {!flags.isGola && ((flags.includesH && flags.flagH) || (flags.includesNoneOfFlags && flags.flagH)) && (
                     <group rotation={[Math.PI / 2, 0, 0]}>
                         <HandleVariant
+                            key={`handle-${entity.id}-${entity.handleVariant}-H`}
                             entity={entity}
                             scale={0.05}
                             rotation={[0, Math.PI / 2, 0]}
@@ -160,6 +161,7 @@ function HandleComponent({ entity, model }: HandleProps) {
                 {!flags.isGola && ((flags.isV && flags.flagV) || (flags.includesNoneOfFlags && flags.flagV)) && (
                     <group rotation={[Math.PI / 2, 0, 0]}>
                         <HandleVariant
+                            key={`handle-${entity.id}-${entity.handleVariant}-V`}
                             entity={entity}
                             scale={0.05}
                             rotation={[0, 0, 0]}
