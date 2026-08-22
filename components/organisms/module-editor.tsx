@@ -31,7 +31,6 @@ export function ModuleConfig() {
         const index = store.modules.findIndex((m) => m.id === currentModule.id);
         if (index !== -1) {
             // Valtio uses this intentional nested mutation to preserve Three.js object identity.
-            // eslint-disable-next-line react-hooks/immutability
             store.modules[index][field] = value;
         }
     };

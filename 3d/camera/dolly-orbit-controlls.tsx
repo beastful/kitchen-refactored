@@ -1,4 +1,6 @@
 import { OrbitControls } from '@react-three/drei'
+import type { OrbitControlsProps } from '@react-three/drei'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
@@ -7,12 +9,9 @@ import { registerCamera } from '@/lib/camera-helper'
 export function ConstantForwardOrbitControls({
   stepSize = 1.0,
   ...props
-}: {
-  stepSize?: number
-  [key: string]: any
-}) {
+}: OrbitControlsProps & { stepSize?: number }) {
   const { camera, gl } = useThree()
-  const controlsRef = useRef<any>(null)
+  const controlsRef = useRef<OrbitControlsImpl>(null)
 
   useEffect(() => {
     const controls = controlsRef.current

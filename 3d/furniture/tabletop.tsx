@@ -43,12 +43,13 @@ function TexturedTabletopMaterial({
 	const texture = useTexture(src);
 
 	const preparedTexture = useMemo(() => {
-		texture.wrapS = THREE.RepeatWrapping;
-		texture.wrapT = THREE.RepeatWrapping;
-		texture.repeat.set(Math.max(1, width / 40), 1);
-		texture.colorSpace = THREE.SRGBColorSpace;
-		texture.needsUpdate = true;
-		return texture;
+		const prepared = texture.clone();
+		prepared.wrapS = THREE.RepeatWrapping;
+		prepared.wrapT = THREE.RepeatWrapping;
+		prepared.repeat.set(Math.max(1, width / 40), 1);
+		prepared.colorSpace = THREE.SRGBColorSpace;
+		prepared.needsUpdate = true;
+		return prepared;
 	}, [texture, width]);
 
 	return (
@@ -63,29 +64,43 @@ function TexturedTabletopMaterial({
 
 export function Tabletop({
 	children,
-	entity
+	entity,
+	renderedHeight
 }: {
 	children: ReactNode;
 	entity: ModuleEntity;
+	/** Measured height of the normalized GLB inside the sibling Center group. */
+	renderedHeight?: number | null;
 }) {
 	const snap = useSnapshot(store);
-	const tabletopWidth = entity.halfExtents[0] * 2 * 10;
+	if (!entity) return <group>{children}</group>;
+
+	const storedHalfExtents = entity.halfExtents;
+	const hasValidHalfExtents = storedHalfExtents.every((value) => value > 0);
+	const halfExtents = hasValidHalfExtents
+		? [...storedHalfExtents]
+		: [entity.size.x / 2, entity.size.y / 2, entity.size.z / 2];
+	const tabletop = (snap.tabletop ?? [0.026, 'Скиф 26', 600]) as [number, string, number];
+	const tabletopWidth = halfExtents[0] * 2 * 10;
 	const tabletopDepth = TABLETOP_DEPTH;
 	// Position the countertop by its real front overhang instead of a fixed
 	// offset. The cabinet is centered at zero and the local scene is scaled by
 	// 0.1, so convert the world dimensions to the module's local units.
-	const cabinetHeight =
-		entity.type === 'floor'
-			? FLOOR_MODULE_HEIGHT
-			: entity.halfExtents[1] * 2;
+	const cabinetHeightLocal =
+		renderedHeight ??
+		(entity.type === 'floor'
+			? FLOOR_MODULE_HEIGHT * 10
+			: halfExtents[1] * 2 * 10);
 	const tabletopLocalY =
-		(cabinetHeight * 10) / 2 +
-		(snap.tabletop[0] * 10) / 2 +
+		cabinetHeightLocal / 2 +			(tabletop[0] * 10) / 2 +
 		0.001 * 10;
+	// The GLB facade is on the +Z side of the cabinet. Keep the tabletop's
+	// front edge 30 mm in front of that side; the remaining depth stays behind
+	// the cabinet, providing the expected clearance at the wall.
 	const tabletopLocalZ =
-		entity.halfExtents[2] * 10 -
-		(tabletopDepth * 10) / 2 +
-		TABLETOP_FRONT_OVERHANG * 10;
+		halfExtents[2] * 10 +
+		TABLETOP_FRONT_OVERHANG * 10 -
+		(tabletopDepth * 10) / 2;
 
 	return (
 		<group>
@@ -97,10 +112,10 @@ export function Tabletop({
 					position={[0, tabletopLocalY, tabletopLocalZ]}>
 					<mesh>
 						<boxGeometry
-							args={[tabletopWidth, snap.tabletop[0] * 10, tabletopDepth * 10]}
+							args={[tabletopWidth, tabletop[0] * 10, tabletopDepth * 10]}
 						/>
 						<TabletopMaterial
-							value={snap.tabletopColor}
+							value={snap.tabletopColor ?? '#8E8478'}
 							width={tabletopWidth}
 						/>
 					</mesh>

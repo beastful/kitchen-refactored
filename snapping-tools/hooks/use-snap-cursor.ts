@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useSnapContext } from '../snap-provider';
-import { CursorLiveState, SnapPlane, PlacementResult } from '../types';
+import { CursorLiveState, SnapPlane } from '../types';
 
 // Императивный доступ для R3F useFrame
 export function useSnapCursor() {

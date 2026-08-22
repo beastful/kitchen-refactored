@@ -7,8 +7,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { Group, Mesh, Vector3, Box3, MeshBasicMaterial } from "three";
 import { useSnapCursor } from "./hooks/use-snap-cursor";
 import { SNAP_RADIUS, THROTTLE } from "./constants";
-import { Html } from "@react-three/drei";
-import { usePointerMove } from "./hooks/use-pointer-move";
 
 const _v1 = new Vector3();
 const _v2 = new Vector3();
@@ -48,7 +46,7 @@ export function SnapCursor({ children, lockY = true, lock, wallGap = 0, ...group
     });
   }, [children]);
 
-  useFrame((_state, _dt) => {
+  useFrame(() => {
     visualRef.current?.position.copy(cursorPos);
     visualRef.current?.rotation.set(0, rotationYaw, 0);
     hitboxRef.current?.position.copy(cursorPos);
@@ -115,10 +113,6 @@ export function SnapCursor({ children, lockY = true, lock, wallGap = 0, ...group
       snapPlanes,
     });
   });
-
-  const pointerEvent = usePointerMove<number>(() => {
-    return frameCount.current
-  }, frameCount.current)
 
   return (
     <>

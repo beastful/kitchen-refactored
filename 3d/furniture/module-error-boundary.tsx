@@ -1,7 +1,7 @@
 "use client"
 
 import { Component, ReactNode } from 'react';
-import { Box, Text } from '@react-three/drei';
+import { Box } from '@react-three/drei';
 
 interface Props {
     children: ReactNode;
@@ -19,15 +19,15 @@ export class ModuleErrorBoundary extends Component<Props, State> {
         this.state = { hasError: false, errorMessage: '' };
     }
 
-    static getDerivedStateFromError(error: any): State {
+    static getDerivedStateFromError(error: unknown): State {
         return {
             hasError: true,
-            errorMessage: error?.message || String(error),
+            errorMessage: error instanceof Error ? error.message : String(error),
         };
     }
 
-    componentDidCatch(error: any, info: any) {
-        console.warn(`[ModuleErrorBoundary] Failed to load module "${this.props.moduleName || 'unknown'}":`, error?.message || error);
+    componentDidCatch(error: Error) {
+        console.warn(`[ModuleErrorBoundary] Failed to load module "${this.props.moduleName || 'unknown'}":`, error.message || error);
     }
 
     // Reset error when moduleName changes (new module loaded)
@@ -39,7 +39,6 @@ export class ModuleErrorBoundary extends Component<Props, State> {
 
     render() {
         if (this.state.hasError) {
-            const moduleLabel = this.props.moduleName || '?';
             return (
                 <group>
                     {/* Semi-transparent orange placeholder box */}

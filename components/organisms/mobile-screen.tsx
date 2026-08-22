@@ -11,6 +11,6 @@ export function MobileScreen() {
                 Используйте ПК для доступа к конструктору
             </div>
         </div>
-        <img className="fixed bottom-0 right-0" src="/mobile.png"/>
+        <img className="fixed bottom-0 right-0" src="/mobile.png" alt="" />
     </div>
 }

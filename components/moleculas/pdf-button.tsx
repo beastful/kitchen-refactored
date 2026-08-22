@@ -33,7 +33,7 @@ export function PDFExportButton() {
   const [isExporting, setIsExporting] = useState(false);
   const [progressStep, setProgressStep] = useState<ExportStep>('');
 
-  const modules = snap_modules.filter((m: any) => !m.tags.includes(CATEGORY_ROOM));
+  const modules = snap_modules.filter((m) => !m.tags.includes(CATEGORY_ROOM));
 
   const modulesBaseTotal = modules.reduce((sum, m) => sum + m.price, 0);
 
@@ -291,7 +291,7 @@ export function PDFExportButton() {
             </tr>
           </thead>
           <tbody>
-            {modules.map((module: any) => {
+            {modules.map((module) => {
               const handleColorHex = `#${new Color(module.handleColor).getHexString()}`;
               const bodyColorHex = `#${new Color(module.color).getHexString()}`;
               const hingeIdx = Math.min(

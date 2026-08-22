@@ -2,8 +2,7 @@
 
 import { CATEGORY_ROOM } from '@/constants';
 import { store } from '@/store';
-import { ModuleEntity } from '@/types';
-import { DeleteIcon, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from 'react';
 import { Color } from 'three';
@@ -15,7 +14,7 @@ export function CalculatorComponent() {
 
     // Get all modules from store, excluding room entities
     const modules = useMemo(() => {
-        return snap.modules.filter((mod: any) =>
+        return snap.modules.filter((mod) =>
             !mod.tags.includes(CATEGORY_ROOM)
         );
     }, [snap.modules]);

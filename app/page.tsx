@@ -2,8 +2,8 @@
 
 import Configurator from '@/components/pages/connfigurator';
 import Introduction from '@/components/pages/introduction';
-import { hydrateStoreFromLocalStorage, store, setJson } from '@/store';
-import React, { Suspense, useEffect, useState } from 'react';
+import { store, setJson } from '@/store';
+import React, { useEffect, useState } from 'react';
 import { useSnapshot } from 'valtio';
 import { AnimatePresence, motion } from "motion/react"
 import { SnapProvider } from '@/snapping-tools/snap-provider';
@@ -13,10 +13,6 @@ import { loadProductFromBitrix, loadSharedFromBitrix } from '@/lib/get-states';
 useTexture.preload('matcaps/mc1.png');
 useTexture.preload('matcaps/mc2.png');
 useTexture.preload('matcaps/mc3.png');
-
-function BiggerScreen() {
-  return
-}
 
 function getQueryParam(param: string): string | null {
     if (typeof window === 'undefined') return null;
@@ -44,7 +40,7 @@ function Home() {
 
         // Если есть state_id — загружаем проект по ссылке (публичный доступ)
         if (stateId) {
-            loadSharedFromBitrix(stateId, (stateData: any) => {
+            loadSharedFromBitrix(stateId, (stateData: unknown) => {
                 try {
                     if (stateData && typeof stateData === 'object') {
                         setJson(JSON.stringify(stateData));
@@ -67,7 +63,7 @@ function Home() {
         }
 
         if (productId) {
-            loadProductFromBitrix(productId, (stateData: any) => {
+            loadProductFromBitrix(productId, (stateData: unknown) => {
                 try {
                     if (stateData && typeof stateData === 'object') {
                         setJson(JSON.stringify(stateData));

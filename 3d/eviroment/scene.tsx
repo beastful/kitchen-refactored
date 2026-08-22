@@ -1,19 +1,18 @@
 'use client'
 
 import { Canvas, useThree } from '@react-three/fiber'
-import { Stats } from '@react-three/drei'
-import React, { useState, useCallback, useRef, Suspense, useEffect } from 'react'
+import React, { useState, useCallback, Suspense, useEffect } from 'react'
 import * as THREE from 'three'
 import { ConstantForwardOrbitControls } from '@/3d/camera/dolly-orbit-controlls' // adjust path
 import Room from '@/3d/eviroment/room'
 
-function R3FSceneInner({ onContextLost }: { onContextLost: any }) {
+function R3FSceneInner({ onContextLost }: { onContextLost: () => void }) {
   const { gl } = useThree()
 
   useEffect(() => {
     const canvas = gl.domElement
 
-    const handleLost = (event: any) => {
+    const handleLost = (event: Event) => {
       event.preventDefault()
       console.warn('WebGL context lost')
       onContextLost()

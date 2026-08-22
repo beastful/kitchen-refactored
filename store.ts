@@ -6,6 +6,7 @@ import { FLOOR_MODULE_HEIGHT, getFloorModuleCenterY } from '@/lib/placement-geom
 
 const STORAGE_KEY = 'room-configurator-store';
 const DEFAULT_FLOOR_VALUE = 'assets/laminate_floor_02_diff_1k.jpg';
+type JsonRecord = Record<string, unknown>;
 
 export interface Store {
   page: string;
@@ -30,21 +31,35 @@ export interface Store {
   parentOrigin: string | null;
 }
 
+const asRecord = (value: unknown): JsonRecord | null => (
+  value !== null && typeof value === 'object' ? value as JsonRecord : null
+);
+
 const serColor = (c: Color) => {
   if (c instanceof Color) return c.getHex();
   return new Color(c).getHex();
 };
 
-const deserColor = (o: string | number) => new Color(o);
+const deserColor = (value: unknown) => (
+  typeof value === 'string' || typeof value === 'number'
+    ? new Color(value)
+    : new Color('#000000')
+);
 
 const serVec3 = (v: Vector3) => ({ x: v.x, y: v.y, z: v.z });
-const deserVec3 = (o: { x: number; y: number; z: number }) =>
-  new Vector3(o.x, o.y, o.z);
+const deserVec3 = (value: unknown) => {
+  const vector = asRecord(value);
+  return new Vector3(
+    Number(vector?.x ?? 0),
+    Number(vector?.y ?? 0),
+    Number(vector?.z ?? 0),
+  );
+};
 
 const findDefByName = (name: string): ModuleDef | undefined =>
   data.find((d) => d.name === name);
 
-function serializeEntity(entity: ModuleEntity): any {
+function serializeEntity(entity: ModuleEntity): JsonRecord {
   return {
     ...entity,
     model: undefined,
@@ -57,13 +72,16 @@ function serializeEntity(entity: ModuleEntity): any {
   };
 }
 
-function deserializeEntity(snapshot: any): ModuleEntity {
-  const def = findDefByName(snapshot.name);
+function deserializeEntity(snapshot: JsonRecord): ModuleEntity {
+  const name = typeof snapshot.name === 'string' ? snapshot.name : '';
+  const def = findDefByName(name);
+  const modelPath = typeof snapshot.modelPath === 'string' ? snapshot.modelPath : undefined;
 
   return {
     ...snapshot,
-    model: def?.model ?? snapshot.model ?? null,
-    modelPath: def?.modelPath ?? snapshot.modelPath,
+    name,
+    model: def?.model ?? null,
+    modelPath: def?.modelPath ?? modelPath,
     handleColor: deserColor(snapshot.handleColor),
     color: deserColor(snapshot.color),
     size: deserVec3(snapshot.size),
@@ -73,7 +91,7 @@ function deserializeEntity(snapshot: any): ModuleEntity {
   } as ModuleEntity;
 }
 
-function serializeState(state: Store): any {
+function serializeState(state: Store): JsonRecord {
   return {
     ...state,
     currentRawModule: null,
@@ -81,23 +99,34 @@ function serializeState(state: Store): any {
   };
 }
 
-function deserializeState(saved: any): Partial<Store> {
-  const copy = { ...saved };
-
-  copy.modules = saved.modules?.map(deserializeEntity) ?? [];
+function deserializeState(saved: JsonRecord): Partial<Store> {
+  const copy: JsonRecord = { ...saved };
+  const savedModules = Array.isArray(saved.modules) ? saved.modules : [];
+  copy.modules = savedModules
+    .map(asRecord)
+    .filter((module): module is JsonRecord => module !== null)
+    .map(deserializeEntity);
   copy.currentRawModule = null;
 
-  copy.floorColor = saved.floorColor ?? DEFAULT_FLOOR_VALUE;
-  copy.tabletopColor = saved.tabletopColor ?? '#8E8478';
-  copy.roomColor = saved.roomColor ?? '#F9F8F4';
-  copy.tabletop = saved.tabletop ?? [0.026, 'Скиф 26', 600];
-  copy.wallHeight = saved.wallHeight ?? 0.7;
-  copy.room = saved.room ?? { d: 3, w: 4, h: 2 };
+  copy.floorColor = typeof saved.floorColor === 'string' ? saved.floorColor : DEFAULT_FLOOR_VALUE;
+  copy.tabletopColor = typeof saved.tabletopColor === 'string' ? saved.tabletopColor : '#8E8478';
+  copy.roomColor = typeof saved.roomColor === 'string' ? saved.roomColor : '#F9F8F4';
+  copy.tabletop = Array.isArray(saved.tabletop) && saved.tabletop.length === 3
+    ? saved.tabletop as [number, string, number]
+    : [0.026, 'Скиф 26', 600];
+  copy.wallHeight = typeof saved.wallHeight === 'number' ? saved.wallHeight : 0.7;
+  const savedRoom = asRecord(saved.room);
+  copy.room = savedRoom &&
+    typeof savedRoom.d === 'number' &&
+    typeof savedRoom.w === 'number' &&
+    typeof savedRoom.h === 'number'
+    ? { d: savedRoom.d, w: savedRoom.w, h: savedRoom.h }
+    : { d: 3, w: 4, h: 2 };
 
   // Projects saved before the floor-height correction contain the old 800 mm
   // slot and its old vertical centre. Migrate only that exact legacy height;
   // future plinth variants keep their own explicit geometry.
-  copy.modules = copy.modules.map((module: ModuleEntity) => {
+  copy.modules = (copy.modules as ModuleEntity[]).map((module) => {
     const legacyHeight = Math.abs(module.size.y - 0.8) <= 0.001;
 
     if (module.type !== 'floor' || !legacyHeight) {
@@ -105,12 +134,12 @@ function deserializeState(saved: any): Partial<Store> {
     }
 
     module.size.y = FLOOR_MODULE_HEIGHT;
-    module.position.y = getFloorModuleCenterY(copy.room.h, module.size.y / 2);
+    module.position.y = getFloorModuleCenterY((copy.room as Store['room']).h, module.size.y / 2);
     module.lock = new Vector3(module.lock.x, module.position.y, module.lock.z);
     return module;
   });
 
-	return copy;
+  return copy as Partial<Store>;
 }
 
 export const store = proxy<Store>({
@@ -141,8 +170,9 @@ export function hydrateStoreFromLocalStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      Object.assign(store, deserializeState(parsed));
+      const parsed: unknown = JSON.parse(raw);
+      const saved = asRecord(parsed);
+      if (saved) Object.assign(store, deserializeState(saved));
     }
   } catch (e) {
     console.error('[Store] Failed to hydrate from localStorage:', e);
@@ -167,8 +197,10 @@ export function getJson(): string {
 
 export function setJson(json: string): void {
   try {
-    const parsed = JSON.parse(json);
-    Object.assign(store, deserializeState(parsed));
+    const parsed: unknown = JSON.parse(json);
+    const saved = asRecord(parsed);
+    if (!saved) throw new Error('State must be an object');
+    Object.assign(store, deserializeState(saved));
   } catch (e) {
     console.error('[Store] Failed to set state from JSON:', e);
     throw new Error('Invalid state JSON');

@@ -4,9 +4,6 @@ import { useSnapContext } from './snap-provider';
 import { SnapPlane, SnapPlacedObjectProps } from './types';
 import { useSnapshot } from 'valtio';
 import { store } from '@/store';
-import { Html } from '@react-three/drei';
-import { usePointerMove } from './hooks/use-pointer-move';
-import { useFrame } from '@react-three/fiber';
 
 const _result = new Vector3();
 const _planePoint = new Vector3();
@@ -56,7 +53,7 @@ function recalculate(
     }
 
     group.position.copy(_result);
-    if(lockY) group.position.y = lock.y;
+    if (lockY) group.position.y = lock.y;
   }
 }
 
@@ -64,15 +61,26 @@ export const SnapPlacedObject = forwardRef<Group, SnapPlacedObjectProps>(
   ({ id, position, rotation = [0, 0, 0], scale = 1, halfExtents, snapPlanes, useDistance = true, children, lock, lockY }, forwardedRef) => {
     const groupRef = useRef<Group>(null);
     const snapContext = useSnapContext();
-    const snap = useSnapshot(store)
+    const snap = useSnapshot(store);
+    const rotationY = rotation[1];
+    const lockPositionY = lock.y;
+
+    const setGroupRef = (node: Group | null) => {
+      groupRef.current = node;
+      if (typeof forwardedRef === 'function') {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        forwardedRef.current = node;
+      }
+    };
 
     useEffect(() => {
       if (!snapContext.registerConstraint || !groupRef.current) return;
 
       const unregister = snapContext.registerConstraint({
         id,
-        ref: groupRef as React.MutableRefObject<any>,
-        halfExtents: halfExtents,
+        ref: groupRef,
+        halfExtents,
         userData: { useDistance, useCursor: false, ignoreNormals: [] },
       });
 
@@ -81,14 +89,10 @@ export const SnapPlacedObject = forwardRef<Group, SnapPlacedObjectProps>(
 
     useEffect(() => {
       recalculate(groupRef.current, halfExtents, snapPlanes, lock, lockY);
-    }, [lock.y, lockY]); // eslint-disable-line
-
-    useEffect(() => {
-      recalculate(groupRef.current, halfExtents, snapPlanes, lock, lockY);
-    }, [rotation[1], halfExtents, snapPlanes, lock.y, lockY, snap]);
+    }, [rotationY, halfExtents, snapPlanes, lock, lockPositionY, lockY, snap]);
 
     return (
-      <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
+      <group ref={setGroupRef} position={position} rotation={rotation} scale={scale}>
         {children}
       </group>
     );

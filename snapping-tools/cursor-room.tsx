@@ -1,11 +1,9 @@
 import { ReactNode, useEffect, useMemo, useRef } from "react"
 import { useSnapContext } from "./snap-provider"
 import { Html } from "@react-three/drei";
-import { ScreenShare, MousePointerClick } from "lucide-react";
 import { useThree } from "@react-three/fiber";
 import { motion, AnimatePresence } from "framer-motion";
 import { CursorClickIcon } from "./animated-icons/cursor-click";
-import { StoredPointerEvent } from "./types";
 import { Vector3 } from "three";
 import { usePointerMove } from "./hooks/use-pointer-move";
 
@@ -57,9 +55,12 @@ export function CursorRoom({ children, width: depth, height, depth: width, show,
     }, [gl])
 
     useEffect(() => {
-        visibilityChange(isVisible(point, width, height, depth, pointer.cursorVisible as boolean, show))
-    }, [point]);
-    const visible = useMemo(() => isVisible(point, width, height, depth, pointer.cursorVisible as boolean, show), [point]);
+        visibilityChange(isVisible(point, width, height, depth, pointer.cursorVisible, show))
+    }, [point, width, height, depth, pointer.cursorVisible, show, visibilityChange]);
+    const visible = useMemo(
+        () => isVisible(point, width, height, depth, pointer.cursorVisible, show),
+        [point, width, height, depth, pointer.cursorVisible, show]
+    );
 
     return <>
         <Html

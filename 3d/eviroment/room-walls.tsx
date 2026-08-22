@@ -1,6 +1,6 @@
 import { SnapConstraint } from '@/snapping-tools/snap-constraint'
 import { store } from '@/store'
-import { Text, useTexture } from '@react-three/drei'
+import { useTexture } from '@react-three/drei'
 import { memo, useEffect } from 'react'
 import { useSnapshot } from 'valtio'
 import * as THREE from 'three'

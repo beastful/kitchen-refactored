@@ -111,7 +111,7 @@ function Introduction() {
                     </div>
                 </div>
                 <div className='w-full'></div>
-                <img className='absolute right-0 bottom-0' src='intro.png' />
+                <img className='absolute right-0 bottom-0' src='intro.png' alt='' />
             </div>
         </div>
     );

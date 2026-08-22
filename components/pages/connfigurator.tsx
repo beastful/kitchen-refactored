@@ -336,7 +336,7 @@ function SidebarContent() {
 
   const sizeChips = ['30', '40', '50', '60', '70', '80']
 
-  const extractSizesFromName = (name: string): number[] => {
+  const extractSizesFromName = useCallback((name: string): number[] => {
     const match = name.match(/(\d+)[хx](\d+)[хx](\d+)(?:см)?/i)
     if (match) {
       return [
@@ -349,14 +349,14 @@ function SidebarContent() {
     const numbers = name.match(/\d+/g)
     if (numbers) return numbers.map((n) => parseInt(n, 10))
     return []
-  }
+  }, [])
 
-  const filterModules = (
+  const filterModules = useCallback((
     modules: typeof data,
     search: string,
     sizeFilter: string | null
-  ) =>
-    modules.filter((m) => {
+  ) => {
+    return modules.filter((m) => {
       const matchesText =
         search === '' || m.displayName?.toLowerCase().includes(search.toLowerCase())
       if (!matchesText) return false
@@ -365,21 +365,22 @@ function SidebarContent() {
       const sizes = extractSizesFromName(m.displayName || m.name)
       return sizes.some((size) => size.toString() === sizeFilter)
     })
+  }, [extractSizesFromName])
 
   const floorModules = useMemo(() => {
     const floorData = data.filter((m) => m.tags.includes(CATEGORY_FLOOR))
     return filterModules(floorData, floorSearch, floorSizeFilter)
-  }, [floorSearch, floorSizeFilter])
+  }, [floorSearch, floorSizeFilter, filterModules])
 
   const wallModules = useMemo(() => {
     const wallData = data.filter((m) => m.tags.includes(CATEGORY_WALL))
     return filterModules(wallData, wallSearch, wallSizeFilter)
-  }, [wallSearch, wallSizeFilter])
+  }, [wallSearch, wallSizeFilter, filterModules])
 
   const techModules = useMemo(() => {
     const techData = data.filter((m) => m.tags.includes(CATEGORY_TECH))
     return filterModules(techData, techSearch, techSizeFilter)
-  }, [techSearch, techSizeFilter])
+  }, [techSearch, techSizeFilter, filterModules])
 
   const roomModules = useMemo(
     () => data.filter((m) => m.tags.includes(CATEGORY_ROOM)),

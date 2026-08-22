@@ -4,7 +4,7 @@ import { createPortal, useFrame } from "@react-three/fiber";
 import { HandleVariant } from "./handle-variant";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
 import { EXPLICT_CASE_EXTRA_QPI } from "@/constants";
-import { Box3, Group, Mesh, Object3D, Vector3 } from "three";
+import { Box3, Color, Group, Material, Mesh, MeshStandardMaterial, Object3D, Vector3 } from "three";
 import { ModuleEntity } from "@/types";
 
 interface HandleProps {
@@ -14,8 +14,23 @@ interface HandleProps {
 
 const THROTTLE_MS = 16; // ~60 fps cap
 
+const golaProfileMaterialCache = new Map<string, MeshStandardMaterial>();
+
+function getGolaProfileMaterial(color: Color): MeshStandardMaterial {
+    const hex = color.getHexString();
+    if (!golaProfileMaterialCache.has(hex)) {
+        golaProfileMaterialCache.set(hex, new MeshStandardMaterial({ color: new Color(color) }));
+    }
+    return golaProfileMaterialCache.get(hex)!;
+}
+
+function canonicalNodeName(name: string): string {
+    return name.replace(/[.]/g, "");
+}
+
 function HandleComponent({ entity, model }: HandleProps) {
     const meshRef = useRef<Group>(null);
+    const isGolaProfile = canonicalNodeName(model.name) === "M_SPL_1_PNT_GOLA";
     const acc = useRef(0);
     const [portalTarget, setPortalTarget] = useState<Object3D | null>(null);
 
@@ -23,6 +38,8 @@ function HandleComponent({ entity, model }: HandleProps) {
     // This keeps the handle in the facade's local coordinate system and makes
     // it follow the facade when a door is animated.
     useLayoutEffect(() => {
+        if (isGolaProfile) return;
+
         let frame = 0;
 
         const attachToAnchorParent = () => {
@@ -37,7 +54,25 @@ function HandleComponent({ entity, model }: HandleProps) {
         attachToAnchorParent();
 
         return () => cancelAnimationFrame(frame);
-    }, [model]);
+    }, [isGolaProfile, model]);
+
+    useLayoutEffect(() => {
+        if (!isGolaProfile) return;
+
+        const originalMaterial: Material | Material[] = model.material;
+        const originalVisible = model.visible;
+        Object.assign(model, {
+            visible: entity.facade === "Gola",
+            material: getGolaProfileMaterial(entity.handleColor),
+        });
+
+        return () => {
+            Object.assign(model, {
+                visible: originalVisible,
+                material: originalMaterial,
+            });
+        };
+    }, [entity.facade, entity.handleColor, isGolaProfile, model]);
 
     const flags = useMemo(() => {
         const includesNoneOfFlags = !model.name.includes("_H") && !model.name.includes("_V");
@@ -97,6 +132,8 @@ function HandleComponent({ entity, model }: HandleProps) {
 
     /* ── 3. Hide only the invisible anchor mesh, not its facade parent. */
     useEffect(() => {
+        if (isGolaProfile) return;
+
         // The anchor is intentionally hidden; the actual handle is rendered
         // through the portal above.
         const anchor = model as Mesh;
@@ -104,9 +141,9 @@ function HandleComponent({ entity, model }: HandleProps) {
         return () => {
             setObjectVisibility(anchor, true);
         };
-    }, [model]);
+    }, [isGolaProfile, model]);
 
-    if (!portalTarget) return null;
+    if (isGolaProfile || !portalTarget) return null;
 
     return createPortal(
         <group ref={meshRef}>

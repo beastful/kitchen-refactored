@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef } from 'react'
 import { CATEGORY_ROOM, CATEGORY_TECH } from '@/constants'
 
 export function ModuleCard({ module }: { module: ModuleDef }) {
-  const { price, name, image, displayName } = module
+  const { price, name, displayName } = module
   const isDragging = useRef(false)
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {

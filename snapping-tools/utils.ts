@@ -1,4 +1,4 @@
-import { Vector3, Box3, Object3D, Matrix4 } from "three";
+import { Vector3, Box3, Object3D, Mesh, BoxGeometry } from "three";
 import { MutableRefObject } from "react";
 import { Intersection, SnapPlane } from "./types";
 
@@ -45,7 +45,6 @@ const _boxA = new Box3();
 const _boxB = new Box3();
 const _center = new Vector3();
 const _size = new Vector3();
-const _matrix = new Matrix4();
 
 export function checkIntersectionFast(
   refA: MutableRefObject<Object3D | null>,
@@ -58,8 +57,8 @@ export function checkIntersectionFast(
     return [false, _center.clone(), _center.clone(), _size.clone(), _size.clone()];
   }
 
-  const geoA = (objA as any).geometry;
-  const geoB = (objB as any).geometry;
+  const geoA = objA instanceof Mesh ? objA.geometry : null;
+  const geoB = objB instanceof Mesh ? objB.geometry : null;
 
   if (!geoA?.boundingBox || !geoB?.boundingBox) {
     return checkIntersection(refA, refB);
@@ -89,8 +88,8 @@ export function checkIntersectionFast(
   return [_boxA.intersectsBox(_boxB), centerA, centerB, sizeA, sizeB];
 }
 
-export function getBoxFromArgs(mesh: any, outBox: Box3): void {
-  const args = (mesh.geometry as any).parameters as { width: number; height: number; depth: number };
+export function getBoxFromArgs(mesh: Mesh<BoxGeometry>, outBox: Box3): void {
+  const args = mesh.geometry.parameters as { width: number; height: number; depth: number };
   const halfW = args.width / 2;
   const halfH = args.height / 2;
   const halfD = args.depth / 2;

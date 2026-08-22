@@ -1,4 +1,4 @@
-import { CATEGORY_TECH, EXPLICT_CASE_WINDOW } from "@/constants";
+import { EXPLICT_CASE_WINDOW } from "@/constants";
 import { Vector3 } from "three";
 import { ModuleEntity } from "@/types";
 import { useSnapshot } from "valtio";
@@ -22,8 +22,6 @@ export function useLock() {
     }
     
     const entityType = snap.currentRawModule.type
-    const isTech = snap.currentRawModule.tags.includes(CATEGORY_TECH)
-
     if (snap.currentRawModule?.name == "Microwave" || snap.currentRawModule?.name == "Door" || snap.currentRawModule?.name == "Window" || snap.currentRawModule?.name == "Refrigirator" || snap.currentRawModule?.name == "Stove") {
        
         return {
@@ -58,7 +56,6 @@ export function useLock() {
 
 export function getLock(mod: ModuleEntity, snap: Store) {
     const entityType = mod.type
-    const isTech = mod.tags.includes(CATEGORY_TECH)
     let wallY = 1;
     // Floor modules are centered at half their full 880 mm height.
     // Keeping this derived from one constant leaves room for a future

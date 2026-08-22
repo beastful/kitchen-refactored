@@ -62,7 +62,7 @@ export interface StoredConstraint {
 export interface SnapContextValue {
     debug: boolean;
     pointerEventRef: RefObject<StoredPointerEvent>;
-    cursorVisibleRef: RefObject<Boolean>;
+    cursorVisibleRef: RefObject<boolean>;
     registerConstraint: (constraint: StoredConstraint) => () => void;
     queryConstraints: (callback: (constraint: StoredConstraint) => void) => void;
     cursorStateRef: MutableRefObject<CursorLiveState>;

@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, useCallback } from 'react';
+import { createContext, useContext, useRef, useCallback } from 'react';
 import { Vector3 } from 'three';
 import {
   StoredPointerEvent,

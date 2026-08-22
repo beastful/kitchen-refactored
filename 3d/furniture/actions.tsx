@@ -1,8 +1,8 @@
 import { ROTATATABLE } from "@/constants";
 import { store } from "@/store";
-import { ModuleEntity, toModuleEntity, toModuleDef } from "@/types";
+import { ModuleEntity, toModuleEntity } from "@/types";
 import { Html } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
+import { ThreeEvent, useThree } from "@react-three/fiber";
 import { Copy, Move, Rotate3D, Settings, Trash2Icon } from "lucide-react";
 import { useCallback, useEffect, useRef, ReactNode, useState } from "react";
 import { useSnapshot } from "valtio";
@@ -22,11 +22,11 @@ export function ModuleMenu({ children, entity }: ModuleMenuProps) {
   const rotatable = entity.tags.includes(ROTATATABLE);
 
   const handleRotate = useCallback((id: string) => {
-    const module = store.modules.find((m) => m.id === id);
-    if (module) module.openAngle += Math.PI / 2;
+    const targetModule = store.modules.find((m) => m.id === id);
+    if (targetModule) targetModule.openAngle += Math.PI / 2;
   }, []);
 
-  const handleGroupClick = (e: any) => {
+  const handleGroupClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
     isTogglingRef.current = true;
     store.openMenuId = isOpen ? null : entity.id;

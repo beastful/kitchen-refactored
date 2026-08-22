@@ -269,7 +269,7 @@ function throw_ray(
 
   let prevT = 0;
   let insideCount = 0;
-  let prevPos = new THREE.Vector3(fx, fy, fz);
+  const prevPos = new THREE.Vector3(fx, fy, fz);
 
   for (let i = 0; i < hits.length; i++) {
     const h = hits[i];
@@ -347,7 +347,7 @@ export const RaycastRuler = ({
 
     dirtyRef.current = false;
 
-    const modules = store.modules.map((m: any) => ({
+    const modules = store.modules.map((m) => ({
       id: m.id,
       halfExtents: m.halfExtents,
       position: m.position,

@@ -15,16 +15,66 @@ interface StateItem {
   name: string;
   date_create: string | null;
   date_update?: string | null;
+  state_data?: string;
 }
+
+type MessageData = Record<string, unknown>;
+type LocalCollection = { states: StateItem[] };
 
 interface GetStatesProps {
   /** Called when a project is fetched. Receives the PARSED state_data object and the id. */
-  onProjectGet?: (state: any, id: string) => void;
+  onProjectGet?: (state: unknown, id: string) => void;
   /** Called when user clicks "Начать новый проект". You decide what to do. */
   onNewProject?: () => void;
 }
 
 const STORAGE_KEY = 'db save collection';
+
+function toStateItem(value: unknown): StateItem | null {
+  const record = value !== null && typeof value === 'object'
+    ? value as Record<string, unknown>
+    : null;
+  if ((typeof record?.id !== 'string' && typeof record?.id !== 'number') || typeof record.name !== 'string') {
+    return null;
+  }
+  return {
+    id: String(record.id),
+    name: record.name,
+    date_create: typeof record.date_create === 'string' ? record.date_create : null,
+    date_update: typeof record.date_update === 'string' ? record.date_update : null,
+    state_data: typeof record.state_data === 'string' ? record.state_data : undefined,
+  };
+}
+
+function parseMessageData(value: unknown): MessageData | null {
+  let parsed: unknown = value;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed) as unknown;
+    } catch {
+      return null;
+    }
+  }
+  return parsed !== null && typeof parsed === 'object'
+    ? parsed as MessageData
+    : null;
+}
+
+function readLocalCollection(): LocalCollection {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    if (!parsed || typeof parsed !== 'object') return { states: [] };
+    const states = (parsed as { states?: unknown }).states;
+    return {
+      states: Array.isArray(states)
+        ? states.map(toStateItem).filter((item): item is StateItem => item !== null)
+        : [],
+    };
+  } catch {
+    return { states: [] };
+  }
+}
 
 const isLocalhost = () => {
   if (typeof window === 'undefined') return false;
@@ -32,16 +82,12 @@ const isLocalhost = () => {
   return host === 'localhost' || host === '127.0.0.1';
 };
 
-export function loadSharedFromBitrix(sceneId: string, onLoaded: (state: any, id: string) => void): void {
+export function loadSharedFromBitrix(sceneId: string, onLoaded: (state: unknown, id: string) => void): void {
     const requestId = String(Math.random());
 
     const onMessage = (event: MessageEvent) => {
-        let data: any;
-        try {
-            data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        } catch {
-            return;
-        }
+        const data = parseMessageData(event.data);
+        if (!data) return;
 
         if (data.requestId === requestId) {
             window.removeEventListener('message', onMessage);
@@ -49,13 +95,16 @@ export function loadSharedFromBitrix(sceneId: string, onLoaded: (state: any, id:
             const wrapper = data.state || data.data || data.result;
             let payload = wrapper;
 
-            if (wrapper && typeof wrapper === 'object' && typeof wrapper.state_data === 'string') {
-                try {
-                    payload = JSON.parse(wrapper.state_data);
-                } catch {
-                    payload = wrapper.state_data;
-                }
+        const wrapperRecord = wrapper !== null && typeof wrapper === 'object'
+            ? wrapper as MessageData
+            : null;
+        if (typeof wrapperRecord?.state_data === 'string') {
+            try {
+                payload = JSON.parse(wrapperRecord.state_data);
+            } catch {
+                payload = wrapperRecord.state_data;
             }
+        }
 
             if (payload) {
                 onLoaded(payload, String(sceneId));
@@ -74,16 +123,12 @@ export function loadSharedFromBitrix(sceneId: string, onLoaded: (state: any, id:
     }, 10000);
 }
 
-export function loadProductFromBitrix(productId: string, onLoaded: (state: any, id: string) => void): void {
+export function loadProductFromBitrix(productId: string, onLoaded: (state: unknown, id: string) => void): void {
     const requestId = String(Math.random());
 
     const onMessage = (event: MessageEvent) => {
-        let data: any;
-        try {
-            data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        } catch {
-            return;
-        }
+        const data = parseMessageData(event.data);
+        if (!data) return;
 
         if (data.requestId === requestId) {
             window.removeEventListener('message', onMessage);
@@ -91,13 +136,16 @@ export function loadProductFromBitrix(productId: string, onLoaded: (state: any, 
             const wrapper = data.state || data.data || data.result;
             let payload = wrapper;
 
-            if (wrapper && typeof wrapper === 'object' && typeof wrapper.state_data === 'string') {
-                try {
-                    payload = JSON.parse(wrapper.state_data);
-                } catch {
-                    payload = wrapper.state_data;
-                }
+        const wrapperRecord = wrapper !== null && typeof wrapper === 'object'
+            ? wrapper as MessageData
+            : null;
+        if (typeof wrapperRecord?.state_data === 'string') {
+            try {
+                payload = JSON.parse(wrapperRecord.state_data);
+            } catch {
+                payload = wrapperRecord.state_data;
             }
+        }
 
             if (payload) {
                 onLoaded(payload, String(productId));
@@ -127,42 +175,42 @@ export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
     if (typeof window === 'undefined') return;
 
     const requestId = String(Math.random());
-    pendingRef.current.add(requestId);
+    const pending = pendingRef.current;
+    pending.add(requestId);
     setLoadingList(true);
 
     // LOCALHOST
     if (isLocalhost()) {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const collection = raw ? JSON.parse(raw) : { states: [] };
-        setList(Array.isArray(collection.states) ? collection.states : []);
+        const collection = readLocalCollection();
+        setList(collection.states);
       } catch (e) {
         console.error('[GetStates] localStorage read failed:', e);
         setList([]);
       }
       setLoadingList(false);
-      pendingRef.current.delete(requestId);
+      pending.delete(requestId);
       return;
     }
 
     // PRODUCTION
     const onMessage = (event: MessageEvent) => {
-      let data: any;
-      try {
-        data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-      } catch {
-        return;
-      }
+      const data = parseMessageData(event.data);
+      if (!data) return;
 
       if (data.requestId === requestId) {
-        pendingRef.current.delete(requestId);
+        pending.delete(requestId);
         window.removeEventListener('message', onMessage);
 
         const responseData = data.states || data.data || data.result || data.list;
         if (Array.isArray(responseData)) {
-          setList(responseData);
+          setList(responseData.map(toStateItem).filter((item): item is StateItem => item !== null));
         } else if (responseData && typeof responseData === 'object') {
-          setList(responseData.items || responseData.records || []);
+          const responseRecord = responseData as MessageData;
+          const items = responseRecord.items ?? responseRecord.records;
+          setList(Array.isArray(items)
+            ? items.map(toStateItem).filter((item): item is StateItem => item !== null)
+            : []);
         } else {
           setList([]);
         }
@@ -177,8 +225,8 @@ export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
     );
 
     const timeout = setTimeout(() => {
-      if (pendingRef.current.has(requestId)) {
-        pendingRef.current.delete(requestId);
+      if (pending.has(requestId)) {
+        pending.delete(requestId);
         window.removeEventListener('message', onMessage);
         setLoadingList(false);
       }
@@ -187,7 +235,7 @@ export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
     return () => {
       clearTimeout(timeout);
       window.removeEventListener('message', onMessage);
-      pendingRef.current.delete(requestId);
+      pending.delete(requestId);
     };
   }, []);
 
@@ -214,9 +262,8 @@ export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
     // LOCALHOST
     if (isLocalhost()) {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const collection = raw ? JSON.parse(raw) : { states: [] };
-        const found = collection.states?.find((s: any) => String(s.id) === String(id));
+        const collection = readLocalCollection();
+        const found = collection.states.find((s) => String(s.id) === String(id));
 
         if (found?.state_data) {
           const parsed = JSON.parse(found.state_data);
@@ -235,14 +282,11 @@ export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
 
     // PRODUCTION
     const onMessage = (event: MessageEvent) => {
-      let data: any;
-      try {
-        data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-      } catch {
-        return;
-      }
+      const data = parseMessageData(event.data);
+      if (!data) return;
 
       if (data.requestId === requestId) {
+        clearTimeout(timeout);
         pendingRef.current.delete(requestId);
         window.removeEventListener('message', onMessage);
         setLoadingId(null);
@@ -250,11 +294,14 @@ export function GetStates({ onProjectGet, onNewProject }: GetStatesProps) {
         const wrapper = data.state || data.data || data.result;
         let payload = wrapper;
 
-        if (wrapper?.state_data && typeof wrapper.state_data === 'string') {
+        const wrapperRecord = wrapper !== null && typeof wrapper === 'object'
+          ? wrapper as MessageData
+          : null;
+        if (typeof wrapperRecord?.state_data === 'string') {
           try {
-            payload = JSON.parse(wrapper.state_data);
+            payload = JSON.parse(wrapperRecord.state_data);
           } catch {
-            payload = wrapper.state_data;
+            payload = wrapperRecord.state_data;
           }
         }
 

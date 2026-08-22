@@ -1,8 +1,15 @@
 import { store } from "@/store";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useSnapshot } from "valtio";
 
-export function Hint({ children, content, className, lineStyle }: any) {
+interface HintProps {
+    children: ReactNode;
+    content: ReactNode;
+    className?: string;
+    lineStyle?: string;
+}
+
+export function Hint({ children, content, className = '', lineStyle = '' }: HintProps) {
     const snap = useSnapshot(store)
     const ref = useRef<HTMLDivElement>(null);
     let bbox;

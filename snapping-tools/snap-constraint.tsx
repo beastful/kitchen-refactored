@@ -1,37 +1,35 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSnapContext } from "@/snapping-tools/snap-provider";
 import { useBoundingBox } from "./hooks/use-bounding-box";
 import { throttle } from 'lodash-es';
 import { SnapConstraintUserDataType, SnapConstraintProps } from "./types";
+import { Group } from 'three';
+import { ThreeEvent } from '@react-three/fiber';
 
 export function SnapConstraint({
     useCursor = false,
     useDistance = false,
     ignoreNormals,
-    radius = 0.1,
     children,
     roomWall = false,
+    radius: _radius = 0.1,
     ...groupProps
 }: SnapConstraintProps) {
 
     const snapContext = useSnapContext();
+    void _radius;
     const [ref, halfExtents] = useBoundingBox();
-    const realRef = useRef(null);
+    const realRef = useRef<Group>(null);
 
-    const throttledSetPointer = useCallback(
-        throttle((e: any) => {
+    const throttledSetPointer = useMemo(
+        () => throttle((e: ThreeEvent<PointerEvent>) => {
             snapContext.pointerEventRef.current = e;
             snapContext.cursorVisibleRef.current = true;
         }, 10),
         [snapContext]
     );
 
-    const userData: SnapConstraintUserDataType = {
-        useCursor,
-        useDistance,
-        ignoreNormals: ignoreNormals ?? [],
-        roomWall,
-    };
+    useEffect(() => () => throttledSetPointer.cancel(), [throttledSetPointer]);
 
     useEffect(() => {
         const id = Math.random().toString(36);

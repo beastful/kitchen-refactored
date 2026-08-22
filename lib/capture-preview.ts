@@ -35,7 +35,7 @@ function blobToDataUrl(blob: Blob): Promise<string> {
 /**
  * Безопасно преобразует canvas в Blob (поддерживает toBlob / convertToBlob / toDataURL).
  */
-async function canvasToBlobSafe(canvas: any): Promise<Blob> {
+async function canvasToBlobSafe(canvas: HTMLCanvasElement): Promise<Blob> {
   if (typeof canvas.toBlob === 'function') {
     return await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
@@ -52,8 +52,11 @@ async function canvasToBlobSafe(canvas: any): Promise<Blob> {
     });
   }
 
-  if (typeof canvas.convertToBlob === 'function') {
-    return await canvas.convertToBlob({ type: 'image/png', quality: 1 });
+  const canvasWithConvert = canvas as HTMLCanvasElement & {
+    convertToBlob?: (options?: { type?: string; quality?: number }) => Promise<Blob>;
+  };
+  if (typeof canvasWithConvert.convertToBlob === 'function') {
+    return await canvasWithConvert.convertToBlob({ type: 'image/png', quality: 1 });
   }
 
   if (typeof canvas.toDataURL === 'function') {

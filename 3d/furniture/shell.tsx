@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
-import { useEffect, useRef } from "react";
-import { Color, Material, Mesh, MeshMatcapMaterial, Texture } from "three";
+import { useEffect } from "react";
+import { Color, Mesh, MeshMatcapMaterial, Texture } from "three";
 import { ModuleEntity } from "@/types";
 
 function canonicalNodeName(name: string): string {
@@ -42,11 +42,13 @@ export function Shell({ entity, model }: ShellProps) {
         } else if (name === "M_SPL_1002") {
             Object.assign(model, { visible: isGolaModule });
         }
-        model.material = getMatcapMaterial(matcapTexture);
+        Object.assign(model, { material: getMatcapMaterial(matcapTexture) });
 
         return () => {
-            model.visible = originalVisible;
-            model.material = originalMaterial;
+            Object.assign(model, {
+                visible: originalVisible,
+                material: originalMaterial,
+            });
         };
     }, [entity.facade, entity.name, model, matcapTexture]);
 

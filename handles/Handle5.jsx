@@ -4,10 +4,8 @@ Command: npx gltfjsx@6.5.3 ./Handle5.glb -k
 */
 
 import React from 'react'
-import { useGLTF } from '@react-three/drei'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('Handle5.glb')
   return (
     <group {...props} dispose={null}>
       <group name="Scene" />
@@ -15,4 +13,3 @@ export function Model(props) {
   )
 }
 
-useGLTF.preload('Handle5.glb')

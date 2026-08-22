@@ -81,7 +81,7 @@ export type ModuleTag = CategoryTag | FeatureTag | CaseTag;
 export type ModuleType = 'wall' | 'floor' | 'tall' | 'base' | 'corner' | 'tech' | 'room';
 
 export interface ModuleDef {
-  model: React.FC<any> | null | string;
+  model: React.ElementType | null | string;
   /** Optional GLB path for modules whose file does not follow the name convention. */
   modelPath?: string;
   /** Physical dimensions in metres: width, height, depth. */
@@ -114,7 +114,7 @@ export interface ModuleEntity {
   hingeReplacement: number;
   price: number;
   size: Vector3;
-  model: React.FC<any> | null | string;
+  model: React.ElementType | null | string;
   /** Optional GLB path for modules whose file does not follow the name convention. */
   modelPath?: string;
   position: Vector3;

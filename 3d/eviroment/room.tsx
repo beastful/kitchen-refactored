@@ -33,9 +33,7 @@ import { getLock, useLock } from '@/lib/use-lock';
 import { CursorRoom } from '@/snapping-tools/cursor-room';
 import { SnapPlane } from '@/snapping-tools/types';
 import { AnimationSystem } from './animation-system';
-import { MemoryAudit } from './memory-audit';
 import { LocalRuler } from './local-ruler';
-import { useValtioKey } from './hooks/use-key';
 import { FLOOR_MODULE_WALL_GAP } from '@/lib/placement-geometry';
 
 function getModuleModelSrc(name: string, modelPath?: string): string {
@@ -78,7 +76,6 @@ function ZCorrection({
 // ── Stable module IDs + hydration-safe version key ──
 function useModuleIds() {
 	const [ids, setIds] = useState(() => store.modules.map((m) => m.id));
-	const [version, setVersion] = useState(0);
 	const prevRef = useRef({
 		ids: store.modules.map((m) => m.id),
 		array: store.modules
@@ -91,7 +88,6 @@ function useModuleIds() {
 			const prev = prevRef.current;
 
 			if (currentArray !== prev.array) {
-				setVersion((v) => v + 1);
 				setIds(newIds);
 				prevRef.current = { ids: newIds, array: currentArray };
 				return;
@@ -107,7 +103,7 @@ function useModuleIds() {
 		});
 	}, []);
 
-	return { ids, version };
+	return { ids };
 }
 
 // ── Isolated cursor: subscribes to store but only updates React state on real changes ──
@@ -116,9 +112,9 @@ const CursorSystem = memo(function CursorSystem({
 	lock,
 	visibilityRef
 }: {
-	lockY: any;
-	lock: any;
-	visibilityRef: React.MutableRefObject<boolean>;
+	lockY: boolean;
+	lock: Vector3;
+	visibilityRef: import('react').MutableRefObject<boolean>;
 }) {
 	const [cursor, setCursor] = useState<{
 		source: ModulePlacementSource | null;
@@ -221,20 +217,29 @@ const CursorSystem = memo(function CursorSystem({
 
 // ── Per-module shell ──
 const ModuleShell = memo(function ModuleShell({
-	id,
-	version
+	id
 }: {
 	id: string;
-	version: number;
 }) {
 	const snap = useSnapshot(store);
-	const moduleProxy = useMemo(
-		() => store.modules.find((m) => m.id === id),
-		[id, version]
-	);
-	if (!moduleProxy) return null;
+	const entity = snap.modules.find((module) => module.id === id);
+	const [renderedHeight, setRenderedHeight] = useState<number | null>(null);
+	const handleCentered = useCallback(({ height }: { height: number }) => {
+		setRenderedHeight((previous) => previous === height ? previous : height);
+	}, []);
 
-	const entity = useSnapshot(moduleProxy);
+	if (!entity) return null;
+
+	const storedHalfExtents = entity.halfExtents;
+	const hasValidHalfExtents = storedHalfExtents.every((value) => value > 0);
+	const halfExtents = (hasValidHalfExtents
+		? [...storedHalfExtents]
+		: [entity.size.x / 2, entity.size.y / 2, entity.size.z / 2]) as [
+		number,
+		number,
+		number
+	];
+
 	return (
 		<group>
 			{snap.ruler && <LocalRuler entity={entity as ModuleEntity} />}
@@ -245,16 +250,18 @@ const ModuleShell = memo(function ModuleShell({
 				lock={entity.lock}
 				id={`placed-${entity.id}`}
 				rotation={[0, entity.openAngle, 0]}
-				halfExtents={entity.halfExtents as [number, number, number]}
+				halfExtents={halfExtents}
 				snapPlanes={entity.snapPlanes as SnapPlane[]}
 				useDistance={true}>
 				<Suspense fallback={<ModuleLoadingPlaceholder />}>
 					<ModuleMenu entity={entity as ModuleEntity}>
-						<Tabletop entity={entity as ModuleEntity}>
+						<Tabletop
+							entity={entity as ModuleEntity}
+							renderedHeight={renderedHeight}>
 							<ZCorrection
 								entity={entity as ModuleEntity}
-								halfExtents={entity.halfExtents as [number, number, number]}>
-								<Center>
+								halfExtents={halfExtents}>
+								<Center onCentered={handleCentered}>
 									{entity.tags.includes(CATEGORY_TECH) ||
 									entity.tags.includes(CATEGORY_ROOM) == true ? (
 										<ModuleErrorBoundary
@@ -303,7 +310,7 @@ export default function Room() {
 	const getPlacementData = usePlacementData();
 	const { lockY, lock } = useLock();
 	const visibilityRef = useRef<boolean>(true);
-	const { ids, version } = useModuleIds();
+	const { ids } = useModuleIds();
 
 	const getPlacementDataRef = useRef(getPlacementData);
 	const lockYRef = useRef(lockY);
@@ -399,11 +406,7 @@ export default function Room() {
 			<RoomWalls />
 
 			{ids.map((id) => (
-				<ModuleShell
-					key={`placed-${id}-${version}`}
-					id={id}
-					version={version}
-				/>
+				<ModuleShell key={`placed-${id}`} id={id} />
 			))}
 		</>
 	);

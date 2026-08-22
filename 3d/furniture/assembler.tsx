@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { Mesh, Object3D } from "three";
+import { useMemo } from "react";
+import { Box3, Mesh, Object3D, Vector3 } from "three";
 import { AssemblerProps } from "@/types";
 import { Facade } from "./facade";
 import { Handle } from "./handle";
 import { Shell } from "./shell";
 import { Shelf } from "./shelf";
 import { useGLTF } from "@react-three/drei";
-import { Box3, Vector3 } from "three";
-import { OBB } from "three/examples/jsm/Addons.js";
 
 export class ObjectClassifier {
   private threshold: number;
@@ -20,12 +18,7 @@ export class ObjectClassifier {
 
   getSize(obj: Object3D): Vector3 {
     const box = new Box3().setFromObject(obj);
-    const obb = new OBB();
-    obb.fromBox3(box)
-    obb.applyMatrix4(obj.matrixWorld)
-    const size = new Vector3();
-    obb.getSize(size);
-    return size;
+    return box.getSize(new Vector3());
   }
 
   isShelf(obj: Object3D): boolean {
@@ -44,18 +37,41 @@ const classifier = new ObjectClassifier();
 export function FacadeConfig({ src, entity }: AssemblerProps) {
   const { scene } = useGLTF(src);
   const model = useMemo(() => scene.clone(), [scene])
-  const [facades, setFacades] = useState<Object3D[]>([]);
-  const [shelves, setShelves] = useState<Object3D[]>([]);
-  const [handles, setHandles] = useState<Object3D[]>([]);
-  const [modules, setModules] = useState<Object3D[]>([]);
-
-  useEffect(() => {
-    const tmpFacades: Object3D[] = [];
-    const tmpShelves: Object3D[] = [];
-    const tmpHandles: Object3D[] = [];
-    const tmpModules: Object3D[] = [];
-
+  const { facades, shelves, handles, modules } = useMemo(() => {
+    const tmpFacades: Mesh[] = [];
+    const tmpShelves: Mesh[] = [];
+    const tmpHandles: Mesh[] = [];
+    const tmpModules: Mesh[] = [];
+    const isCorrect1 = entity.name === "M_SPL_1_CORRECT1";
+    const correct1Facades = new Set([
+      "M_SPL_1_F_A",
+      "M_SPL_1_F_B",
+      "M_SPL_1_F_C",
+      "M_SPL_1_F_D",
+      "M_SPL_1_F_F",
+    ]);
     model.traverse((obj: Object3D) => {
+      // Correct1 has a flat list of named meshes. Register only those meshes;
+      // registering container nodes or their children twice causes visible
+      // facade overlays and makes the selected material appear inconsistent.
+      if (isCorrect1) {
+        if (!(obj instanceof Mesh)) return;
+        const name = obj.name.replace(/[.]/g, "");
+        if (correct1Facades.has(name)) {
+          tmpFacades.push(obj);
+        } else if (name.includes("_PNT_")) {
+          // Correct1 contains the built-in Gola profile as a mesh named
+          // M_SPL_1_PNT_GOLA. Handle renders it in place and only enables it
+          // in Gola mode; the H/V points keep the regular handle behavior.
+          tmpHandles.push(obj);
+        } else {
+          // Keep non-facade renderables such as cabinet legs in the scene.
+          tmpModules.push(obj);
+        }
+        return;
+      }
+
+      if (!(obj instanceof Mesh)) return;
       if (obj.name.includes("_F") && classifier.isFacade(obj)) {
         tmpFacades.push(obj);
       } else if (obj.name.includes("_F") && classifier.isShelf(obj) && !obj.name.includes("_IC")) {
@@ -69,11 +85,13 @@ export function FacadeConfig({ src, entity }: AssemblerProps) {
       }
     });
 
-    setFacades(tmpFacades)
-    setShelves(tmpShelves)
-    setHandles(tmpHandles)
-    setModules(tmpModules)
-  }, [model])
+    return {
+      facades: tmpFacades,
+      shelves: tmpShelves,
+      handles: tmpHandles,
+      modules: tmpModules,
+    };
+  }, [entity.name, model])
 
   // Measure actual model dimensions and compute corrective scale SYNCHRONOUSLY.
   // GLTF models may differ from backend positioning expectations in ALL axes.
@@ -99,7 +117,7 @@ export function FacadeConfig({ src, entity }: AssemblerProps) {
     };
 
     return new Vector3(scaleFor('x'), scaleFor('y'), scaleFor('z'));
-  }, [model, entity.size.x, entity.size.y, entity.size.z])
+  }, [model, entity.size])
 
   return (
     <group scale={modelScale}>

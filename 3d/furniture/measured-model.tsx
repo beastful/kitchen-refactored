@@ -23,9 +23,14 @@ export function MeasuredModel({ src, entity }: { src: string; entity: ModuleEnti
 
     const parentScale = 0.1;
 
+    const targetSize = {
+      x: entity.size.x,
+      y: entity.size.y,
+      z: entity.size.z,
+    };
     const scaleFor = (axis: 'x' | 'y' | 'z'): number => {
       const world = modelSize[axis] * parentScale;
-      const target = entity.size[axis];
+      const target = targetSize[axis];
       if (world > 0.001 && Math.abs(world - target) > 0.005 && target > 0) {
         return target / world;
       }

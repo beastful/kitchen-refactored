@@ -2,6 +2,20 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 const STORAGE_KEY = 'db save collection';
 
+function parseMessageData(value: unknown): Record<string, unknown> | null {
+    let parsed: unknown = value;
+    if (typeof parsed === 'string') {
+        try {
+            parsed = JSON.parse(parsed) as unknown;
+        } catch {
+            return null;
+        }
+    }
+    return parsed !== null && typeof parsed === 'object'
+        ? parsed as Record<string, unknown>
+        : null;
+}
+
 const isLocalhost = () => {
     if (typeof window === 'undefined') return false;
     const h = window.location.hostname;
@@ -90,12 +104,8 @@ export function useSaveToBack(): [
 
         /* ── PRODUCTION postMessage ─────────────── */
         const onMessage = (event: MessageEvent) => {
-            let data: any;
-            try {
-                data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-            } catch {
-                return;
-            }
+            const data = parseMessageData(event.data);
+            if (!data) return;
             if (data.requestId === requestId) {
                 pendingRef.current.delete(requestId);
                 window.removeEventListener('message', onMessage);

@@ -7,7 +7,7 @@ import React from 'react'
 import { useGLTF } from '@react-three/drei'
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF('Handle1.glb')
+  const { nodes } = useGLTF('Handle1.glb')
   return (
     <group {...props} dispose={null}>
       <mesh name="handle_01" geometry={nodes.handle_01.geometry} material={nodes.handle_01.material} rotation={[Math.PI / 2, 0, 0]} scale={0.005} />

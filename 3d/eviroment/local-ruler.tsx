@@ -1,11 +1,7 @@
 
 "use client";
 
-import { useEffect, memo } from "react";
-import { EXPLICT_CASE_FOLD, EXPLICT_CASE_STRAIGHT, EXPLICT_CASE_TOP } from "@/constants";
-import { Color, Mesh, MeshBasicMaterial, MeshStandardMaterial } from "three";
 import { ModuleEntity } from "@/types";
-import { animationRegistry } from "@/3d/eviroment/animation-system";
 import { Text } from "@react-three/drei";
 import { useSnapshot } from "valtio";
 import { store } from "@/store";

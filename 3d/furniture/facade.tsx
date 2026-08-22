@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, memo } from "react";
+import { memo, useEffect, useLayoutEffect } from "react";
 import { Box3, Color, Mesh, MeshStandardMaterial } from "three";
 import { ModuleEntity } from "@/types";
 import { animationRegistry } from "@/3d/eviroment/animation-system";
@@ -37,9 +37,8 @@ function getColorHex(color: Color): string {
 
 function FacadeComponent({ entity, model }: FacadeProps) {
     /* ── Material ── */
-    useEffect(() => {
+    useLayoutEffect(() => {
         const originalMaterial = model.material;
-        const originalVisible = model.visible;
         const name = canonicalNodeName(model.name);
         const isCorrect1 = entity.name === "M_SPL_1_CORRECT1";
         const correct1FacadeNodes: Record<string, string> = {
@@ -55,27 +54,31 @@ function FacadeComponent({ entity, model }: FacadeProps) {
         let shouldShow = false;
         if (isCorrect1) {
             shouldShow = name === correct1FacadeNodes[entity.facade];
-        } else if (model.name.includes(`_${entity.facade}`)) {
+        } else if (name.includes(`_${entity.facade}`)) {
             shouldShow = true;
         } else if (
-            !model.name.includes(`_A`) &&
-            !model.name.includes(`_B`) &&
-            !model.name.includes(`_C`) &&
+            !name.includes(`_A`) &&
+            !name.includes(`_B`) &&
+            !name.includes(`_C`) &&
             entity.facade === "Flat"
         ) {
             shouldShow = true;
         }
 
         // Use visibility so hidden facades cannot occlude the selected one
-        // through depth writing.
-        Object.assign(model, { visible: shouldShow });
+        // through depth writing. Assign the material to the selected mesh as
+        // well, so a GLB's baked white material cannot win over the picker.
         const colorHex = getColorHex(entity.color);
-        const material = getFacadeMaterial(`#${colorHex}`, shouldShow ? 1 : 0);
-        model.material = material;
+        Object.assign(model, {
+            visible: shouldShow,
+            material: getFacadeMaterial(`#${colorHex}`, 1),
+        });
 
         return () => {
-            model.visible = originalVisible;
-            model.material = originalMaterial;
+            Object.assign(model, {
+                visible: false,
+                material: originalMaterial,
+            });
         };
     }, [entity.color, entity.facade, entity.name, model]);
 
@@ -89,12 +92,15 @@ function FacadeComponent({ entity, model }: FacadeProps) {
         model.geometry.computeBoundingBox();
         if (model.geometry.boundingBox) bounds.copy(model.geometry.boundingBox);
 
+        const name = canonicalNodeName(model.name);
+        // F_F is the stationary shortened front of the Gola cabinet. It is
+        // never a moving door, even though the module has a straight-case tag.
+        if (name === "M_SPL_1_F_F") return;
+
         // Correct1 has a real hinged door mesh but no pivot node. Keep the
-        // selected side edge fixed while rotating the mesh around Y.
-        const sideSign = Math.sign(originalX) || 1;
-        // The Correct1 door geometry runs from its hinge at local X=0
-        // towards negative X. Use the edge closest to the node origin.
-        const hingeLocalX = sideSign >= 0 ? bounds.max.x : bounds.min.x;
+        // left side edge fixed while rotating the mesh around Y toward the
+        // viewer instead of translating the whole facade along Z.
+        const hingeLocalX = bounds.min.x;
         const hingeLocalZ = (bounds.min.z + bounds.max.z) / 2;
 
         animationRegistry.facades.set(model.uuid, {
@@ -102,7 +108,7 @@ function FacadeComponent({ entity, model }: FacadeProps) {
             originalX,
             originalZ,
             originalRotX,
-            hingeSign: sideSign,
+            hingeSign: 1,
 
             originalRotY,
             hingeLocalX,
