@@ -6,6 +6,7 @@ import { buildSnapPlanes, checkIntersectionFast, computeSnappedPosition, distanc
 import { useEffect, useMemo, useRef } from "react";
 import { Group, Mesh, Vector3, Box3, MeshBasicMaterial } from "three";
 import { useSnapCursor } from "./hooks/use-snap-cursor";
+import { usePointerMove } from "./hooks/use-pointer-move";
 import { SNAP_RADIUS, THROTTLE } from "./constants";
 
 const _v1 = new Vector3();
@@ -113,6 +114,12 @@ export function SnapCursor({ children, lockY = true, lock, wallGap = 0, ...group
       snapPlanes,
     });
   });
+
+  // Pointer-move driven re-render: useSnapCursorTransform publishes its frame
+  // position through a ref snapshot, so the cursor only follows the pointer
+  // when this component re-renders. Subscribing to pointermove (the value
+  // changes on every move) re-renders exactly when the cursor must move.
+  usePointerMove<number>((e) => e.timeStamp, frameCount.current);
 
   return (
     <>
