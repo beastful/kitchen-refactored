@@ -116,11 +116,13 @@ if [ "$CHANGED" -gt 0 ]; then
       echo "FAILED: $rel" >&2
       return 1
     fi
+    echo "  ↑ $rel"
   }
   export -f upload_one
   export REMOTE_DIR FTP_HOST FTP_USER FTP_PASS
 
   FAILED=0
+  echo "Заливаю $CHANGED файлов в $JOBS потоков..."
   # Не используем код выхода 255: xargs прекращает обработку очереди при 255,
   # а нам важно попытаться отправить каждый найденный файл и собрать все ошибки.
   xargs -0 -P "$JOBS" -I{} bash -c 'upload_one "$1" || exit 1' _ {} < "$CANDIDATES" || FAILED=1
