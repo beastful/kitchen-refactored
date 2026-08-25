@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { store } from "@/store";
 import { EXPLICT_CASE_FOLD, EXPLICT_CASE_STRAIGHT, EXPLICT_CASE_TOP } from "@/constants";
 import { Mesh } from "three";
-import { ModuleEntity } from "@/types";
+import { isGolaCapableModule, ModuleEntity } from "@/types";
 
 export interface FacadeAnimData {
   mesh: Mesh;
@@ -56,7 +56,7 @@ export function AnimationSystem() {
       let targetRotY = originalRotY;
 
       if (entity.tags.includes(EXPLICT_CASE_STRAIGHT)) {
-        if (entity.name === "M_SPL_1_CORRECT1") {
+        if (isGolaCapableModule(entity)) {
           // Correct1 is a hinged door. Its old straight-case rule translated
           // the whole facade by open * 3 instead of rotating it around a side.
           const delta = hingeSign * open;
@@ -78,7 +78,7 @@ export function AnimationSystem() {
       }
 
       mesh.position.z = targetZ;
-      if (!(entity.tags.includes(EXPLICT_CASE_STRAIGHT) && entity.name === "M_SPL_1_CORRECT1") || open === 0) {
+      if (!(entity.tags.includes(EXPLICT_CASE_STRAIGHT) && isGolaCapableModule(entity)) || open === 0) {
         mesh.position.x = data.originalX;
       }
       mesh.rotation.x = targetRotX;

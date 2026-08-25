@@ -13,6 +13,9 @@
 # Или одной командой через npm:
 #   FTP_USER=... FTP_PASS=... npm run deploy
 #
+# Для локального запуска можно создать .env.deploy в корне проекта (файл
+# игнорируется Git), после чего достаточно выполнить: npm run deploy
+#
 # Переменные окружения:
 #   FTP_HOST       хост FTP (по умолчанию h61.netangels.ru)
 #   FTP_USER       логин FTP
@@ -24,6 +27,30 @@
 # Первый аргумент — локальный каталог для заливки (по умолчанию out/).
 
 set -euo pipefail
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+# Локальные секреты не попадают в Git; уже заданные переменные окружения имеют приоритет.
+if [ -f "$SCRIPT_DIR/.env.deploy" ]; then
+  DEPLOY_ENV_VARS=(FTP_HOST FTP_USER FTP_PASS REMOTE_DIR REMOTE_MANIFEST JOBS)
+  declare -A DEPLOY_ENV_WAS_SET DEPLOY_ENV_VALUE
+  for variable in "${DEPLOY_ENV_VARS[@]}"; do
+    if [ "${!variable+x}" = x ]; then
+      DEPLOY_ENV_WAS_SET["$variable"]=1
+      DEPLOY_ENV_VALUE["$variable"]="${!variable}"
+    fi
+  done
+
+  set -a
+  # shellcheck disable=SC1091
+  . "$SCRIPT_DIR/.env.deploy"
+  set +a
+
+  for variable in "${DEPLOY_ENV_VARS[@]}"; do
+    if [ "${DEPLOY_ENV_WAS_SET[$variable]:-0}" = 1 ]; then
+      declare "$variable=${DEPLOY_ENV_VALUE[$variable]}"
+    fi
+  done
+fi
 
 FTP_HOST="${FTP_HOST:-h61.netangels.ru}"
 FTP_USER="${FTP_USER:?FTP_USER не задан}"

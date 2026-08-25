@@ -18,8 +18,8 @@ export function getFloorModuleCenterY(
   return -roomHeight / 2 + ROOM_FLOOR_TOP_OFFSET + moduleHalfHeight;
 }
 
-/** Standard countertop depth in world metres (600 mm). */
-export const TABLETOP_DEPTH = 0.6;
+/** Standard countertop depth needed to bridge the cabinet-to-wall clearance. */
+export const TABLETOP_DEPTH = 0.7;
 
 /** Desired countertop overhang beyond the front of a lower cabinet. */
 export const TABLETOP_FRONT_OVERHANG = 0.03;

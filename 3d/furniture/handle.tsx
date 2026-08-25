@@ -30,7 +30,8 @@ function canonicalNodeName(name: string): string {
 
 function HandleComponent({ entity, model }: HandleProps) {
     const meshRef = useRef<Group>(null);
-    const isGolaProfile = canonicalNodeName(model.name) === "M_SPL_1_PNT_GOLA";
+    const canonicalName = canonicalNodeName(model.name);
+    const isGolaProfile = canonicalName === "M_SPL_1_PNT_GOLA" || canonicalName === "M_SPL_1_F_F001";
     const acc = useRef(0);
     const [portalTarget, setPortalTarget] = useState<Object3D | null>(null);
 

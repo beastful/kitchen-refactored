@@ -1,0 +1,45 @@
+name: Build and deploy constructor
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!README.md'
+      - '!docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: constructor-production
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      FTP_HOST: h61.netangels.ru
+      FTP_USER: ${{ secrets.FTP_USER }}
+      FTP_PASS: ${{ secrets.FTP_PASS }}
+      REMOTE_DIR: /www/constructor3d
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Deploy to NetAngels via FTP
+        run: ./deploy-netangels.sh

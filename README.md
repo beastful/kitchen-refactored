@@ -97,18 +97,57 @@ https://yasnaya-mebel.na4u.ru/constructor/?mode=iframe&product_id=372
 
 ## Деплой на NetAngels
 
-Собрать приложение и загрузить его одной командой:
+### Локальный запуск
+
+Один раз создайте локальный файл с FTP-настройками:
+
+```bash
+cp .env.deploy.example .env.deploy
+```
+
+Заполните `FTP_USER` и `FTP_PASS` в `.env.deploy`. Этот файл уже добавлен в
+`.gitignore` и не должен попадать в Git. После этого сборка и загрузка
+выполняются одной командой:
+
+```bash
+npm run deploy
+```
+
+Команда сначала выполняет `npm run build`, а затем запускает
+`deploy-netangels.sh`. Переменные окружения, переданные непосредственно в
+команде, имеют приоритет над `.env.deploy`:
 
 ```bash
 FTP_USER='логин' FTP_PASS='пароль' npm run deploy
 ```
 
-Эта команда сначала выполняет `npm run build`, а затем запускает
-`deploy-netangels.sh`. При необходимости шаги можно выполнить отдельно:
+### Автоматический деплой после push
+
+В репозитории настроен GitHub Actions workflow:
+
+```text
+git add .
+git commit -m "Описание изменений"
+git push origin main
+```
+
+После `git push` GitHub сам установит зависимости, выполнит `npm run build` и
+загрузит изменённые файлы в `/www/constructor3d`. Для ручного запуска workflow
+используйте вкладку **Actions** и кнопку **Run workflow**.
+
+Перед первым запуском добавьте в GitHub: **Settings → Secrets and variables →
+Actions → New repository secret**:
+
+| Secret | Значение |
+|---|---|
+| `FTP_USER` | FTP-логин NetAngels |
+| `FTP_PASS` | FTP-пароль NetAngels |
+
+Для локального запуска отдельно:
 
 ```bash
 npm run build
-FTP_USER='логин' FTP_PASS='пароль' ./deploy-netangels.sh
+./deploy-netangels.sh
 ```
 
 Переменные окружения:

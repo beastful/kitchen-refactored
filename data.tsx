@@ -619,6 +619,8 @@ const floor_data: ModuleDef[] = [
 const wall_data: ModuleDef[] = [
     {
         model: ModuleExample,
+        modelPath: 'modules/M_UMB/M_UMB_1_Correct.glb',
+        size: [0.2, 0.72, 0.32],
         type: 'wall',
         price: 1810,
         name: 'M_UMB_1',

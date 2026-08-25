@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { Color } from "three";
 import { hinges } from "@/data";
 import { COLORS } from "@/constants";
-import { ModuleEntity } from "@/types";
+import { isGolaCapableModule, ModuleEntity } from "@/types";
 
 export function ModuleConfig() {
     const snap = useSnapshot(store);
@@ -15,8 +15,9 @@ export function ModuleConfig() {
     // Find the configurable module from the store
     const currentModule = snap.modules.find((m) => m.id === snap.configurableEntity);
 
-    // Gola is currently available only for the dedicated GLB test module.
-    const isGolaModule = currentModule?.name === "M_SPL_1_CORRECT1";
+    // Gola is available only when the loaded model contains its dedicated
+    // carcass and facade variants.
+    const isGolaModule = isGolaCapableModule(currentModule);
 
     // Helper to update module fields directly in the store
     const updateModuleField = <K extends Exclude<keyof ModuleEntity, 'snapPlanes'>>(

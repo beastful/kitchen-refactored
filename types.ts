@@ -138,6 +138,43 @@ export interface ModuleEntity {
 
 export type ModulePlacementSource = ModuleDef | ModuleEntity;
 
+/**
+ * The corrected M_SPL_1 asset is the only catalog model that contains the
+ * alternate carcass, Gola front, and built-in profile mesh. API modules can
+ * expose their GLB in either `modelPath` or the string-valued `model` field,
+ * so capability detection must inspect both fields as well as the legacy name.
+ */
+type GolaCapabilitySource = Pick<ModulePlacementSource, 'name' | 'modelPath'> & {
+  /** A snapshot may have a structurally different React component type. */
+  model?: unknown;
+  displayName?: string;
+};
+
+export function isGolaCapableModule(
+  source: GolaCapabilitySource | null | undefined,
+): boolean {
+  if (!source) return false;
+
+  const modelPaths = [
+    source.modelPath,
+    typeof source.model === 'string' ? source.model : undefined,
+  ]
+    .filter((path): path is string => Boolean(path))
+    .map((path) => path.toLowerCase().split(/[?#]/, 1)[0]);
+  const hasCorrectModel = modelPaths.some((path) => (
+    path.endsWith('m_spl_1_correct.glb') ||
+    path.endsWith('m_spl_1_correct1.glb') ||
+    path.endsWith('/m_spl_1_correct.glb') ||
+    path.endsWith('/m_spl_1_correct1.glb')
+  ));
+
+  return (
+    source.name.toUpperCase() === 'M_SPL_1_CORRECT1' ||
+    hasCorrectModel ||
+    source.displayName?.toLowerCase().includes('correct1') === true
+  );
+}
+
 function isModuleEntity(source: ModulePlacementSource): source is ModuleEntity {
   return (
     'id' in source &&
